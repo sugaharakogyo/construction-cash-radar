@@ -685,6 +685,11 @@ if calc:
 <div class="cta-box">
     <div style="font-size:30px; font-weight:900; line-height:1.5;">
         続きを見るには Pro版へ
+st.link_button(
+"Pro版を申し込む（LINE）",
+"https://lin.ee/xxxx"
+)
+        
     </div>
     <div class="card-body" style="margin-top:10px;">
         現場利益、12ヶ月予測、銀行提出サマリーまで使えます。<br>
@@ -699,3 +704,4 @@ st.markdown("""
 ※ ホーム画面に追加すればアプリのように使えます。
 </div>
 """, unsafe_allow_html=True)
+
