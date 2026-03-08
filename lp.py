@@ -712,6 +712,8 @@ st.link_button(
 "https://lin.ee/7m28VAs"
 )
 
+st.markdown("## 無料で資金ショート診断")
+
 st.link_button(
 "無料診断を試す",
 "https://construction-cash-check.streamlit.app"
