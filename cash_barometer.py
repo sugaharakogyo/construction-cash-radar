@@ -4,19 +4,57 @@ import altair as alt
 import json
 from pathlib import Path
 import datetime
-st.markdown("""
+t.markdown("""
 <style>
 .result-danger{
-background:#ffe5e5;
-color:#000;
+    background:#ffe5e5 !important;
+    color:#111 !important;
+    border-left:12px solid #ff4d4f !important;
+    border-radius:18px !important;
+    padding:20px !important;
+    margin-top:18px !important;
 }
+.result-danger .kpi-big,
+.result-danger .kpi-mid,
+.result-danger .card-body,
+.result-danger div,
+.result-danger span,
+.result-danger b{
+    color:#111 !important;
+}
+
 .result-warn{
-background:#fff3cd;
-color:#000;
+    background:#fff3cd !important;
+    color:#111 !important;
+    border-left:12px solid #f4b400 !important;
+    border-radius:18px !important;
+    padding:20px !important;
+    margin-top:18px !important;
 }
+.result-warn .kpi-big,
+.result-warn .kpi-mid,
+.result-warn .card-body,
+.result-warn div,
+.result-warn span,
+.result-warn b{
+    color:#111 !important;
+}
+
 .result-safe{
-background:#e6f7e6;
-color:#000;
+    background:#e6f7e6 !important;
+    color:#111 !important;
+    border-left:12px solid #2e7d32 !important;
+    border-radius:18px !important;
+    padding:20px !important;
+    margin-top:18px !important;
+}
+.result-safe .kpi-big,
+.result-safe .kpi-mid,
+.result-safe .card-body,
+.result-safe div,
+.result-safe span,
+.result-safe b{
+    color:#111 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -707,3 +745,4 @@ if not is_pro:
 "https://lin.ee/7m28VAs",
 use_container_width=True
 )
+
