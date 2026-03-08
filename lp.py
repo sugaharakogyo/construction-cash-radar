@@ -687,7 +687,7 @@ if calc:
         続きを見るには Pro版へ
 st.link_button(
 "Pro版を申し込む（LINE）",
-"https://lin.ee/xxxx"
+"https://lin.ee/7m28VAs"
 )
         
     </div>
@@ -704,4 +704,5 @@ st.markdown("""
 ※ ホーム画面に追加すればアプリのように使えます。
 </div>
 """, unsafe_allow_html=True)
+
 
