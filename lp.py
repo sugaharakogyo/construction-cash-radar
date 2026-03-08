@@ -392,9 +392,10 @@ with right:
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown(
-    '<a href="#diagnosis" class="cta-link">無料で試してみる</a>',
-    unsafe_allow_html=True
+st.link_button(
+    "無料で試してみる",
+    "https://construction-cash-check.streamlit.app",
+    use_container_width=True
 )
 
 # ===============================
