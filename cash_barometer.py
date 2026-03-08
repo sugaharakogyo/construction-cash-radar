@@ -4,7 +4,7 @@ import altair as alt
 import json
 from pathlib import Path
 import datetime
-t.markdown("""
+st.markdown("""
 <style>
 .result-danger{
     background:#ffe5e5 !important;
@@ -745,4 +745,5 @@ if not is_pro:
 "https://lin.ee/7m28VAs",
 use_container_width=True
 )
+
 
