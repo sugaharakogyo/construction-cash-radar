@@ -712,6 +712,12 @@ st.link_button(
 "https://lin.ee/7m28VAs"
 )
 
+st.link_button(
+"無料診断を試す",
+"https://construction-cash-check.streamlit.app"
+)
+
+
 st.markdown("""
 <div class="small-note">
 ※ スマホでも見やすく設計しています。<br>
