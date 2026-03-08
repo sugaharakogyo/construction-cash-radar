@@ -4,6 +4,22 @@ import altair as alt
 import json
 from pathlib import Path
 import datetime
+st.markdown("""
+<style>
+.result-danger{
+background:#ffe5e5;
+color:#000;
+}
+.result-warn{
+background:#fff3cd;
+color:#000;
+}
+.result-safe{
+background:#e6f7e6;
+color:#000;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ===============================
 # 設定・保存
