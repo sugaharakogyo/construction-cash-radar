@@ -94,6 +94,23 @@ h1, h2, h3, p, div, span, label {
     font-weight:900;
     margin-bottom:10px;
 }
+div.stLinkButton > a {
+    background: #111827 !important;
+    color: white !important;
+    border: 2px solid #111827 !important;
+    border-radius: 14px !important;
+    font-weight: 800 !important;
+    font-size: 18px !important;
+    padding: 14px 18px !important;
+    text-align: center !important;
+    display: block !important;
+}
+
+div.stLinkButton > a:hover {
+    background: #000000 !important;
+    color: white !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
