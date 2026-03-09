@@ -414,18 +414,9 @@ text-align:center;
 font-size:18px;
 font-weight:700;
 ">
-現在 <span style="font-size:24px;">127社</span> が診断しています
+現在 <span style="font-size:24px;">多くの建設会社</span> が診断しています
 </div>
 """, unsafe_allow_html=True)
-
-st.link_button("無料で診断する", APP_URL)
-
-st.markdown("""
-<div class="cta-sub">
-    あなたの会社のキャッシュ状況を、今すぐ見える化してください。
-</div>
-""", unsafe_allow_html=True)
-
 # 警告
 st.markdown("""
 <div class="warning-box">
