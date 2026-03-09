@@ -11,10 +11,12 @@ LINE_URL = "https://lin.ee/7m28VAs"
 
 st.markdown("""
 <style>
+
+/* 全体 */
 .block-container{
-    max-width: 980px;
-    padding-top: 1rem;
-    padding-bottom: 3rem;
+    max-width:900px;
+    padding-top:1rem;
+    padding-bottom:3rem;
 }
 
 html, body, [class*="css"] {
@@ -22,142 +24,152 @@ html, body, [class*="css"] {
 }
 
 .stApp{
-    background:
-        radial-gradient(circle at top left, rgba(255,215,0,0.15), transparent 25%),
-        radial-gradient(circle at top right, rgba(0,191,255,0.18), transparent 25%),
-        linear-gradient(180deg, #0b1020 0%, #10182f 35%, #f6f7fb 35%, #f6f7fb 100%);
+    background:#f6f7fb;
 }
 
 /* ヒーロー */
 .hero{
-    background:
-        linear-gradient(135deg, rgba(255,196,0,0.18) 0%, rgba(255,196,0,0.02) 20%),
-        linear-gradient(135deg, #081223 0%, #0f1d3a 45%, #0ea5e9 100%);
-    border: 2px solid rgba(255,255,255,0.08);
-    border-radius: 28px;
-    padding: 34px 24px 30px 24px;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.30);
-    margin-bottom: 18px;
-    position: relative;
-    overflow: hidden;
-}
-
-.hero:before{
-    content:"";
-    position:absolute;
-    top:-80px;
-    right:-80px;
-    width:220px;
-    height:220px;
-    background: radial-gradient(circle, rgba(255,215,0,0.35), transparent 70%);
-    border-radius:50%;
+    background:linear-gradient(135deg,#0f172a,#0369a1);
+    border-radius:26px;
+    padding:32px 24px;
+    color:white;
+    margin-bottom:28px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.18);
 }
 
 .hero-badge{
-    display:inline-block;
-    background: linear-gradient(90deg, #facc15, #fde047);
+    background:#facc15;
     color:#111 !important;
-    font-size:14px;
-    font-weight:900;
+    font-weight:800;
+    display:inline-block;
+    padding:7px 14px;
     border-radius:999px;
-    padding:8px 14px;
     margin-bottom:14px;
-    box-shadow:0 6px 16px rgba(250,204,21,0.35);
+    font-size:14px;
 }
 
 .hero-title{
-    font-size:54px;
-    line-height:1.12;
+    font-size:42px;
     font-weight:900;
+    line-height:1.2;
+    margin-bottom:16px;
     color:white !important;
-    margin:0 0 14px 0;
-    letter-spacing: -1px;
-}
-
-.hero-title .red{
-    color:#ff5b5b !important;
-    text-shadow:0 0 20px rgba(255,91,91,0.25);
 }
 
 .hero-title .yellow{
-    color:#ffd84d !important;
-    text-shadow:0 0 20px rgba(255,216,77,0.25);
+    color:#facc15 !important;
+}
+
+.hero-title .red{
+    color:#ef4444 !important;
 }
 
 .hero-text{
-    font-size:19px;
+    font-size:18px;
     line-height:1.9;
-    color:#f5f7ff !important;
-    margin:0;
+    opacity:0.97;
+    margin-bottom:16px;
+    color:white !important;
 }
 
 .hero-mini{
-    margin-top:16px;
-    font-size:15px;
-    color:#dbeafe !important;
-    line-height:1.8;
+    font-size:16px;
+    opacity:0.9;
+    color:white !important;
 }
 
-/* CTA */
-.cta-wrap{
-    margin-top:18px;
-    margin-bottom:8px;
+/* カウンター */
+.counter-box{
+    background:#e9f7ee;
+    border:3px solid #16a34a;
+    border-radius:18px;
+    padding:16px;
+    margin-top:6px;
+    margin-bottom:20px;
+    text-align:center;
+    font-size:18px;
+    font-weight:800;
+    color:#111 !important;
 }
 
-div.stLinkButton > a{
-    display:block !important;
-    text-align:center !important;
-    background: linear-gradient(90deg, #ff4b4b 0%, #ff2d55 100%) !important;
-    color:#ffffff !important;
-    border:0 !important;
-    border-radius:18px !important;
-    padding:18px 18px !important;
-    font-size:24px !important;
-    font-weight:900 !important;
-    text-decoration:none !important;
-    box-shadow:0 12px 26px rgba(255,59,92,0.35) !important;
-    letter-spacing:0.5px !important;
-}
-
-div.stLinkButton > a:hover{
-    background: linear-gradient(90deg, #ef4444 0%, #e11d48 100%) !important;
-    color:#ffffff !important;
-}
-
+/* CTAサブ */
 .cta-sub{
     text-align:center;
     font-size:17px;
     color:#374151 !important;
     line-height:1.8;
-    margin-top:12px;
-    margin-bottom:10px;
+    margin-top:14px;
+    margin-bottom:8px;
     font-weight:700;
 }
 
-/* カード */
+/* ボタン */
+div.stLinkButton > a{
+    background:#16a34a !important;
+    color:white !important;
+    border:none !important;
+    border-radius:16px !important;
+    font-weight:900 !important;
+    font-size:22px !important;
+    padding:18px 14px !important;
+    text-align:center !important;
+    display:block !important;
+    text-decoration:none !important;
+    box-shadow:0 10px 20px rgba(22,163,74,0.20) !important;
+}
+
+div.stLinkButton > a:hover{
+    background:#15803d !important;
+    color:white !important;
+}
+
+/* セクション共通 */
 .section-card{
     background:#ffffff;
-    border-radius:24px;
+    border-radius:22px;
     padding:24px 20px;
     margin-top:18px;
-    border:1px solid #e5e7eb;
-    box-shadow:0 8px 22px rgba(15,23,42,0.06);
+    box-shadow:0 6px 18px rgba(0,0,0,0.05);
+    border:1px solid #ececec;
 }
 
 .section-title{
-    font-size:32px;
-    line-height:1.35;
+    font-size:30px;
     font-weight:900;
-    color:#111827 !important;
+    color:#111 !important;
     margin-bottom:14px;
+    line-height:1.4;
 }
 
 .section-text{
     font-size:18px;
     line-height:1.9;
-    color:#1f2937 !important;
+    color:#222 !important;
 }
 
+/* 警告 */
+.warning-box{
+    background:#fff1f2;
+    border:3px solid #ef4444;
+    border-radius:20px;
+    padding:22px;
+    margin-top:30px;
+}
+
+.warning-title{
+    font-size:24px;
+    font-weight:900;
+    color:#b91c1c !important;
+    margin-bottom:10px;
+}
+
+.warning-text{
+    font-size:18px;
+    line-height:1.9;
+    color:#4c0519 !important;
+}
+
+/* 悩みリスト */
 .problem-list{
     margin:0;
     padding-left:22px;
@@ -170,26 +182,18 @@ div.stLinkButton > a:hover{
     margin-bottom:8px;
 }
 
-.em{
-    color:#dc2626 !important;
-    font-weight:900;
-}
-
-.highlight{
-    color:#1d4ed8 !important;
-    font-weight:900;
-}
-
+/* 特徴 */
 .feature-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:14px;
+    margin-top:8px;
 }
 
 .feature-box{
-    background:linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    background:#f8fafc;
     border:2px solid #e5e7eb;
-    border-radius:20px;
+    border-radius:18px;
     padding:16px;
 }
 
@@ -197,15 +201,15 @@ div.stLinkButton > a:hover{
     display:inline-block;
     background:#111827;
     color:white !important;
-    font-size:13px;
+    font-size:12px;
     font-weight:900;
     border-radius:999px;
-    padding:5px 10px;
+    padding:4px 9px;
     margin-bottom:10px;
 }
 
 .feature-title{
-    font-size:21px;
+    font-size:20px;
     font-weight:900;
     color:#111827 !important;
     margin-bottom:6px;
@@ -217,84 +221,53 @@ div.stLinkButton > a:hover{
     color:#334155 !important;
 }
 
-/* 強い訴求 */
-.warning-box{
-    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-    border:3px solid #fb7185;
-    border-radius:24px;
-    padding:22px 20px;
-    margin-top:18px;
-    box-shadow:0 10px 22px rgba(251,113,133,0.15);
-}
-
-.warning-title{
-    font-size:30px;
-    font-weight:900;
-    color:#9f1239 !important;
-    line-height:1.4;
-    margin-bottom:10px;
-}
-
-.warning-text{
-    font-size:18px;
-    line-height:1.9;
-    color:#4c0519 !important;
-}
-
 /* 価格 */
 .price-box{
-    background:
-      linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.02)),
-      #f0fdf4;
+    background:#e9f7ee;
     border:4px solid #16a34a;
     border-radius:26px;
     padding:26px 20px;
-    margin-top:18px;
+    margin-top:26px;
     text-align:center;
     box-shadow:0 14px 30px rgba(34,197,94,0.14);
+    color:#111 !important;
+}
+
+.price-box *{
+    color:#111 !important;
 }
 
 .price-box h3{
-    font-size:42px;
+    font-size:40px;
     font-weight:900;
-    color:#111827 !important;
     margin:0 0 10px 0;
 }
 
 .price-main{
-    font-size:58px;
+    font-size:52px;
     font-weight:900;
-    color:#111827 !important;
+    margin:10px 0;
     line-height:1.2;
-    margin-top:12px;
-    margin-bottom:8px;
 }
 
 .price-text{
-    font-size:19px;
+    font-size:18px;
     line-height:1.9;
-    color:#111827 !important;
-}
-.price-box{
-color:#111 !important;
-}
-
-.price-box *{
-color:#111 !important;
 }
 
 /* 導線 */
 .flow{
     display:grid;
-    grid-template-columns:repeat(4, 1fr);
+    grid-template-columns:repeat(4,1fr);
     gap:12px;
+    margin-top:10px;
 }
 
 .flow-box{
     background:#ffffff;
     border:2px solid #dbeafe;
     border-radius:18px;
-    padding:16px 12px;
+    padding:14px 12px;
     text-align:center;
 }
 
@@ -324,37 +297,35 @@ color:#111 !important;
 
 /* フッター */
 .small-note{
-    color:#6b7280 !important;
+    color:#666 !important;
     font-size:14px;
-    line-height:1.9;
-    margin-top:22px;
+    line-height:1.8;
+    margin-top:20px;
     text-align:center;
 }
 
 /* スマホ */
-@media (max-width: 768px){
+@media(max-width:700px){
+
     .block-container{
-        padding-top: 0.6rem;
-        padding-bottom: 2rem;
+        padding-top:0.6rem;
+        padding-bottom:2rem;
     }
 
     .hero{
-        padding:24px 16px 22px 16px;
-        border-radius:22px;
+        padding:26px 18px;
     }
 
     .hero-title{
-        font-size:36px;
-        line-height:1.15;
+        font-size:32px;
     }
 
     .hero-text{
-        font-size:17px;
-        line-height:1.85;
+        font-size:16px;
     }
 
     .hero-mini{
-        font-size:14px;
+        font-size:15px;
     }
 
     .section-title{
@@ -370,23 +341,20 @@ color:#111 !important;
         grid-template-columns:1fr;
     }
 
+    .price-main{
+        font-size:40px;
+    }
+
     .flow{
         grid-template-columns:1fr;
     }
 
-    .price-box h3{
-        font-size:32px;
-    }
-
-    .price-main{
-        font-size:46px;
-    }
-
     div.stLinkButton > a{
-        font-size:21px !important;
-        padding:16px 14px !important;
+        font-size:20px !important;
+        padding:16px 12px !important;
     }
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -410,27 +378,30 @@ st.markdown("""
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+# カウンター
 st.markdown("""
-<div style="
-background:#f3fff5;
-border:3px solid #2e7d32;
-border-radius:16px;
-padding:12px;
-margin-bottom:20px;
-text-align:center;
-font-size:18px;
-font-weight:700;
-">
-現在 <span style="font-size:24px;">多くの建設会社</span> が診断しています
+<div class="counter-box">
+現在 多くの建設会社が診断しています
 </div>
 """, unsafe_allow_html=True)
+
+# CTA
+st.link_button("無料で診断する", APP_URL)
+
+st.markdown("""
+<div class="cta-sub">
+    あなたの会社のキャッシュ状況を、今すぐ見える化してください。
+</div>
+""", unsafe_allow_html=True)
+
 # 警告
 st.markdown("""
 <div class="warning-box">
     <div class="warning-title">売上があっても、現金が尽きたら終わりです。</div>
     <div class="warning-text">
         利益が出ていても、入金サイト・原価率・固定費のズレで<br>
-        <span class="em">突然お金が回らなくなる</span> ことがあります。<br>
+        <b>突然お金が回らなくなる</b>ことがあります。<br>
         建設キャッシュレーダーは、その危険を先に見つけるためのツールです。
     </div>
 </div>
@@ -441,10 +412,10 @@ st.markdown("""
 <div class="section-card">
     <div class="section-title">こんなお悩みありませんか？</div>
     <ul class="problem-list">
-        <li>売上はあるのに、なぜかお金が残らない</li>
-        <li>原価率の高い現場に、後から気づく</li>
+        <li>売上はあるのに、お金が残らない</li>
+        <li>原価率が高い現場に後から気づく</li>
         <li>このままで本当に大丈夫か不安</li>
-        <li>銀行や税理士に、数字をうまく説明できない</li>
+        <li>銀行や税理士に数字をうまく説明できない</li>
     </ul>
 </div>
 """, unsafe_allow_html=True)
@@ -478,7 +449,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 導線説明
+# 導線
 st.markdown("""
 <div class="section-card">
     <div class="section-title">使い方はかんたんです</div>
@@ -530,6 +501,6 @@ st.link_button("LINEで問い合わせる", LINE_URL)
 st.markdown("""
 <div class="small-note">
 ※ スマホでも見やすく設計しています。<br>
-※ トラック広告・チラシ・プロフィールQRからそのまま開けます。
+※ インスタ・QR・チラシからそのまま開けます。
 </div>
 """, unsafe_allow_html=True)
