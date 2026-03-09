@@ -7,13 +7,13 @@ import streamlit as st
 st.set_page_config(
     page_title="建設キャッシュレーダー",
     page_icon="🏗️",
-    layout="wide",
+    layout="centered",
 )
 
 LINE_URL = "https://lin.ee/7m28VAs"
 DEMO_LIMIT = 6
 SALES_BUFFER = 1.3
-PRO_ACCESS_CODE = "sugahara9800"   # ← あとで自由に変えてOK
+PRO_ACCESS_CODE = "sugahara9800"   # あとで自由に変更OK
 
 # =====================================
 # 見た目
@@ -21,14 +21,15 @@ PRO_ACCESS_CODE = "sugahara9800"   # ← あとで自由に変えてOK
 st.markdown("""
 <style>
 .block-container{
-    padding-top: 1.5rem;
+    padding-top: 1.2rem;
     padding-bottom: 3rem;
+    max-width: 900px;
 }
 h1, h2, h3, p, div, span, label {
     color: #111 !important;
 }
 .stApp {
-    background: #ffffff;
+    background: #f7f7f7;
 }
 .result-card{
     border-radius: 18px;
@@ -67,6 +68,7 @@ h1, h2, h3, p, div, span, label {
     padding:16px;
     border:1px solid #ececec;
     margin-top:10px;
+    text-align:center;
 }
 .small-note{
     color:#666 !important;
@@ -78,6 +80,19 @@ h1, h2, h3, p, div, span, label {
     font-size:14px;
     color:#666 !important;
     margin-bottom:8px;
+}
+.input-box{
+    background:#ffffff;
+    border:2px solid #ececec;
+    border-radius:18px;
+    padding:18px;
+    margin-top:16px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.04);
+}
+.section-title{
+    font-size:20px;
+    font-weight:900;
+    margin-bottom:10px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -112,48 +127,64 @@ if "is_pro" not in st.session_state:
     st.session_state.is_pro = False
 
 # =====================================
-# サイドバー
+# ヘッダー
 # =====================================
-with st.sidebar:
-    st.header("📌 入力（ざっくりでOK）")
+st.markdown('<div class="logo-mini">建設業向け診断ツール</div>', unsafe_allow_html=True)
+st.title("建設キャッシュレーダー")
+st.write("売上と現場コストを入れるだけ。『いつ資金ショートするか』『安全にするには月いくら必要か』が一発で見える。")
 
-    st.markdown("## 🔒 プラン")
-    pro_code_input = st.text_input("Proコード", type="password")
+# =====================================
+# Proコード
+# =====================================
+st.markdown('<div class="input-box">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">🔒 プラン</div>', unsafe_allow_html=True)
 
-    if pro_code_input == PRO_ACCESS_CODE:
-        st.session_state.is_pro = True
-        st.success("Pro版が有効です")
-    elif pro_code_input:
-        st.session_state.is_pro = False
-        st.error("Proコードが違います")
+pro_code_input = st.text_input("Proコード", type="password", placeholder="Pro版の方だけ入力")
 
-    is_pro = st.session_state.is_pro
+if pro_code_input == PRO_ACCESS_CODE:
+    st.session_state.is_pro = True
+    st.success("Pro版が有効です")
+elif pro_code_input:
+    st.session_state.is_pro = False
+    st.error("Proコードが違います")
 
-    if is_pro:
-        st.caption("✅ Pro版：機能無制限")
-    else:
-        st.caption(f"※ デモは計算ボタン {DEMO_LIMIT} 回まで")
+is_pro = st.session_state.is_pro
 
-    st.markdown("## 📊 月次入力")
-    sales = st.number_input("売上（月）", min_value=0, value=8300000, step=100000)
-    cost = st.number_input("原価（月） ※材料+外注など", min_value=0, value=3700000, step=100000)
-    fixed_total = st.number_input("固定費（全部） ※人件費/家賃/返済/リース/その他", min_value=0, value=5300000, step=100000)
-    cash_on_hand = st.number_input("現在の現金残高", min_value=0, value=300000, step=100000)
+if is_pro:
+    st.caption("✅ Pro版：機能無制限")
+else:
+    st.caption(f"※ デモは計算ボタン {DEMO_LIMIT} 回まで")
+st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("## ⚙️ 設定（ざっくり）")
-    tax_rate = st.slider("税率（概算）", min_value=0.0, max_value=0.6, value=0.30, step=0.01)
-    safety_months = st.slider("安全ライン（月）", min_value=1, max_value=12, value=6, step=1)
+# =====================================
+# 入力欄
+# =====================================
+st.markdown('<div class="input-box">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">📊 月次入力</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("## 📋 現場利益（Pro機能）")
-    site_sales = st.number_input("現場売上", min_value=0, value=1000000, step=10000)
-    site_cost = st.number_input("現場原価", min_value=0, value=650000, step=10000)
+sales = st.number_input("売上（月）", min_value=0, value=8300000, step=100000)
+cost = st.number_input("原価（月） ※材料+外注など", min_value=0, value=3700000, step=100000)
+fixed_total = st.number_input("固定費（全部） ※人件費/家賃/返済/リース/その他", min_value=0, value=5300000, step=100000)
+cash_on_hand = st.number_input("現在の現金残高", min_value=0, value=300000, step=100000)
 
-    st.markdown("---")
-    st.markdown("## 🧮 利益シミュレーター（Pro機能）")
-    sim_sales_up = st.number_input("売上をいくら増やす？", min_value=0, value=1000000, step=100000)
-    sim_cost_down_pct = st.slider("原価を何%下げる？", min_value=0.0, max_value=20.0, value=5.0, step=0.5)
+st.markdown('<div class="section-title" style="margin-top:14px;">⚙️ 設定（ざっくり）</div>', unsafe_allow_html=True)
+tax_rate = st.slider("税率（概算）", min_value=0.0, max_value=0.6, value=0.30, step=0.01)
+safety_months = st.slider("安全ライン（月）", min_value=1, max_value=12, value=6, step=1)
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# =====================================
+# Pro機能入力
+# =====================================
+st.markdown('<div class="input-box">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">📋 現場利益（Pro機能）</div>', unsafe_allow_html=True)
+site_sales = st.number_input("現場売上", min_value=0, value=1000000, step=10000)
+site_cost = st.number_input("現場原価", min_value=0, value=650000, step=10000)
+
+st.markdown('<div class="section-title" style="margin-top:14px;">🧮 利益シミュレーター（Pro機能）</div>', unsafe_allow_html=True)
+sim_sales_up = st.number_input("売上をいくら増やす？", min_value=0, value=1000000, step=100000)
+sim_cost_down_pct = st.slider("原価を何%下げる？", min_value=0.0, max_value=20.0, value=5.0, step=0.5)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # =====================================
 # 計算
@@ -194,26 +225,14 @@ sim_diff = sim_new_after_tax - after_tax_profit
 demo_locked = (st.session_state.calc_count >= DEMO_LIMIT) and (not is_pro)
 
 # =====================================
-# ヘッダー
-# =====================================
-col_head1, col_head2 = st.columns([1, 8])
-with col_head1:
-    st.markdown('<div class="logo-mini">建設業向け診断</div>', unsafe_allow_html=True)
-with col_head2:
-    st.title("建設キャッシュレーダー")
-    st.write("売上と現場コストを入れるだけ。『いつ資金ショートするか』『安全にするには月いくら必要か』が一発で見える。")
-
-# =====================================
 # 計算ボタン
 # =====================================
-col_btn1, col_btn2 = st.columns([1, 3])
-with col_btn1:
-    calc = st.button("計算する", type="primary", disabled=demo_locked)
-with col_btn2:
-    if is_pro:
-        st.caption("✅ Pro版：機能無制限")
-    else:
-        st.caption(f"※ デモは計算ボタンが {DEMO_LIMIT} 回まで")
+calc = st.button("計算する", type="primary", disabled=demo_locked, use_container_width=False)
+
+if is_pro:
+    st.caption("✅ Pro版：機能無制限")
+else:
+    st.caption(f"※ デモは計算ボタンが {DEMO_LIMIT} 回まで")
 
 if calc and (not demo_locked):
     if not is_pro:
@@ -227,9 +246,7 @@ if demo_locked:
 # 結果表示
 # =====================================
 if calc or st.session_state.get("last_calc", False):
-    if demo_locked:
-        pass
-    else:
+    if not demo_locked:
         months_left = 0
         if runway_months is not None:
             months_left = max(0, int(runway_months))
@@ -364,14 +381,13 @@ if calc or st.session_state.get("last_calc", False):
             </div>
             """, unsafe_allow_html=True)
 
-            c1, c2, c3 = st.columns(3)
+            c1, c2 = st.columns(2)
             with c1:
                 st.markdown(f'<div class="metric-box"><b>月商</b><br>{yen(sales)}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="metric-box"><b>原価</b><br>{yen(cost)}</div>', unsafe_allow_html=True)
-            with c2:
                 st.markdown(f'<div class="metric-box"><b>固定費</b><br>{yen(fixed_total)}</div>', unsafe_allow_html=True)
+            with c2:
                 st.markdown(f'<div class="metric-box"><b>税後利益</b><br>{yen(delta_after)}</div>', unsafe_allow_html=True)
-            with c3:
                 st.markdown(f'<div class="metric-box"><b>現在現金</b><br>{yen(cash_on_hand)}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="metric-box"><b>安全ライン</b><br>{yen(safe_cash)}</div>', unsafe_allow_html=True)
 
@@ -394,7 +410,6 @@ if calc or st.session_state.get("last_calc", False):
                 st.markdown(f'<div class="metric-box"><b>利益率</b><br>{site_rate:.1f}%</div>', unsafe_allow_html=True)
 
             # ⑧ 改善アドバイス
-            advice = ""
             if delta_after < 0:
                 advice = "資金が減少しています。売上アップか固定費削減を最優先で見直してください。"
             elif site_rate < 15:
@@ -419,16 +434,15 @@ if calc or st.session_state.get("last_calc", False):
             </div>
             """, unsafe_allow_html=True)
 
-            sim1, sim2, sim3 = st.columns(3)
+            sim1, sim2 = st.columns(2)
             with sim1:
                 st.markdown(f'<div class="metric-box"><b>改善後の税後利益</b><br>{yen(sim_new_after_tax)}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="metric-box"><b>改善後の売上</b><br>{yen(sim_new_sales)}</div>', unsafe_allow_html=True)
             with sim2:
                 st.markdown(f'<div class="metric-box"><b>今との差額</b><br>{yen(sim_diff)}</div>', unsafe_allow_html=True)
-            with sim3:
-                st.markdown(f'<div class="metric-box"><b>改善後の売上</b><br>{yen(sim_new_sales)}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="metric-box"><b>改善後の原価</b><br>{yen(sim_new_cost)}</div>', unsafe_allow_html=True)
 
         else:
-            # 無料版ではPro案内だけ
             st.markdown("""
             <div class="pro-box">
                 <div style="font-size:34px; font-weight:900; line-height:1.4;">
