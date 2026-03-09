@@ -333,417 +333,241 @@ if calc and (not is_pro):
 if demo_locked:
     st.error("⛔ デモは6回までです。続きはProでご利用ください。")
 
-# ===============================
-# 🚨 超重要：資金ショート巨大表示
-# ===============================
-if runway_months is None:
-    st.markdown("## 🟢 資金ショート：なし（黒字）")
-else:
-    months_left = max(0, int(runway_months))
-    sd = datetime.date.today() + datetime.timedelta(days=months_left * 30)
-    st.markdown(
-        f"""
-<div style="background:#fff0f0;border-left:12px solid #ff3b30;padding:18px;border-radius:14px;margin:10px 0;">
-  <div style="font-size:18px;font-weight:800;">⚠ このままだと</div>
-  <div style="font-size:44px;font-weight:900;line-height:1.05;margin:6px 0;">
-    {sd.year}年{sd.month}月<br>資金ショート
-  </div>
-  <div style="font-size:16px;margin-top:6px;">（目安：あと <b>{months_left}ヶ月</b>）</div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
 
-# ===============================
-# ✔ 安全にするには（売上）
-# ===============================
-if need_sales_safe is not None and need_sales_safe > 0:
-    st.markdown(
-        f"""
-<div style="background:#fff8e6;border-left:10px solid #f59e0b;padding:16px;border-radius:12px;margin-bottom:20px;">
-  <div style="font-size:18px;font-weight:700;">✔ 安全にするには</div>
-  <div style="font-size:34px;font-weight:900;margin-top:6px;">売上 +{yen(need_sales_safe)} / 月</div>
-  <div style="font-size:14px;margin-top:6px;color:#666;">※ 原価率が今と同じ前提（余裕係数×{SALES_BUFFER}込み）</div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
+if calc:
+    # ===============================
+    # 共通計算
+    # ===============================
+    months_left = 0
+    if runway_months is not None:
+        months_left = max(0, int(runway_months))
 
-# ===============================
-# ⚡ 今すぐ分かる結論（売れる版）
-# ===============================
-st.markdown("## ⚡ 今すぐ分かる結論（売れる版）")
-
-if runway_months is None:
-    st.success("🟢 いまは安全。税後でも黒字で、資金ショートの心配は小さい。")
-else:
-    if runway_months >= 6:
-        st.success(f"🟢 いまは安全寄り。資金余命は約 {runway_months:.1f} ヶ月。")
-    elif runway_months >= 3:
-        st.warning(f"🟡 注意。資金余命は約 {runway_months:.1f} ヶ月。早めに手を打とう。")
+    # ===============================
+    # ① 資金ショート結果カード
+    # ===============================
+    if runway_months is None:
+        st.markdown(f"""
+        <div style="
+            background:#e6f7e6;
+            border-left:12px solid #2e7d32;
+            border-radius:18px;
+            padding:22px;
+            margin-top:18px;
+            color:#111;
+            box-shadow:0 4px 14px rgba(0,0,0,0.06);
+        ">
+            <div style="font-size:40px; font-weight:900; line-height:1.3; color:#111;">
+                🟢 いまは安全です
+            </div>
+            <div style="font-size:18px; line-height:1.8; margin-top:10px; color:#111;">
+                税後でも黒字で、資金ショートの心配は小さい状態です。<br>
+                安全ライン（6ヶ月分の固定費）: <b>{yen(safe_cash)}</b>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     else:
-        st.error(f"🔴 危険。資金余命は約 {runway_months:.1f} ヶ月。今月中に改善が必要。")
-
-if need_sales_safe is not None and need_sales_safe > 0:
-    st.markdown("### ✅ 今日やる打ち手（最短で効く順）")
-    st.write(f"・まず **売上 +{yen(need_sales_safe)} / 月** を目標に置く（余裕係数×{SALES_BUFFER}込み）")
-    st.write("・入金を早くする（請求締め/前金/出来高）")
-    st.write("・支払いを遅くする（外注/材料のサイト交渉）")
-    st.write("・固定費の一時停止（サブスク/リース/交際費など）")
-
-st.divider()
-
-# ===============================
-# 🚨 社長トップ診断（NEW）
-# ===============================
-st.markdown("## 🚨 キャッシュ診断（社長が最初に見る）")
-
-b1, b2, b3, b4 = st.columns(4)
-with b1:
-    b1.metric("今月の増減（税後）", yen(delta_after))
-with b2:
-    b2.metric("安全ライン（手元目標）", yen(target_cash))
-with b3:
-    b3.metric("安全ラインまで不足", yen(need_cash))
-with b4:
-    b4.metric("毎月必要利益（税後）", yen(need_after_per_month) if need_after_per_month is not None else "0円")
-
-# ===============================
-# 🛟 安全ライン（建設会社の目安）
-# ===============================
-st.markdown("## 🛟 安全ライン")
-
-safe_cash = burn * 6
-lack_cash = max(0, safe_cash - cash_on_hand)
-
-s1, s2, s3 = st.columns(3)
-
-s1.metric(
-    "安全ライン（6ヶ月）",
-    yen(safe_cash)
-)
-
-s2.metric(
-    "現在の現金",
-    yen(cash_on_hand)
-)
-
-if lack_cash > 0:
-    s3.metric(
-        "不足額",
-        yen(lack_cash)
-    )
-    st.warning("⚠ 安全ラインに届いていません")
-else:
-    s3.metric(
-        "余裕資金",
-        yen(cash_on_hand - safe_cash)
-    )
-    st.success("🟢 安全ラインクリア")
-
-# ===============================
-# ✔ 安全にするには（売上 / 利益）
-# ===============================
-st.markdown("## ✔ 安全にするには")
-
-need_profit_text = "0円"
-if need_after_per_month is not None:
-    need_profit_text = yen(need_after_per_month)
-
-need_sales_text = "0円"
-if need_sales_safe is not None:
-    need_sales_text = yen(need_sales_safe)
-
-a1, a2 = st.columns(2)
-
-with a1:
-    st.metric(
-        "売上を増やすなら（月）",
-        f"+{need_sales_text}"
-    )
-
-with a2:
-    st.metric(
-        "利益を増やすなら（月）",
-        f"+{need_profit_text}"
-    )
-
-
-# ===============================
-# 🔮 もしもシミュレーション（社長が触るやつ）
-# ===============================
-st.markdown("## 🔮 もしもシミュレーション（社長が触るやつ）")
-st.caption("売上・原価率・固定費を少し動かしたら、資金ショートと安全ラインがどう変わるかを一瞬で確認。")
-
-scol1, scol2, scol3 = st.columns(3)
-with scol1:
-    sales_up = st.number_input("売上をいくら増やす？（月）", min_value=0, step=100000, value=0, key="sim_sales_up")
-with scol2:
-    cost_rate_diff = st.slider("原価率を何%下げる？（改善）", 0.0, 10.0, 0.0, 0.1, key="sim_cost_rate_down")
-with scol3:
-    fixed_cut = st.number_input("固定費をいくら下げる？（月）", min_value=0, step=50000, value=0, key="sim_fixed_cut")
-
-sales2 = sales + float(sales_up)
-cost_rate2 = max(0.0, cost_rate_now - (float(cost_rate_diff) / 100.0))
-cost2 = sales2 * cost_rate2
-burn2 = max(0.0, burn - float(fixed_cut))
-
-gross2 = sales2 - cost2
-delta2 = gross2 - burn2
-tax2 = delta2 * tax_rate if delta2 > 0 else 0
-after2 = delta2 - tax2
-
-runway2 = None
-if after2 < 0:
-    runway2 = (cash_on_hand / abs(after2)) if abs(after2) > 0 else 0
-
-short_text2 = "ショートなし（黒字）"
-if runway2 is not None:
-    months_left2 = max(0, int(runway2))
-    sd2 = datetime.date.today() + datetime.timedelta(days=months_left2 * 30)
-    short_text2 = f"{sd2.year}年{sd2.month}月"
-
-m1, m2, m3, m4 = st.columns(4)
-m1.metric("売上（想定）", yen(sales2))
-m2.metric("税後の増減（想定）", yen(after2))
-m3.metric("資金ショート（想定）", short_text2)
-m4.metric("原価率（想定）", f"{cost_rate2*100:.1f}%")
-
-st.caption("💡 使い方：まず全部0で現状確認 → 次にどれか1つだけ動かす。")
-st.divider()
-
-# ===============================
-# 🧱 現場利益（10秒入力UI + 原価率：売れる）
-# ===============================
-st.markdown("## 🧱 現場利益（10秒で入力）")
-st.caption("『現場名・請負・原価合計（ざっくり）』でもOK。『原価率%』で入れてもOK（自動計算）。")
-
-if "projects" not in st.session_state or not isinstance(st.session_state.projects, list) or len(st.session_state.projects) == 0:
-    st.session_state.projects = [
-        {"現場名": "現場A", "請負金額": 3_000_000, "原価合計": 2_300_000, "原価率(%)": 0.0, "メモ": ""},
-        {"現場名": "現場B", "請負金額": 2_500_000, "原価合計": 1_850_000, "原価率(%)": 0.0, "メモ": ""},
-    ]
-
-dfp = pd.DataFrame(st.session_state.projects)
-
-for col in ["現場名", "請負金額", "原価合計", "原価率(%)", "メモ"]:
-    if col not in dfp.columns:
-        if col in ["現場名", "メモ"]:
-            dfp[col] = ""
-        else:
-            dfp[col] = 0
-
-st.caption("👇 行追加してOK（社長はここだけで終わり）")
-edited = st.data_editor(
-    dfp[["現場名", "請負金額", "原価合計", "原価率(%)", "メモ"]],
-    use_container_width=True,
-    num_rows="dynamic",
-    key="projects_editor_fast_rate",
-)
-
-for col in ["請負金額", "原価合計", "原価率(%)"]:
-    edited[col] = pd.to_numeric(edited[col], errors="coerce").fillna(0)
-
-edited["原価率(%)"] = edited["原価率(%)"].clip(lower=0, upper=100)
-
-# 自動計算（壊れにくい）
-for i in edited.index:
-    contract = float(edited.at[i, "請負金額"])
-    cost_sum = float(edited.at[i, "原価合計"])
-    rate = float(edited.at[i, "原価率(%)"])
-
-    if contract <= 0:
-        continue
-
-    if cost_sum == 0 and rate > 0:
-        edited.at[i, "原価合計"] = round(contract * rate / 100.0)
-    elif rate == 0 and cost_sum > 0:
-        edited.at[i, "原価率(%)"] = round((cost_sum / contract) * 100.0, 1)
-
-edited["現場利益"] = edited["請負金額"] - edited["原価合計"]
-edited["利益率"] = edited.apply(lambda r: safe_div(r["現場利益"], r["請負金額"], 0.0), axis=1)
-
-# 保存
-st.session_state.projects = edited.drop(columns=["現場利益", "利益率"], errors="ignore").to_dict("records")
-save_state()
-
-# KPI（社長が最初に見る）
-valid = edited[edited["請負金額"] > 0].copy()
-site_count = int(len(valid))
-total_site_profit = float(valid["現場利益"].sum()) if site_count > 0 else 0.0
-avg_site_profit = (total_site_profit / site_count) if site_count > 0 else 0.0
-avg_site_margin = float(valid["利益率"].mean()) if site_count > 0 else 0.0
-
-k1, k2, k3, k4 = st.columns(4)
-k1.metric("現場数（請負入力あり）", f"{site_count}件")
-k2.metric("今月の現場合計利益", yen(total_site_profit))
-k3.metric("✅ 1現場 平均利益", yen(avg_site_profit))
-k4.metric("参考：平均利益率", f"{avg_site_margin*100:.1f}%")
-
-st.divider()
-
-# TOP5（利益）
-st.markdown("### 🏆 儲かってる現場 TOP5")
-top_profit = valid.sort_values("現場利益", ascending=False).head(5)
-if len(top_profit) == 0:
-    st.info("現場を追加して『請負金額』を入れるとTOPが出ます。")
-else:
-    cols = st.columns(min(5, len(top_profit)))
-    for i, (_, r) in enumerate(top_profit.iterrows()):
-        cols[i].metric(r["現場名"] if r["現場名"] else "（未入力）", yen(float(r["現場利益"])))
-
-# TOP5（利益率）
-st.markdown("### 📈 利益率が高い現場 TOP5（上手い現場）")
-top_rate = valid.sort_values("利益率", ascending=False).head(5)
-if len(top_rate) == 0:
-    st.info("現場を追加して『請負金額』を入れるとTOPが出ます。")
-else:
-    cols2 = st.columns(min(5, len(top_rate)))
-    for i, (_, r) in enumerate(top_rate.iterrows()):
-        cols2[i].metric(
-            r["現場名"] if r["現場名"] else "（未入力）",
-            f"{float(r['利益率'])*100:.1f}%",
-            delta=yen(float(r["現場利益"])),
-        )
-
-# 赤字当たりTOP3（ざっくり）
-st.markdown("### 🛠 赤字の原因（当たり）TOP3（ざっくり）")
-loss_df = valid.sort_values("現場利益").head(3).copy()
-if len(loss_df) == 0:
-    st.info("請負金額を入れると分析が出ます。")
-else:
-    for _, r in loss_df.iterrows():
-        name = r["現場名"] if r["現場名"] else "（未入力）"
-        profit = float(r["現場利益"])
-        margin = float(r["利益率"]) * 100
-        if profit < 0:
-            st.error(f"🔥 {name}：赤字 {yen(abs(profit))}（利益率 {margin:.1f}%）")
-            st.write("当たり：①請負が安い ②原価が盛れてる ③外注/材料が想定より高い（まず原価率を疑う）")
-        else:
-            st.warning(f"⚠ {name}：利益 {yen(profit)}（利益率 {margin:.1f}%）")
-
-with st.expander("📌 現場一覧（表で確認）"):
-    show = edited[["現場名", "請負金額", "原価合計", "原価率(%)", "現場利益", "利益率", "メモ"]].copy()
-    show["利益率"] = (show["利益率"] * 100).round(1).astype(str) + "%"
-    show = show.sort_values("現場利益", ascending=False)
-    st.dataframe(show, use_container_width=True)
-
-st.divider()
-
-# ===============================
-# 📈 12ヶ月 現金推移（予測）+ CSV
-# ===============================
-st.markdown("## 📈 12ヶ月 現金推移（予測）")
-
-months = list(range(0, 13))
-cash_series_pre = [cash_on_hand + (delta_pre * m) for m in months]
-cash_series_after = [cash_on_hand + (delta_after * m) for m in months]
-
-df = pd.DataFrame({"月": months, "税前キャッシュ": cash_series_pre, "税後キャッシュ": cash_series_after})
-
-danger_month = None
-for m, v in zip(months, cash_series_after):
-    if v < 0:
-        danger_month = m
-        break
-
-c1, c2, c3 = st.columns(3)
-c1.metric("税後 月次増減", yen(delta_after))
-c2.metric("税後 最終月（12ヶ月目）", yen(cash_series_after[-1]))
-if danger_month is None:
-    c3.success("危険月：なし（税後が0円を下回らない）")
-else:
-    c3.error(f"危険月：{danger_month} ヶ月目")
-
-base = alt.Chart(df).encode(x=alt.X("月:Q", title="月"))
-line_pre = base.mark_line().encode(y=alt.Y("税前キャッシュ:Q", title="現金残高"), tooltip=["月", "税前キャッシュ"])
-line_after = base.mark_line().encode(y="税後キャッシュ:Q", tooltip=["月", "税後キャッシュ"])
-chart = (line_pre + line_after).properties(height=260)
-st.altair_chart(chart, use_container_width=True)
-
-with st.expander("📋 12ヶ月の明細（表/CSV）"):
-    st.dataframe(df, use_container_width=True)
-    st.download_button(
-        "CSVをダウンロード",
-        data=df.to_csv(index=False).encode("utf-8-sig"),
-        file_name="cash_forecast_12m.csv",
-        mime="text/csv",
-        key="download_csv_12m_main",
-    )
-
-st.divider()
-
-# ===============================
-# 🏦 銀行提出用 1枚サマリー（TXT）
-# ===============================
-st.markdown("## 🏦 銀行提出用（1枚サマリー）")
-st.caption("※ このままコピペでメール/稟議に貼れます。")
-
-short_text = "ショートなし（黒字）"
-if runway_months is not None:
-    months_left = max(0, int(runway_months))
-    sd = datetime.date.today() + datetime.timedelta(days=months_left * 30)
-    short_text = f"{sd.year}年{sd.month}月"
-
-need_sales_text = "0円/月"
-if need_sales_safe is not None and need_sales_safe > 0:
-    need_sales_text = yen(need_sales_safe) + "/月"
-
-summary_text = f"""
-【建設キャッシュレーダー：銀行提出サマリー】
-
-■今月（概算）
-・売上：{yen(sales)}
-・原価（材料+外注など）：{yen(cost)}
-・固定費+返済（毎月出ていく）：{yen(burn)}
-・税率（概算）：{int(tax_rate*100)}%
-
-■キャッシュ状況（税後ベース）
-・今月の増減（税後）：{yen(delta_after)}
-・資金ショート予測：{short_text}
-
-■安全ライン（手元目標）
-・安全ライン（手元目標）：{yen(target_cash)}
-・安全ラインまで不足：{yen(need_cash)}
-
-■安全にするための目安
-・売上を上げるなら：+{need_sales_text}
-
-（備考）本数値は“月次のざっくり予測”です。実績の入金/支払サイト差は別途反映可能。
-""".strip()
-
-st.text_area("👇 そのまま銀行に送れる文面", summary_text, height=240)
-st.download_button(
-    "📄 サマリーをTXTで保存（銀行に送れる）",
-    data=summary_text.encode("utf-8-sig"),
-    file_name="bank_summary.txt",
-    mime="text/plain",
-)
-
-# ===============================
-# デモ案内
-# ===============================
-if not is_pro:
-    remain = DEMO_LIMIT - int(st.session_state.calc_count)
-    if remain > 0:
-        st.warning(f"⏳ デモ残り {remain} 回（計算ボタン）")
+        st.markdown(f"""
+        <div style="
+            background:#ffe5e5;
+            border-left:12px solid #ff4d4f;
+            border-radius:18px;
+            padding:22px;
+            margin-top:18px;
+            color:#111;
+            box-shadow:0 4px 14px rgba(0,0,0,0.06);
+        ">
+            <div style="font-size:42px; font-weight:900; line-height:1.3; color:#111;">
+                ⚠ 資金ショートまで<br>あと {months_left} ヶ月
+            </div>
+            <div style="font-size:18px; line-height:1.8; margin-top:10px; color:#111;">
+                このままだと毎月 <b>{yen(abs(delta_after))}</b> ずつ現金が減ります。<br>
+                年間では <b>{yen(abs(delta_after) * 12)}</b> のキャッシュ減少です。
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ===============================
+    # ② 安全ラインカード
+    # ===============================
+    if lack_cash > 0:
+        st.markdown(f"""
+        <div style="
+            background:#fff3cd;
+            border-left:12px solid #f4b400;
+            border-radius:18px;
+            padding:22px;
+            margin-top:18px;
+            color:#111;
+            box-shadow:0 4px 14px rgba(0,0,0,0.06);
+        ">
+            <div style="font-size:30px; font-weight:900; line-height:1.4; color:#111;">
+                安全ラインまで不足<br>{yen(lack_cash)}
+            </div>
+            <div style="font-size:18px; line-height:1.8; margin-top:10px; color:#111;">
+                安全にするには、ざっくり<br>
+                <b>売上 +{yen(need_sales_safe)} / 月</b><br>
+                を目安に見直す必要があります。
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     else:
-        st.error("🚫 デモ上限に達しました。Proで無制限に利用できます。")
+        st.markdown(f"""
+        <div style="
+            background:#e6f7e6;
+            border-left:12px solid #2e7d32;
+            border-radius:18px;
+            padding:22px;
+            margin-top:18px;
+            color:#111;
+            box-shadow:0 4px 14px rgba(0,0,0,0.06);
+        ">
+            <div style="font-size:30px; font-weight:900; line-height:1.4; color:#111;">
+                安全ラインクリア
+            </div>
+            <div style="font-size:18px; line-height:1.8; margin-top:10px; color:#111;">
+                現在の現金は、6ヶ月安全ラインを超えています。
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown("## 💰 Pro（月9,800円）でできること")
-    p1, p2 = st.columns([2, 1])
-    with p1:
-        st.markdown(
-            """- 売上/原価も自由に変更（デモは固定）
-- 計算回数の制限なし
-- 12ヶ月推移・銀行提出CSV/TXTを業務で使い倒せる
-- 現場の10秒入力＆ランキングで利益の見える化"""
-        )
-    with p2:
-        st.link_button(
-"🚀 Proを申し込む",
-"https://lin.ee/7m28VAs",
-use_container_width=True
-)
+    # ===============================
+    # ③ 今すぐ分かる結論
+    # ===============================
+    urgency = "危険"
+    urgency_msg = f"資金余命は約 {months_left} ヶ月。今月中に改善が必要です。"
+
+    if runway_months is None:
+        urgency = "安全"
+        urgency_msg = "税後でも黒字です。まずは今の水準維持を優先してください。"
+    elif months_left >= 12:
+        urgency = "注意"
+        urgency_msg = f"まだ余裕はありますが、放置すると {months_left} ヶ月後に危険です。"
+
+    st.markdown(f"""
+    <div style="
+        background:#ffffff;
+        border:3px solid #ececec;
+        border-radius:18px;
+        padding:22px;
+        margin-top:20px;
+        color:#111;
+        box-shadow:0 4px 14px rgba(0,0,0,0.04);
+    ">
+        <div style="font-size:20px; font-weight:900; color:#111;">⚡ 今すぐ分かる結論</div>
+        <div style="margin-top:10px; font-size:17px; line-height:1.8; color:#111;">
+            <b>{urgency}</b>。{urgency_msg}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ===============================
+    # ④ 今日やる打ち手
+    # ===============================
+    actions = []
+
+    if lack_cash > 0:
+        actions.append(f"まず <b>売上 +{yen(need_sales_safe)} / 月</b> を目安に改善する")
+    if delta_after < 0:
+        actions.append("入金を早くする（請求締め・入金サイト短縮）")
+        actions.append("固定費と返済額を見直す")
+        actions.append("原価率の高い現場を洗い出す")
+
+    if not actions:
+        actions.append("今の利益率と現金残高を維持する")
+        actions.append("原価率が高い現場だけ毎月チェックする")
+
+    actions_html = "".join([f"<li style='margin-bottom:8px;'>{a}</li>" for a in actions[:4]])
+
+    st.markdown(f"""
+    <div style="
+        background:#ffffff;
+        border:3px solid #ececec;
+        border-radius:18px;
+        padding:22px;
+        margin-top:20px;
+        color:#111;
+        box-shadow:0 4px 14px rgba(0,0,0,0.04);
+    ">
+        <div style="font-size:20px; font-weight:900; color:#111;">✅ 今日やる打ち手（最短で効く順）</div>
+        <div style="margin-top:10px; font-size:17px; line-height:1.8; color:#111;">
+            <ul style="padding-left:22px; margin:0;">
+                {actions_html}
+            </ul>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ===============================
+    # ⑤ 12ヶ月資金推移グラフ
+    # ===============================
+    months = list(range(1, 13))
+    cash_list = []
+    current_cash = cash_on_hand
+
+    for _ in months:
+        current_cash = current_cash + delta_after
+        cash_list.append(current_cash)
+
+    df_cash = pd.DataFrame({
+        "月": months,
+        "現金残高": cash_list
+    })
+
+    st.markdown("""
+    <div style="
+        background:#ffffff;
+        border:3px solid #ececec;
+        border-radius:18px;
+        padding:22px;
+        margin-top:20px;
+        color:#111;
+        box-shadow:0 4px 14px rgba(0,0,0,0.04);
+    ">
+        <div style="font-size:20px; font-weight:900; color:#111;">📈 Proで見える12ヶ月資金推移</div>
+        <div style="margin-top:10px; font-size:16px; line-height:1.8; color:#111;">
+            今の条件のまま進んだ場合、現金が12ヶ月でどう動くかを確認できます。
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.line_chart(df_cash.set_index("月"))
+
+    # ===============================
+    # ⑥ Pro申込み導線
+    # ===============================
+    st.markdown("""
+    <div style="
+        background:#eef9f0;
+        border:4px solid #2e7d32;
+        border-radius:20px;
+        padding:24px;
+        margin-top:22px;
+        text-align:center;
+        color:#111;
+        box-shadow:0 4px 14px rgba(0,0,0,0.05);
+    ">
+        <div style="font-size:34px; font-weight:900; line-height:1.4; color:#111;">
+            続きは Pro版へ
+        </div>
+        <div style="font-size:18px; line-height:1.9; margin-top:12px; color:#111;">
+            Pro版では<br>
+            <b>12ヶ月資金推移</b>・<b>現場利益管理</b>・<b>銀行提出サマリー</b><br>
+            まで使えます。
+        </div>
+        <div style="font-size:44px; font-weight:900; margin-top:16px; color:#111;">
+            月 9,800円
+        </div>
+        <div style="font-size:16px; margin-top:8px; color:#111;">
+            デモは6回まで / Proは無制限
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.link_button(
+        "🚀 Proを申し込む（LINE）",
+        "https://lin.ee/7m28VAs",
+        use_container_width=True
+    )
+
 
 
