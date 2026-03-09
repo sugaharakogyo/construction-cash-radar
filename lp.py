@@ -275,6 +275,13 @@ div.stLinkButton > a:hover{
     line-height:1.9;
     color:#111827 !important;
 }
+.price-box{
+color:#111 !important;
+}
+
+.price-box *{
+color:#111 !important;
+}
 
 /* 導線 */
 .flow{
