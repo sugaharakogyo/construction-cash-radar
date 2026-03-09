@@ -479,12 +479,23 @@ if calc or st.session_state.get("last_calc", False):
             </div>
             """, unsafe_allow_html=True)
 
-            st.link_button(
-                "🚀 Proを申し込む（LINE）",
-                LINE_URL,
-                use_container_width=True
-            )
-
+st.markdown(f"""
+<a href="{LINE_URL}" target="_blank"
+style="
+display:block;
+text-align:center;
+background:#111827;
+color:white;
+padding:16px;
+border-radius:14px;
+font-size:20px;
+font-weight:800;
+text-decoration:none;
+margin-top:10px;
+">
+🚀 LINEでProを申し込む
+</a>
+""", unsafe_allow_html=True)
 # =====================================
 # フッター
 # =====================================
