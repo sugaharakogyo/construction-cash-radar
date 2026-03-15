@@ -1,10 +1,21 @@
 import streamlit as st
 
+st.markdown("""
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V96H2R41TL"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-V96H2R41TL');
+</script>
+""", unsafe_allow_html=True)
+
 st.set_page_config(
     page_title="建設キャッシュレーダー",
-    page_icon="🏗️",
+    page_icon="🏗",
     layout="centered"
 )
+
 
 APP_URL = "https://construction-cash-check.streamlit.app"
 LINE_URL = "https://lin.ee/7m28VAs"
