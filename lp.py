@@ -1,6 +1,14 @@
 import streamlit as st
 
-st.markdown("""
+st.set_page_config(
+    page_title="建設キャッシュレーダー",
+    page_icon="📊",
+    layout="centered"
+)
+
+# Google Analytics
+st.components.v1.html("""
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-V96H2R41TL"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -8,8 +16,7 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-V96H2R41TL');
 </script>
-""", unsafe_allow_html=True)
-
+""", height=0)
 st.set_page_config(
     page_title="建設キャッシュレーダー",
     page_icon="🏗",
