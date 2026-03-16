@@ -6,7 +6,7 @@ page_icon="🏗",
 layout="centered"
 )
 
-APP_URL="https://construction-cash-radar.streamlit.app"
+APP_URL="https://construction-cash-check.streamlit.app"
 LINE_URL="https://lin.ee/7m28VAs"
 
 st.markdown("""
