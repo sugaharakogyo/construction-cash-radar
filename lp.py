@@ -24,92 +24,20 @@ st.components.v1.html(
     height=0,
 )
 
+# 全体CSS
 st.markdown("""
 <style>
 .block-container{
-    max-width: 900px;
+    max-width: 920px;
     padding-top: 0.8rem;
     padding-bottom: 3rem;
 }
-
 html, body, [class*="css"]{
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
-
 .stApp{
     background: linear-gradient(180deg, #f8fbff 0%, #f6f7fb 100%);
 }
-
-/* 青い部分だけしっかり表示 */
-.hero-wrap{
-    background: linear-gradient(135deg, #020617 0%, #0b3b74 42%, #0284c7 100%);
-    border-radius: 28px;
-    padding: 28px 22px 24px 22px;
-    box-shadow: 0 24px 52px rgba(0,0,0,0.28);
-    margin-bottom: 18px;
-}
-
-.hero-badge{
-    display:inline-block;
-    background:#facc15;
-    color:#111 !important;
-    font-weight:900;
-    font-size:14px;
-    border-radius:999px;
-    padding:8px 14px;
-    margin-bottom:16px;
-}
-
-.hero-title{
-    font-size:48px;
-    line-height:1.08;
-    font-weight:900;
-    margin:0 0 16px 0;
-    color:#ffffff !important;
-}
-
-.hero-sub{
-    font-size:19px;
-    line-height:1.8;
-    font-weight:800;
-    color:#ffffff !important;
-    margin-bottom:14px;
-}
-
-.hero-mini{
-    font-size:15px;
-    line-height:1.8;
-    font-weight:700;
-    color:#dbeafe !important;
-    margin-bottom:14px;
-}
-
-.hero-note{
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.14);
-    border-radius: 16px;
-    padding: 12px 14px;
-    font-size: 15px;
-    line-height: 1.7;
-    font-weight: 700;
-    color: #ffffff !important;
-}
-
-.yellow{ color:#facc15 !important; }
-.red{ color:#ff4d4f !important; }
-
-.green-band{
-    background:#ecfdf3;
-    border:3px solid #16a34a;
-    border-radius:18px;
-    padding:14px;
-    text-align:center;
-    font-size:19px;
-    font-weight:900;
-    color:#111 !important;
-    margin-bottom:18px;
-}
-
 .section-card{
     background:#ffffff;
     border:1px solid #edf2f7;
@@ -118,46 +46,12 @@ html, body, [class*="css"]{
     box-shadow:0 10px 24px rgba(15,23,42,0.05);
     margin-top:18px;
 }
-
 .section-title{
     font-size:30px;
     font-weight:900;
     color:#111 !important;
     margin-bottom:12px;
 }
-
-.price-card{
-    background: linear-gradient(180deg, #f0fff4 0%, #dcfce7 100%);
-    border:5px solid #16a34a;
-    border-radius:24px;
-    padding:26px 18px;
-    box-shadow:0 18px 34px rgba(22,163,74,0.18);
-    text-align:center;
-    margin-top:22px;
-}
-
-.price-title{
-    font-size:36px;
-    font-weight:900;
-    color:#111 !important;
-    margin-bottom:8px;
-}
-
-.price-main{
-    font-size:56px;
-    font-weight:900;
-    color:#111 !important;
-    line-height:1.1;
-    margin:10px 0;
-}
-
-.price-text{
-    font-size:18px;
-    line-height:1.8;
-    font-weight:800;
-    color:#111 !important;
-}
-
 .small-note{
     text-align:center;
     color:#666 !important;
@@ -165,7 +59,6 @@ html, body, [class*="css"]{
     line-height:1.8;
     margin-top:18px;
 }
-
 div.stLinkButton > a{
     background: linear-gradient(180deg, #18b24c 0%, #16a34a 100%) !important;
     color: white !important;
@@ -179,17 +72,12 @@ div.stLinkButton > a{
     text-decoration: none !important;
     box-shadow: 0 12px 22px rgba(22,163,74,0.22) !important;
 }
-
 div.stLinkButton > a:hover{
     background: linear-gradient(180deg, #16a34a 0%, #15803d 100%) !important;
     color: white !important;
 }
-
-@media (max-width: 700px){
-    .hero-title{font-size:36px;}
-    .hero-sub{font-size:17px;}
+@media (max-width:700px){
     .section-title{font-size:24px;}
-    .price-main{font-size:42px;}
     div.stLinkButton > a{
         font-size:20px !important;
         padding:16px 12px !important;
@@ -198,42 +86,131 @@ div.stLinkButton > a:hover{
 </style>
 """, unsafe_allow_html=True)
 
-# 青い部分
-st.markdown("""
-<div class="hero-wrap">
-    <div class="hero-badge">建設会社専用 / 最短30秒 無料診断</div>
+# 青い部分（独立表示）
+st.components.v1.html(
+    """
+    <style>
+      body{
+        margin:0;
+        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        background:transparent;
+      }
+      .hero{
+        background: linear-gradient(135deg, #020617 0%, #0b3b74 42%, #0284c7 100%);
+        border-radius: 28px;
+        padding: 28px 22px 24px 22px;
+        box-shadow: 0 24px 52px rgba(0,0,0,0.28);
+        color: white;
+      }
+      .badge{
+        display:inline-block;
+        background:#facc15;
+        color:#111;
+        font-weight:900;
+        font-size:14px;
+        border-radius:999px;
+        padding:8px 14px;
+        margin-bottom:16px;
+      }
+      .hero-title{
+        font-size:48px;
+        line-height:1.08;
+        font-weight:900;
+        margin:0 0 16px 0;
+        color:#ffffff;
+      }
+      .yellow{ color:#facc15; }
+      .red{ color:#ff4d4f; }
+      .hero-sub{
+        font-size:19px;
+        line-height:1.8;
+        font-weight:800;
+        color:#ffffff;
+        margin-bottom:14px;
+      }
+      .hero-mini{
+        font-size:15px;
+        line-height:1.8;
+        font-weight:700;
+        color:#dbeafe;
+        margin-bottom:14px;
+      }
+      .hero-note{
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 16px;
+        padding: 12px 14px;
+        font-size: 15px;
+        line-height: 1.7;
+        font-weight: 700;
+        color: #ffffff;
+      }
+      @media (max-width:700px){
+        .hero-title{font-size:36px;}
+        .hero-sub{font-size:17px;}
+      }
+    </style>
 
-    <div class="hero-title">
+    <div class="hero">
+      <div class="badge">建設会社専用 / 最短30秒 無料診断</div>
+
+      <div class="hero-title">
         <span class="yellow">黒字でも</span><br>
         <span class="red">倒産します</span>
-    </div>
+      </div>
 
-    <div class="hero-sub">
+      <div class="hero-sub">
         あなたの会社、あと何ヶ月持つか分かりますか？<br><br>
         売上・原価・固定費・現金を入れるだけで、<br>
         資金ショート危険度 と 安全ライン不足額 を<br>
         最短30秒で診断します。
-    </div>
+      </div>
 
-    <div class="hero-mini">
+      <div class="hero-mini">
         会計ソフトでは見えない未来の資金を見える化。<br>
         スマホでもすぐ使えます。
-    </div>
+      </div>
 
-    <div class="hero-note">
+      <div class="hero-note">
         「利益は出ているのに、お金が残らない」<br>
         そんな建設会社のための、未来の資金診断ツールです。
+      </div>
     </div>
-</div>
-""", unsafe_allow_html=True)
-
-# 緑帯
-st.markdown(
-    '<div class="green-band">建設会社専用 / 資金ショート危険度を無料診断</div>',
-    unsafe_allow_html=True
+    """,
+    height=420,
+    scrolling=False,
 )
 
-# CTA
+st.write("")
+
+# 緑帯
+st.components.v1.html(
+    """
+    <style>
+      body{
+        margin:0;
+        background:transparent;
+        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      }
+      .green-band{
+        background:#ecfdf3;
+        border:3px solid #16a34a;
+        border-radius:18px;
+        padding:14px;
+        text-align:center;
+        font-size:19px;
+        font-weight:900;
+        color:#111;
+      }
+    </style>
+    <div class="green-band">建設会社専用 / 資金ショート危険度を無料診断</div>
+    """,
+    height=70,
+    scrolling=False,
+)
+
+st.write("")
+
 st.link_button("30秒で無料診断する", APP_URL)
 
 # 3つ分かること
@@ -312,21 +289,67 @@ for col, item in zip([s1, s2, s3, s4], steps):
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# 価格
-st.markdown('<div class="price-card">', unsafe_allow_html=True)
-st.markdown('<div class="price-title">社長専用 Proダッシュボード</div>', unsafe_allow_html=True)
-st.markdown(
-    '<div class="price-text">12ヶ月資金推移・現場利益管理・銀行提出サマリー・<br>利益改善シミュレーターまで使えます。</div>',
-    unsafe_allow_html=True
-)
-st.markdown('<div class="price-main">月 9,800円</div>', unsafe_allow_html=True)
-st.markdown(
-    '<div class="price-text">まずは無料診断。必要ならLINEから申込み。</div>',
-    unsafe_allow_html=True
-)
-st.markdown('</div>', unsafe_allow_html=True)
+# 緑の価格部分（独立表示）
+st.components.v1.html(
+    """
+    <style>
+      body{
+        margin:0;
+        background:transparent;
+        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      }
+      .price-card{
+        background: linear-gradient(180deg, #f0fff4 0%, #dcfce7 100%);
+        border:5px solid #16a34a;
+        border-radius:24px;
+        padding:26px 18px;
+        box-shadow:0 18px 34px rgba(22,163,74,0.18);
+        text-align:center;
+      }
+      .price-title{
+        font-size:36px;
+        font-weight:900;
+        color:#111;
+        margin-bottom:8px;
+      }
+      .price-main{
+        font-size:56px;
+        font-weight:900;
+        color:#111;
+        line-height:1.1;
+        margin:10px 0;
+      }
+      .price-text{
+        font-size:18px;
+        line-height:1.8;
+        font-weight:800;
+        color:#111;
+      }
+      @media (max-width:700px){
+        .price-title{font-size:28px;}
+        .price-main{font-size:42px;}
+        .price-text{font-size:16px;}
+      }
+    </style>
 
-# CTA
+    <div class="price-card">
+      <div class="price-title">社長専用 Proダッシュボード</div>
+      <div class="price-text">
+        12ヶ月資金推移・現場利益管理・銀行提出サマリー・<br>
+        利益改善シミュレーターまで使えます。
+      </div>
+      <div class="price-main">月 9,800円</div>
+      <div class="price-text">
+        まずは無料診断。必要ならLINEから申込み。
+      </div>
+    </div>
+    """,
+    height=260,
+    scrolling=False,
+)
+
+st.write("")
+
 st.link_button("30秒で無料診断する", APP_URL)
 st.link_button("LINEで問い合わせる", LINE_URL)
 
