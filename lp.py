@@ -52,11 +52,11 @@ st.markdown("""
     line-height: 1.7;
 }
 .hero-wrap{
-    background: linear-gradient(135deg, #081224 0%, #0c3d73 45%, #0a7ac2 100%);
-    border-radius: 30px;
-    padding: 28px 22px 24px 22px;
-    box-shadow: 0 18px 40px rgba(2,24,58,0.22);
-    margin-bottom: 24px;
+background: linear-gradient(135deg,#020617 0%,#0b3b74 40%,#0284c7 100%);
+border-radius: 30px;
+padding: 32px 24px;
+box-shadow: 0 24px 50px rgba(0,0,0,0.35);
+margin-bottom: 26px;
 }
 .badge{
     display:inline-block;
