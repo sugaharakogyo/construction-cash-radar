@@ -2,7 +2,7 @@ import streamlit as st
 
 st.set_page_config(
     page_title="建設キャッシュレーダー",
-    page_icon="📊",
+    page_icon="🏗",
     layout="centered"
 )
 
@@ -17,22 +17,14 @@ gtag('js', new Date());
 gtag('config', 'G-V96H2R41TL');
 </script>
 """, height=0)
-st.set_page_config(
-    page_title="建設キャッシュレーダー",
-    page_icon="🏗",
-    layout="centered"
-)
-
 
 APP_URL = "https://construction-cash-check.streamlit.app"
 LINE_URL = "https://lin.ee/7m28VAs"
 
 st.markdown("""
 <style>
-
-/* 全体 */
 .block-container{
-    max-width:900px;
+    max-width:950px;
     padding-top:1rem;
     padding-bottom:3rem;
 }
@@ -45,33 +37,70 @@ html, body, [class*="css"] {
     background:#f6f7fb;
 }
 
-/* ヒーロー */
+/* HERO */
 .hero{
-    background:linear-gradient(135deg,#0f172a,#0369a1);
-    border-radius:26px;
-    padding:32px 24px;
+    background:linear-gradient(135deg,#0f172a 0%,#0b3b66 45%,#0369a1 100%);
+    border-radius:28px;
+    padding:34px 24px 28px 24px;
     color:white;
-    margin-bottom:28px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.18);
+    margin-bottom:24px;
+    box-shadow:0 16px 34px rgba(0,0,0,0.18);
+    position:relative;
+    overflow:hidden;
+}
+
+.hero:before{
+    content:"";
+    position:absolute;
+    top:-40px;
+    right:-40px;
+    width:180px;
+    height:180px;
+    background:rgba(250,204,21,0.12);
+    border-radius:50%;
+}
+
+.hero:after{
+    content:"";
+    position:absolute;
+    bottom:-55px;
+    left:-55px;
+    width:220px;
+    height:220px;
+    background:rgba(239,68,68,0.10);
+    border-radius:50%;
 }
 
 .hero-badge{
+    position:relative;
+    z-index:1;
     background:#facc15;
     color:#111 !important;
-    font-weight:800;
+    font-weight:900;
     display:inline-block;
-    padding:7px 14px;
+    padding:8px 14px;
     border-radius:999px;
-    margin-bottom:14px;
+    margin-bottom:16px;
     font-size:14px;
+    box-shadow:0 6px 16px rgba(250,204,21,0.25);
+}
+
+.hero-grid{
+    position:relative;
+    z-index:1;
+    display:grid;
+    grid-template-columns:1.35fr 0.9fr;
+    gap:18px;
+    align-items:center;
 }
 
 .hero-title{
-    font-size:42px;
+    font-size:44px;
     font-weight:900;
-    line-height:1.2;
+    line-height:1.18;
     margin-bottom:16px;
     color:white !important;
+    letter-spacing:0.3px;
 }
 
 .hero-title .yellow{
@@ -85,32 +114,113 @@ html, body, [class*="css"] {
 .hero-text{
     font-size:18px;
     line-height:1.9;
-    opacity:0.97;
-    margin-bottom:16px;
+    opacity:0.98;
+    margin-bottom:14px;
     color:white !important;
 }
 
 .hero-mini{
-    font-size:16px;
-    opacity:0.9;
+    font-size:15px;
+    opacity:0.92;
     color:white !important;
+    line-height:1.8;
 }
 
-/* カウンター */
+.hero-visual{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:24px;
+    padding:16px;
+    backdrop-filter:blur(3px);
+}
+
+.visual-screen{
+    background:#ffffff;
+    border-radius:18px;
+    padding:14px;
+    box-shadow:0 10px 24px rgba(0,0,0,0.15);
+}
+
+.visual-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
+
+.visual-logo{
+    font-size:14px;
+    font-weight:900;
+    color:#0f172a !important;
+}
+
+.visual-status{
+    font-size:12px;
+    font-weight:800;
+    color:#16a34a !important;
+    background:#dcfce7;
+    border-radius:999px;
+    padding:5px 10px;
+}
+
+.visual-chart{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:6px;
+    align-items:end;
+    height:120px;
+    margin:14px 0 10px 0;
+}
+
+.bar{
+    border-radius:10px 10px 4px 4px;
+    background:linear-gradient(180deg,#38bdf8,#1d4ed8);
+}
+
+.bar.red{
+    background:linear-gradient(180deg,#fb7185,#dc2626);
+}
+
+.visual-cards{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.v-card{
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:10px;
+}
+
+.v-label{
+    font-size:11px;
+    font-weight:800;
+    color:#64748b !important;
+    margin-bottom:4px;
+}
+
+.v-value{
+    font-size:17px;
+    font-weight:900;
+    color:#111827 !important;
+}
+
+/* Counter / Sub CTA */
 .counter-box{
     background:#e9f7ee;
     border:3px solid #16a34a;
     border-radius:18px;
     padding:16px;
-    margin-top:6px;
-    margin-bottom:20px;
+    margin-top:2px;
+    margin-bottom:18px;
     text-align:center;
     font-size:18px;
-    font-weight:800;
+    font-weight:900;
     color:#111 !important;
 }
 
-/* CTAサブ */
 .cta-sub{
     text-align:center;
     font-size:17px;
@@ -121,7 +231,7 @@ html, body, [class*="css"] {
     font-weight:700;
 }
 
-/* ボタン */
+/* Buttons */
 div.stLinkButton > a{
     background:#16a34a !important;
     color:white !important;
@@ -141,7 +251,7 @@ div.stLinkButton > a:hover{
     color:white !important;
 }
 
-/* セクション共通 */
+/* Common cards */
 .section-card{
     background:#ffffff;
     border-radius:22px;
@@ -165,7 +275,41 @@ div.stLinkButton > a:hover{
     color:#222 !important;
 }
 
-/* 警告 */
+/* 3 points */
+.point-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-top:6px;
+}
+
+.point-box{
+    background:linear-gradient(180deg,#f8fafc,#eef6ff);
+    border:2px solid #dbeafe;
+    border-radius:18px;
+    padding:18px 14px;
+    text-align:center;
+}
+
+.point-icon{
+    font-size:30px;
+    margin-bottom:10px;
+}
+
+.point-title{
+    font-size:19px;
+    font-weight:900;
+    color:#111827 !important;
+    margin-bottom:8px;
+}
+
+.point-text{
+    font-size:15px;
+    line-height:1.7;
+    color:#475569 !important;
+}
+
+/* Warning */
 .warning-box{
     background:#fff1f2;
     border:3px solid #ef4444;
@@ -187,7 +331,7 @@ div.stLinkButton > a:hover{
     color:#4c0519 !important;
 }
 
-/* 悩みリスト */
+/* Problems */
 .problem-list{
     margin:0;
     padding-left:22px;
@@ -200,7 +344,7 @@ div.stLinkButton > a:hover{
     margin-bottom:8px;
 }
 
-/* 特徴 */
+/* Features */
 .feature-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -239,41 +383,7 @@ div.stLinkButton > a:hover{
     color:#334155 !important;
 }
 
-/* 価格 */
-.price-box{
-    background:#e9f7ee;
-    border:4px solid #16a34a;
-    border-radius:26px;
-    padding:26px 20px;
-    margin-top:26px;
-    text-align:center;
-    box-shadow:0 14px 30px rgba(34,197,94,0.14);
-    color:#111 !important;
-}
-
-.price-box *{
-    color:#111 !important;
-}
-
-.price-box h3{
-    font-size:40px;
-    font-weight:900;
-    margin:0 0 10px 0;
-}
-
-.price-main{
-    font-size:52px;
-    font-weight:900;
-    margin:10px 0;
-    line-height:1.2;
-}
-
-.price-text{
-    font-size:18px;
-    line-height:1.9;
-}
-
-/* 導線 */
+/* Flow */
 .flow{
     display:grid;
     grid-template-columns:repeat(4,1fr);
@@ -313,7 +423,41 @@ div.stLinkButton > a:hover{
     line-height:1.6;
 }
 
-/* フッター */
+/* Price */
+.price-box{
+    background:#e9f7ee;
+    border:4px solid #16a34a;
+    border-radius:26px;
+    padding:26px 20px;
+    margin-top:26px;
+    text-align:center;
+    box-shadow:0 14px 30px rgba(34,197,94,0.14);
+    color:#111 !important;
+}
+
+.price-box *{
+    color:#111 !important;
+}
+
+.price-box h3{
+    font-size:40px;
+    font-weight:900;
+    margin:0 0 10px 0;
+}
+
+.price-main{
+    font-size:52px;
+    font-weight:900;
+    margin:10px 0;
+    line-height:1.2;
+}
+
+.price-text{
+    font-size:18px;
+    line-height:1.9;
+}
+
+/* Footer */
 .small-note{
     color:#666 !important;
     font-size:14px;
@@ -322,7 +466,7 @@ div.stLinkButton > a:hover{
     text-align:center;
 }
 
-/* スマホ */
+/* Mobile */
 @media(max-width:700px){
 
     .block-container{
@@ -334,8 +478,12 @@ div.stLinkButton > a:hover{
         padding:26px 18px;
     }
 
+    .hero-grid{
+        grid-template-columns:1fr;
+    }
+
     .hero-title{
-        font-size:32px;
+        font-size:34px;
     }
 
     .hero-text{
@@ -355,6 +503,10 @@ div.stLinkButton > a:hover{
         font-size:16px;
     }
 
+    .point-grid{
+        grid-template-columns:1fr;
+    }
+
     .feature-grid{
         grid-template-columns:1fr;
     }
@@ -372,48 +524,103 @@ div.stLinkButton > a:hover{
         padding:16px 12px !important;
     }
 }
-
 </style>
 """, unsafe_allow_html=True)
 
-# ヒーロー
+# Hero
 st.markdown("""
 <div class="hero">
-    <div class="hero-badge">建設会社向け / 30秒無料診断</div>
-    <div class="hero-title">
-        建設会社は<br>
-        <span class="yellow">黒字でも</span><br>
-        <span class="red">潰れます</span>
-    </div>
-    <div class="hero-text">
-        原因は <b>資金ショート</b>。<br>
-        売上・原価・固定費・現金を入れるだけで、<br>
-        <b>いつ危ないか</b> と <b>安全にするには月いくら必要か</b> がすぐ分かる。
-    </div>
-    <div class="hero-mini">
-        まずは無料で診断。<br>
-        スマホでもすぐ使えます。
+    <div class="hero-badge">建設会社専用 / 最短30秒 無料診断</div>
+    <div class="hero-grid">
+        <div>
+            <div class="hero-title">
+                建設会社は<br>
+                <span class="yellow">黒字でも</span><br>
+                <span class="red">倒産します</span>
+            </div>
+            <div class="hero-text">
+                <b>あなたの会社、あと何ヶ月持つか分かりますか？</b><br><br>
+                売上・原価・固定費・現金を入れるだけで、<br>
+                <b>資金ショート危険度</b> と <b>安全ライン不足額</b> を<br>
+                最短30秒で診断します。
+            </div>
+            <div class="hero-mini">
+                会計ソフトでは見えない、未来の資金を見える化。<br>
+                スマホでもすぐ使えます。
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="visual-screen">
+                <div class="visual-top">
+                    <div class="visual-logo">建設キャッシュレーダー™</div>
+                    <div class="visual-status">危険度 高</div>
+                </div>
+
+                <div class="visual-chart">
+                    <div class="bar" style="height:86px;"></div>
+                    <div class="bar" style="height:72px;"></div>
+                    <div class="bar" style="height:58px;"></div>
+                    <div class="bar" style="height:42px;"></div>
+                    <div class="bar red" style="height:24px;"></div>
+                    <div class="bar red" style="height:14px;"></div>
+                </div>
+
+                <div class="visual-cards">
+                    <div class="v-card">
+                        <div class="v-label">資金ショートまで</div>
+                        <div class="v-value">あと5ヶ月</div>
+                    </div>
+                    <div class="v-card">
+                        <div class="v-label">安全ライン不足</div>
+                        <div class="v-value">780万円</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# カウンター
 st.markdown("""
 <div class="counter-box">
-現在 多くの建設会社が診断しています
+建設会社専用 / 資金ショート危険度を無料診断
 </div>
 """, unsafe_allow_html=True)
 
-# CTA
-st.link_button("無料で診断する", APP_URL)
+st.link_button("30秒で無料診断する", APP_URL)
 
 st.markdown("""
 <div class="cta-sub">
-    あなたの会社のキャッシュ状況を、今すぐ見える化してください。
+    未来の資金を見える化して、危険を先に把握してください。
 </div>
 """, unsafe_allow_html=True)
 
-# 警告
+# 3 points
+st.markdown("""
+<div class="section-card">
+    <div class="section-title">30秒でこの3つが分かります</div>
+    <div class="point-grid">
+        <div class="point-box">
+            <div class="point-icon">⏳</div>
+            <div class="point-title">あと何ヶ月持つか</div>
+            <div class="point-text">資金ショートまでの目安がすぐ分かります。</div>
+        </div>
+        <div class="point-box">
+            <div class="point-icon">🛡️</div>
+            <div class="point-title">安全ラインとの差額</div>
+            <div class="point-text">安全に経営するために、あといくら必要か見えます。</div>
+        </div>
+        <div class="point-box">
+            <div class="point-icon">📈</div>
+            <div class="point-title">今やるべき改善</div>
+            <div class="point-text">売上・原価・固定費のどこを直すべきか整理できます。</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Warning
 st.markdown("""
 <div class="warning-box">
     <div class="warning-title">売上があっても、現金が尽きたら終わりです。</div>
@@ -425,7 +632,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 悩み
+# Problems
 st.markdown("""
 <div class="section-card">
     <div class="section-title">こんなお悩みありませんか？</div>
@@ -438,68 +645,68 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 特徴
+# Features
 st.markdown("""
 <div class="section-card">
     <div class="section-title">建設キャッシュレーダーで分かること</div>
     <div class="feature-grid">
         <div class="feature-box">
             <div class="feature-num">STEP 1</div>
-            <div class="feature-title">資金ショート時期</div>
-            <div class="feature-text">このままだと、あと何ヶ月で危ないかが分かります。</div>
+            <div class="feature-title">あと何ヶ月持つか分かる</div>
+            <div class="feature-text">このままだと、いつ危ないかが見えます。</div>
         </div>
         <div class="feature-box">
             <div class="feature-num">STEP 2</div>
-            <div class="feature-title">安全ライン不足額</div>
-            <div class="feature-text">安全にするために、月いくら改善が必要か見えます。</div>
+            <div class="feature-title">安全ラインとの差額が分かる</div>
+            <div class="feature-text">安全にするために、あといくら必要か見えます。</div>
         </div>
         <div class="feature-box">
             <div class="feature-num">STEP 3</div>
-            <div class="feature-title">今日やる打ち手</div>
-            <div class="feature-text">売上・入金・固定費・原価のどこを優先すべきか整理できます。</div>
+            <div class="feature-title">今やるべき改善が分かる</div>
+            <div class="feature-text">売上・固定費・原価のどこを直すべきか整理できます。</div>
         </div>
         <div class="feature-box">
             <div class="feature-num">PRO</div>
-            <div class="feature-title">さらに深く改善</div>
-            <div class="feature-text">12ヶ月資金推移、銀行提出サマリー、利益改善シミュレーターまで使えます。</div>
+            <div class="feature-title">毎月使える経営ダッシュボード</div>
+            <div class="feature-text">12ヶ月資金推移、現場利益、銀行提出サマリーまで使えます。</div>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# 導線
+# Flow
 st.markdown("""
 <div class="section-card">
     <div class="section-title">使い方はかんたんです</div>
     <div class="flow">
         <div class="flow-box">
             <div class="flow-step">STEP 1</div>
-            <div class="flow-title">無料診断</div>
+            <div class="flow-title">数字を入れる</div>
             <div class="flow-text">売上・原価・固定費・現金を入力</div>
         </div>
         <div class="flow-box">
             <div class="flow-step">STEP 2</div>
-            <div class="flow-title">結果確認</div>
-            <div class="flow-text">危険時期と不足額をチェック</div>
+            <div class="flow-title">結果を見る</div>
+            <div class="flow-text">危険度・不足額・改善ポイントを確認</div>
         </div>
         <div class="flow-box">
             <div class="flow-step">STEP 3</div>
-            <div class="flow-title">LINE申込み</div>
+            <div class="flow-title">LINEで相談</div>
             <div class="flow-text">もっと詳しく使いたい方はLINEへ</div>
         </div>
         <div class="flow-box">
             <div class="flow-step">STEP 4</div>
-            <div class="flow-title">Pro利用</div>
-            <div class="flow-text">資金推移・利益管理まで使える</div>
+            <div class="flow-title">Pro版で管理</div>
+            <div class="flow-text">毎月の資金推移と危険アラートを確認</div>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# 価格
+# Price
 st.markdown("""
 <div class="price-box">
-    <h3>続きは Pro版へ</h3>
+    <h3>社長専用 Proダッシュボード</h3>
     <div class="price-text">
         Pro版では<br>
         <b>12ヶ月資金推移</b>・<b>現場利益管理</b>・<b>銀行提出サマリー</b><br>
@@ -507,15 +714,15 @@ st.markdown("""
     </div>
     <div class="price-main">月 9,800円</div>
     <div class="price-text">
-        まずは無料診断 → 気に入ったらLINEから申込み
+        まずは無料診断。必要ならLINEから申込み。
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-st.link_button("無料で診断する", APP_URL)
+st.link_button("30秒で無料診断する", APP_URL)
 st.link_button("LINEで問い合わせる", LINE_URL)
 
-# フッター
+# Footer
 st.markdown("""
 <div class="small-note">
 ※ スマホでも見やすく設計しています。<br>
