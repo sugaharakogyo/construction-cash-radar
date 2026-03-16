@@ -9,7 +9,6 @@ st.set_page_config(
 APP_URL = "https://construction-cash-check.streamlit.app"
 LINE_URL = "https://lin.ee/7m28VAs"
 
-# Google Analytics
 st.components.v1.html(
     """
     <!-- Google tag (gtag.js) -->
@@ -24,7 +23,7 @@ st.components.v1.html(
     height=0,
 )
 
-st.markdown("""
+html = """
 <style>
 .block-container{
     max-width: 920px;
@@ -435,7 +434,7 @@ a{
 
   <div class="green-band">建設会社専用 / 資金ショート危険度を無料診断</div>
 
-  <a class="primary-btn" href="%s" target="_self">30秒で無料診断する</a>
+  <a class="primary-btn" href="APP_URL" target="_self">30秒で無料診断する</a>
 
   <div class="card">
     <div class="card-title">30秒でこの3つが分かります</div>
@@ -516,8 +515,8 @@ a{
   </div>
 
   <div class="cta-stack">
-    <a class="primary-btn" href="%s" target="_self">30秒で無料診断する</a>
-    <a class="secondary-btn" href="%s" target="_blank">LINEで問い合わせる</a>
+    <a class="primary-btn" href="APP_URL" target="_self">30秒で無料診断する</a>
+    <a class="secondary-btn" href="LINE_URL" target="_blank">LINEで問い合わせる</a>
   </div>
 
   <div class="footer">
@@ -526,4 +525,8 @@ a{
   </div>
 
 </div>
-""" % (APP_URL, APP_URL, LINE_URL), unsafe_allow_html=True)
+"""
+
+html = html.replace("APP_URL", APP_URL).replace("LINE_URL", LINE_URL)
+
+st.markdown(html, unsafe_allow_html=True)
