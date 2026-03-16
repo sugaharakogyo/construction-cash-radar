@@ -55,9 +55,9 @@ color:white;
 .hero-wrap{
 background: linear-gradient(135deg,#020617 0%,#0b3b74 40%,#0284c7 100%);
 border-radius: 30px;
-padding: 32px 24px;
-box-shadow: 0 24px 50px rgba(0,0,0,0.35);
-margin-bottom: 26px;
+padding: 34px 24px;
+box-shadow: 0 25px 55px rgba(0,0,0,0.45);
+margin-bottom: 28px;
 }
 .badge{
     display:inline-block;
@@ -96,14 +96,13 @@ margin-bottom: 26px;
 }
 .price-box{
 background:linear-gradient(180deg,#f0fff4,#dcfce7);
-border:5px solid #16a34a;
+border:6px solid #16a34a;
 border-radius:28px;
-padding:28px 20px;
+padding:30px 20px;
 text-align:center;
-margin-top:26px;
-box-shadow:0 18px 36px rgba(22,163,74,0.25);
+margin-top:30px;
+box-shadow:0 20px 40px rgba(22,163,74,0.35);
 }
-
 .price-big{
     font-size:54px;
     font-weight:900;
