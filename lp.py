@@ -1,9 +1,9 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="建設キャッシュレーダー",
-    page_icon="🏗",
-    layout="centered"
+page_title="建設キャッシュレーダー",
+page_icon="🏗",
+layout="centered"
 )
 
 APP_URL="https://construction-cash-radar.streamlit.app"
@@ -19,6 +19,7 @@ padding-top:1rem;
 
 .stApp{
 background:#f3f4f6;
+font-family:sans-serif;
 }
 
 /* HERO */
@@ -29,7 +30,7 @@ border-radius:24px;
 padding:28px;
 color:white;
 margin-bottom:20px;
-box-shadow:0 15px 35px rgba(0,0,0,0.25);
+box-shadow:0 20px 40px rgba(0,0,0,0.25);
 }
 
 .hero-badge{
@@ -42,18 +43,17 @@ display:inline-block;
 margin-bottom:12px;
 }
 
-.hero-appname{
-font-size:15px;
+.hero-app{
 font-weight:800;
 margin-bottom:10px;
-color:#e0ecff;
+color:#dbeafe;
 }
 
 .hero-title{
 font-size:52px;
 font-weight:900;
 line-height:1.1;
-margin-bottom:12px;
+margin-bottom:14px;
 }
 
 .yellow{color:#facc15;}
@@ -61,13 +61,14 @@ margin-bottom:12px;
 
 .hero-sub{
 font-size:20px;
-font-weight:700;
 line-height:1.8;
+font-weight:700;
 }
 
 .hero-mini{
 margin-top:12px;
 color:#dbeafe;
+font-size:16px;
 }
 
 /* CTA */
@@ -80,52 +81,56 @@ padding:10px;
 font-weight:800;
 text-align:center;
 margin:18px 0;
+color:#111827;
 }
 
-/* SECTION */
+/* section */
 
 .section-title{
 font-size:28px;
 font-weight:900;
 margin:30px 0 10px;
+color:#111827;
 }
 
-/* CARDS */
+/* cards */
 
 .card{
 background:white;
 border-radius:14px;
-padding:16px;
+padding:18px;
 margin-bottom:12px;
-box-shadow:0 2px 6px rgba(0,0,0,0.05);
+box-shadow:0 3px 6px rgba(0,0,0,0.05);
+color:#111827;
 }
 
 .card-green{
-border-left:6px solid #16a34a;
 background:#dcfce7;
+border-left:6px solid #16a34a;
 }
 
 .card-blue{
-border-left:6px solid #2563eb;
 background:#dbeafe;
+border-left:6px solid #2563eb;
 }
 
 .card-yellow{
-border-left:6px solid #eab308;
 background:#fef9c3;
+border-left:6px solid #eab308;
 }
 
-/* WARNING */
+/* warning */
 
 .warning{
 background:#fee2e2;
 border-left:6px solid #ef4444;
 border-radius:14px;
-padding:18px;
-margin:20px 0;
+padding:20px;
+margin:24px 0;
+color:#111827;
 }
 
-/* LIST */
+/* list */
 
 .list{
 background:white;
@@ -133,17 +138,30 @@ border-radius:14px;
 padding:16px;
 margin-bottom:10px;
 box-shadow:0 2px 5px rgba(0,0,0,0.05);
+color:#111827;
 }
 
-/* PRICE */
+/* result sample */
+
+.sample{
+background:#eef2ff;
+border-left:6px solid #4f46e5;
+border-radius:14px;
+padding:20px;
+margin:25px 0;
+color:#111827;
+}
+
+/* price */
 
 .price{
-background:#dcfce7;
+background:#bbf7d0;
 border:4px solid #16a34a;
 border-radius:24px;
 padding:28px;
 text-align:center;
 margin:30px 0;
+color:#111827;
 }
 
 .price-title{
@@ -157,31 +175,22 @@ font-weight:900;
 margin:10px 0;
 }
 
-/* MOBILE */
+/* mobile */
 
 @media(max-width:768px){
 
-.hero-title{
-font-size:34px;
-}
+.hero-title{font-size:34px;}
 
-.hero-sub{
-font-size:16px;
-}
+.hero-sub{font-size:16px;}
 
-.price-main{
-font-size:38px;
-}
+.section-title{font-size:22px;}
 
-.section-title{
-font-size:22px;
-}
+.price-main{font-size:40px;}
 
 }
 
 </style>
 """,unsafe_allow_html=True)
-
 
 # HERO
 
@@ -190,7 +199,7 @@ st.markdown("""
 
 <div class="hero-badge">建設会社専用 / 最短30秒 無料診断</div>
 
-<div class="hero-appname">建設キャッシュレーダー</div>
+<div class="hero-app">建設キャッシュレーダー</div>
 
 <div class="hero-title">
 <span class="yellow">黒字でも</span><br>
@@ -199,40 +208,42 @@ st.markdown("""
 
 <div class="hero-sub">
 
-あなたの会社、あと何ヶ月持つか分かりますか？<br><br>
+原因は <b>資金ショート</b> です。<br><br>
 
 売上・原価・固定費・現金を入れるだけで<br>
 
-資金ショート危険度 と 安全ライン不足額 を<br>
+あなたの会社の<br>
 
-最短30秒で診断します。
+<b>資金ショート危険度</b> と  
+<b>安全ライン不足額</b> が  
+
+30秒で分かります。
 
 </div>
 
 <div class="hero-mini">
-会計ソフトでは見えない未来の資金を見える化。<br>
-スマホでもすぐ使えます。
+
+会計ソフトでは見えない  
+未来の資金繰りを見える化。
+
 </div>
 
 </div>
 """,unsafe_allow_html=True)
 
-
 st.markdown('<div class="green-band">建設会社専用 / 資金ショート危険度を無料診断</div>',unsafe_allow_html=True)
 
 st.link_button("30秒で無料診断する",APP_URL)
-
 
 # 3つ
 
 st.markdown('<div class="section-title">30秒でこの3つが分かります</div>',unsafe_allow_html=True)
 
-st.markdown('<div class="card card-green"><b>⏳ あと何ヶ月持つか</b><br>資金ショートまでの目安がすぐ分かります。</div>',unsafe_allow_html=True)
+st.markdown('<div class="card card-green"><b>資金ショートまでの期間</b><br>あと何ヶ月持つか分かります。</div>',unsafe_allow_html=True)
 
-st.markdown('<div class="card card-blue"><b>🛡️ 安全ラインとの差額</b><br>安全に経営するために、あといくら必要か見えます。</div>',unsafe_allow_html=True)
+st.markdown('<div class="card card-blue"><b>安全ラインとの差額</b><br>あといくら必要か見えます。</div>',unsafe_allow_html=True)
 
-st.markdown('<div class="card card-yellow"><b>📈 今やるべき改善</b><br>売上・原価・固定費のどこを優先して直すべきか整理できます。</div>',unsafe_allow_html=True)
-
+st.markdown('<div class="card card-yellow"><b>改善ポイント</b><br>どこを直せばいいか分かります。</div>',unsafe_allow_html=True)
 
 # WARNING
 
@@ -241,73 +252,85 @@ st.markdown("""
 
 <b style="font-size:22px">売上があっても、現金が尽きたら終わりです。</b><br><br>
 
-利益が出ていても、入金サイト・原価率・固定費のズレで突然お金が回らなくなることがあります。  
+利益が出ていても  
 
-建設キャッシュレーダーは、その危険を先に見つけるためのツールです。
+入金サイト・原価率・固定費のズレで  
+
+突然お金が回らなくなることがあります。
 
 </div>
 """,unsafe_allow_html=True)
 
+# sample result
+
+st.markdown('<div class="section-title">診断結果のイメージ</div>',unsafe_allow_html=True)
+
+st.markdown("""
+<div class="sample">
+
+売上　900万円<br>
+原価　620万円<br>
+固定費　260万円<br>
+現金　180万円<br><br>
+
+<b>診断結果</b><br><br>
+
+資金ショートまで  
+<b>3.4ヶ月</b><br><br>
+
+安全ライン  
+<b>あと380万円不足</b><br><br>
+
+改善ポイント  
+<b>原価率 −3%</b>
+
+</div>
+""",unsafe_allow_html=True)
 
 # 悩み
 
 st.markdown('<div class="section-title">こんなお悩みありませんか？</div>',unsafe_allow_html=True)
 
-st.markdown('<div class="list"><b>売上はあるのに、お金が残らない</b></div>',unsafe_allow_html=True)
-st.markdown('<div class="list"><b>原価率が高い現場に後から気づく</b></div>',unsafe_allow_html=True)
-st.markdown('<div class="list"><b>このままで本当に大丈夫か不安</b></div>',unsafe_allow_html=True)
-st.markdown('<div class="list"><b>銀行や税理士に数字をうまく説明できない</b></div>',unsafe_allow_html=True)
-
+st.markdown('<div class="list">売上はあるのにお金が残らない</div>',unsafe_allow_html=True)
+st.markdown('<div class="list">原価率が高い現場に後から気づく</div>',unsafe_allow_html=True)
+st.markdown('<div class="list">このままで本当に大丈夫か不安</div>',unsafe_allow_html=True)
+st.markdown('<div class="list">銀行や税理士に数字を説明できない</div>',unsafe_allow_html=True)
 
 # 向いてる会社
 
 st.markdown('<div class="section-title">このサービスが向いている会社</div>',unsafe_allow_html=True)
 
-st.markdown('<div class="list"><b>月ごとの資金繰りを先に把握したい会社</b><br>「今月は大丈夫」ではなく、数ヶ月先まで見たい会社に向いています。</div>',unsafe_allow_html=True)
-
-st.markdown('<div class="list"><b>社長が数字判断を早くしたい会社</b><br>売上・原価・固定費・現金を入れて、すぐ判断したい会社に向いています。</div>',unsafe_allow_html=True)
-
-st.markdown('<div class="list"><b>税理士・銀行との会話を強くしたい会社</b><br>感覚ではなく、数字で話したい会社に向いています。</div>',unsafe_allow_html=True)
-
+st.markdown('<div class="list">月ごとの資金繰りを先に把握したい会社</div>',unsafe_allow_html=True)
+st.markdown('<div class="list">社長が数字判断を早くしたい会社</div>',unsafe_allow_html=True)
+st.markdown('<div class="list">税理士・銀行との会話を強くしたい会社</div>',unsafe_allow_html=True)
 
 # 使い方
 
 st.markdown('<div class="section-title">使い方はかんたんです</div>',unsafe_allow_html=True)
 
-st.markdown('<div class="list"><b>STEP1　数字を入れる</b><br>売上・原価・固定費・現金を入力します。</div>',unsafe_allow_html=True)
+st.markdown('<div class="list"><b>STEP1</b> 数字を入力</div>',unsafe_allow_html=True)
+st.markdown('<div class="list"><b>STEP2</b> 診断結果を見る</div>',unsafe_allow_html=True)
+st.markdown('<div class="list"><b>STEP3</b> LINEで相談</div>',unsafe_allow_html=True)
+st.markdown('<div class="list"><b>STEP4</b> Pro版で管理</div>',unsafe_allow_html=True)
 
-st.markdown('<div class="list"><b>STEP2　結果を見る</b><br>危険度・不足額・改善ポイントを確認します。</div>',unsafe_allow_html=True)
-
-st.markdown('<div class="list"><b>STEP3　LINEで相談</b><br>もっと詳しく使いたい方はLINEへ進みます。</div>',unsafe_allow_html=True)
-
-st.markdown('<div class="list"><b>STEP4　Pro版で管理</b><br>毎月の資金推移と危険アラートを確認します。</div>',unsafe_allow_html=True)
-
-
-# 価格
+# price
 
 st.markdown("""
 <div class="price">
 
 <div class="price-title">社長専用 Proダッシュボード</div>
 
-12ヶ月資金推移・現場利益管理・銀行提出サマリー<br>
-利益改善シミュレーターまで使えます。
+12ヶ月資金推移<br>
+現場利益管理<br>
+銀行提出サマリー<br>
+利益改善シミュレーター
 
 <div class="price-main">月 9,800円</div>
 
-まずは無料診断。必要ならLINEから申込み。
+まずは無料診断
 
 </div>
 """,unsafe_allow_html=True)
-
 
 st.link_button("30秒で無料診断する",APP_URL)
 st.link_button("LINEで問い合わせる",LINE_URL)
-
-
-st.markdown("""
-<div style="text-align:center;color:#6b7280;font-size:14px;margin-top:20px">
-※ スマホでも見やすく設計しています。<br>
-※ インスタ・QR・チラシからそのまま開けます。
-</div>
-""",unsafe_allow_html=True)
