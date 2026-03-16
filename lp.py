@@ -41,9 +41,10 @@ st.markdown("""
     margin-bottom: 12px;
 }
 .subtext{
-    font-size: 19px;
-    font-weight: 700;
-    line-height: 1.8;
+font-size:19px;
+font-weight:700;
+line-height:1.8;
+color:white;
 }
 .mini{
     font-size: 15px;
@@ -94,14 +95,15 @@ margin-bottom: 26px;
     color:#111;
 }
 .price-box{
-    background:#eefcf3;
-    border:4px solid #16a34a;
-    border-radius:26px;
-    padding:24px 18px;
-    text-align:center;
-    margin-top:22px;
-    box-shadow:0 14px 28px rgba(22,163,74,0.12);
+background:linear-gradient(180deg,#f0fff4,#dcfce7);
+border:5px solid #16a34a;
+border-radius:28px;
+padding:28px 20px;
+text-align:center;
+margin-top:26px;
+box-shadow:0 18px 36px rgba(22,163,74,0.25);
 }
+
 .price-big{
     font-size:54px;
     font-weight:900;
