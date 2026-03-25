@@ -80,25 +80,25 @@ def save_users(users):
 
 def ensure_default_admin():
     users = load_users()
-    # 初回だけ管理用のサンプルアカウントを作る
-    # 必要ならあとでID/PASSを変更してください
     if "admin" not in users:
         users["admin"] = {
             "password_hash": hash_password("admin1234"),
-            "display_name": "管理者"
+            "display_name": "管理者",
+            "role": "admin"
         }
         save_users(users)
 
-def register_user(username: str, password: str, display_name: str = ""):
+def register_user_by_admin(username: str, password: str, display_name: str = ""):
     users = load_users()
     if username in users:
-        return False, "このIDはすでに使われています。"
+        return False, "このPro IDはすでに使われています。"
     users[username] = {
         "password_hash": hash_password(password),
-        "display_name": display_name or username
+        "display_name": display_name or username,
+        "role": "user"
     }
     save_users(users)
-    return True, "Proユーザーを登録しました。"
+    return True, "Proユーザーを発行しました。"
 
 def authenticate_user(username: str, password: str):
     users = load_users()
@@ -106,6 +106,10 @@ def authenticate_user(username: str, password: str):
     if not user:
         return False
     return user.get("password_hash") == hash_password(password)
+
+def get_user_info(username: str):
+    users = load_users()
+    return users.get(username, {})
 
 def get_user_state_file(username: str) -> Path:
     safe_name = re.sub(r'[\\/:*?"<>| ]', "_", username)
@@ -161,7 +165,10 @@ def reset_state_for_user(username=None):
 
 def change_and_save():
     username = st.session_state.get("auth_user")
-    save_state_for_user(username if st.session_state.get("is_pro_logged_in") else None)
+    if st.session_state.get("is_pro_logged_in"):
+        save_state_for_user(username)
+    else:
+        save_state_for_user(None)
 
 def count_demo_use():
     if st.session_state.get("plan") == "デモ（無料）":
@@ -319,8 +326,9 @@ if "is_pro_logged_in" not in st.session_state:
     st.session_state["is_pro_logged_in"] = False
 if "auth_user" not in st.session_state:
     st.session_state["auth_user"] = ""
+if "auth_role" not in st.session_state:
+    st.session_state["auth_role"] = ""
 
-# 初回ロード
 if "app_initialized" not in st.session_state:
     loaded = load_state_for_user(None)
     for key, value in loaded.items():
@@ -468,6 +476,14 @@ st.markdown("""
         font-weight: 700;
     }
 
+    .input-highlight {
+        background: #f8fafc;
+        border: 2px solid #cbd5e1;
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 12px;
+    }
+
     .stMetric {
         background: #ffffff;
         padding: 16px;
@@ -476,6 +492,27 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
         text-align: center;
         margin-bottom: 14px;
+    }
+
+    .stTextInput label, .stNumberInput label, .stSlider label {
+        color: #0f172a !important;
+        font-weight: 800 !important;
+        font-size: 1.05rem !important;
+    }
+
+    .stTextInput input, .stNumberInput input {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border: 2px solid #94a3b8 !important;
+        border-radius: 12px !important;
+        padding: 0.7rem 0.9rem !important;
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+    }
+
+    .stTextInput input:focus, .stNumberInput input:focus {
+        border: 2px solid #2563eb !important;
+        box-shadow: 0 0 0 1px #2563eb !important;
     }
 
     .stButton > button {
@@ -547,6 +584,7 @@ if st.session_state["is_pro_logged_in"]:
     st.markdown(f"""
         <div class="auth-box">
             ログイン中: <b>{st.session_state["auth_user"]}</b>
+            {" / 管理者" if st.session_state["auth_role"] == "admin" else ""}
         </div>
     """, unsafe_allow_html=True)
 
@@ -562,6 +600,7 @@ if st.session_state["is_pro_logged_in"]:
         if st.button("🚪 ログアウト"):
             st.session_state["is_pro_logged_in"] = False
             st.session_state["auth_user"] = ""
+            st.session_state["auth_role"] = ""
             st.session_state["plan"] = "デモ（無料）"
             loaded = load_state_for_user(None)
             for key, value in loaded.items():
@@ -569,43 +608,71 @@ if st.session_state["is_pro_logged_in"]:
             st.rerun()
 
 else:
-    tab1, tab2 = st.tabs(["ログイン", "Proユーザー登録"])
+    st.markdown("<div class='input-highlight'>", unsafe_allow_html=True)
+    st.text_input("Pro ID を入力", key="login_id")
+    st.text_input("パスワードを入力", type="password", key="login_pw")
+    if st.button("🔑 ログインする"):
+        login_id = st.session_state.get("login_id", "").strip()
+        login_pw = st.session_state.get("login_pw", "").strip()
+        if authenticate_user(login_id, login_pw):
+            user_info = get_user_info(login_id)
+            st.session_state["is_pro_logged_in"] = True
+            st.session_state["auth_user"] = login_id
+            st.session_state["auth_role"] = user_info.get("role", "user")
+            st.session_state["plan"] = "Pro（月9,800円）"
+            loaded = load_state_for_user(login_id)
+            for key, value in loaded.items():
+                st.session_state[key] = value
+            st.success("ログインしました。")
+            st.rerun()
+        else:
+            st.error("Pro ID かパスワードが違います。")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    with tab1:
-        login_id = st.text_input("Pro ID", key="login_id")
-        login_pw = st.text_input("パスワード", type="password", key="login_pw")
-
-        if st.button("🔑 ログインする"):
-            if authenticate_user(login_id, login_pw):
-                st.session_state["is_pro_logged_in"] = True
-                st.session_state["auth_user"] = login_id
-                st.session_state["plan"] = "Pro（月9,800円）"
-                loaded = load_state_for_user(login_id)
-                for key, value in loaded.items():
-                    st.session_state[key] = value
-                st.success("ログインしました。")
-                st.rerun()
-            else:
-                st.error("IDかパスワードが違います。")
-
-    with tab2:
-        new_id = st.text_input("新しいPro ID", key="new_id")
-        new_name = st.text_input("表示名", key="new_name")
-        new_pw = st.text_input("新しいパスワード", type="password", key="new_pw")
-
-        if st.button("👤 Proユーザー登録"):
-            if not new_id.strip() or not new_pw.strip():
-                st.warning("IDとパスワードを入れてください。")
-            elif len(new_pw) < 4:
-                st.warning("パスワードは4文字以上にしてください。")
-            else:
-                ok, msg = register_user(new_id.strip(), new_pw.strip(), new_name.strip())
-                if ok:
-                    st.success(msg)
-                else:
-                    st.error(msg)
+    st.caption("管理者が発行したPro IDでログインしてください。")
 
 st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# 管理者だけのユーザー発行
+# =========================
+if st.session_state.get("is_pro_logged_in") and st.session_state.get("auth_role") == "admin":
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("🛠️ 管理者専用：Proユーザー発行")
+
+    st.markdown("<div class='input-highlight'>", unsafe_allow_html=True)
+    st.text_input("新しいPro ID", key="admin_new_id")
+    st.text_input("表示名", key="admin_new_name")
+    st.text_input("初期パスワード", type="password", key="admin_new_pw")
+
+    if st.button("👤 Proユーザーを発行"):
+        new_id = st.session_state.get("admin_new_id", "").strip()
+        new_name = st.session_state.get("admin_new_name", "").strip()
+        new_pw = st.session_state.get("admin_new_pw", "").strip()
+
+        if not new_id or not new_pw:
+            st.warning("Pro ID と初期パスワードを入れてください。")
+        elif len(new_pw) < 4:
+            st.warning("初期パスワードは4文字以上にしてください。")
+        else:
+            ok, msg = register_user_by_admin(new_id, new_pw, new_name)
+            if ok:
+                st.success(msg)
+            else:
+                st.error(msg)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    users = load_users()
+    rows = []
+    for uid, info in users.items():
+        rows.append({
+            "Pro ID": uid,
+            "表示名": info.get("display_name", ""),
+            "権限": info.get("role", "user")
+        })
+    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
 # 会社名入力
@@ -884,7 +951,7 @@ with col_b:
 st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
-# Pro限定 / デモは一部だけ
+# Pro限定 / デモ一部表示
 # =========================
 if is_pro:
     st.markdown("""
@@ -964,7 +1031,6 @@ else:
         </div>
     """, unsafe_allow_html=True)
 
-    # デモは一部だけ見せる
     preview_col1, preview_col2 = st.columns(2)
     with preview_col1:
         st.metric("12ヶ月後の税引後現預金（プレビュー）", f"{cash_after_tax[-1]:,.0f} 万円")
