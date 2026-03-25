@@ -586,7 +586,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-st.link_button("📱 LINE追加ボタン", LINE_URL="https://lin.ee/7m28VAs")
+st.link_button("📱 LINE追加ボタン", "https://lin.ee/7m28VAs")
 
 # =========================
 # フッター
