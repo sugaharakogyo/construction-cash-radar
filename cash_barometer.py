@@ -111,6 +111,25 @@ def get_user_info(username: str):
     users = load_users()
     return users.get(username, {})
 
+def update_password(username: str, current_password: str, new_password: str):
+    users = load_users()
+    user = users.get(username)
+    if not user:
+        return False, "ユーザーが見つかりません。"
+    if user.get("password_hash") != hash_password(current_password):
+        return False, "現在のパスワードが違います。"
+    users[username]["password_hash"] = hash_password(new_password)
+    save_users(users)
+    return True, "パスワードを変更しました。"
+
+def admin_reset_user_password(target_username: str, new_password: str):
+    users = load_users()
+    if target_username not in users:
+        return False, "対象ユーザーが見つかりません。"
+    users[target_username]["password_hash"] = hash_password(new_password)
+    save_users(users)
+    return True, "パスワードを再設定しました。"
+
 def get_user_state_file(username: str) -> Path:
     safe_name = re.sub(r'[\\/:*?"<>| ]', "_", username)
     return USER_DATA_DIR / f"{safe_name}_state.json"
@@ -193,11 +212,9 @@ def sanitize_filename(text: str) -> str:
 def draw_label_value(c, x, y, label, value, width=230, height=54):
     c.setFillColor(white)
     c.roundRect(x, y - height, width, height, 10, fill=1, stroke=0)
-
     c.setFillColor(HexColor("#475569"))
     c.setFont(PDF_FONT_BOLD, 9)
     c.drawString(x + 12, y - 16, label)
-
     c.setFillColor(HexColor("#0f172a"))
     c.setFont(PDF_FONT_BOLD, 16)
     c.drawString(x + 12, y - 38, value)
@@ -353,24 +370,24 @@ st.markdown("""
 
     .block-container {
         max-width: 900px;
-        padding-top: 1.2rem;
-        padding-bottom: 2rem;
+        padding-top: 1rem;
+        padding-bottom: 1.2rem;
     }
 
     .card {
         background: #ffffff;
-        padding: 22px;
+        padding: 20px;
         border-radius: 18px;
         box-shadow: 0 8px 20px rgba(15, 23, 42, 0.10);
-        margin-bottom: 18px;
+        margin-bottom: 14px;
         border: 1px solid #dbe4ee;
     }
 
     .center-card {
-        padding: 24px;
+        padding: 20px;
         border-radius: 20px;
         box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
-        margin-bottom: 18px;
+        margin-bottom: 14px;
         text-align: center;
         border: 1px solid rgba(255,255,255,0.25);
     }
@@ -378,8 +395,8 @@ st.markdown("""
     .big-status-font {
         font-size: 4.0rem !important;
         font-weight: 900 !important;
-        margin-top: 0.4rem;
-        margin-bottom: 0.4rem;
+        margin-top: 0.3rem;
+        margin-bottom: 0.3rem;
         line-height: 1;
         color: white !important;
     }
@@ -395,28 +412,28 @@ st.markdown("""
         border-left: 8px solid #2563eb;
         padding: 18px;
         border-radius: 12px;
-        margin-top: 10px;
-        margin-bottom: 10px;
+        margin-top: 8px;
+        margin-bottom: 8px;
         color: #0f172a !important;
     }
 
     .pro-box {
         background: linear-gradient(135deg, #111827, #1f2937);
         color: white !important;
-        padding: 18px;
+        padding: 16px;
         border-radius: 16px;
         box-shadow: 0 8px 18px rgba(0,0,0,0.18);
-        margin-bottom: 18px;
+        margin-bottom: 12px;
         text-align: center;
     }
 
     .demo-box {
         background: #fff4cc;
         color: #5b4300 !important;
-        padding: 18px;
+        padding: 16px;
         border-radius: 14px;
         border: 2px solid #f4c542;
-        margin-bottom: 18px;
+        margin-bottom: 12px;
         text-align: center;
         font-weight: 700;
     }
@@ -424,10 +441,10 @@ st.markdown("""
     .locked-box {
         background: linear-gradient(135deg, #7c2d12, #b91c1c);
         color: white !important;
-        padding: 18px;
+        padding: 16px;
         border-radius: 16px;
         box-shadow: 0 8px 18px rgba(0,0,0,0.14);
-        margin-bottom: 16px;
+        margin-bottom: 12px;
         text-align: center;
         font-weight: 700;
     }
@@ -435,10 +452,10 @@ st.markdown("""
     .line-box {
         background: linear-gradient(135deg, #06c755, #03a84a);
         color: white !important;
-        padding: 18px;
+        padding: 16px;
         border-radius: 16px;
         box-shadow: 0 8px 18px rgba(0,0,0,0.14);
-        margin-bottom: 16px;
+        margin-bottom: 12px;
         text-align: center;
         font-weight: 700;
     }
@@ -446,10 +463,10 @@ st.markdown("""
     .csv-box {
         background: linear-gradient(135deg, #0f766e, #0f4c81);
         color: white !important;
-        padding: 18px;
+        padding: 16px;
         border-radius: 16px;
         box-shadow: 0 8px 18px rgba(0,0,0,0.14);
-        margin-bottom: 16px;
+        margin-bottom: 12px;
         text-align: center;
         font-weight: 700;
     }
@@ -457,10 +474,10 @@ st.markdown("""
     .pdf-box {
         background: linear-gradient(135deg, #7c2d12, #b91c1c);
         color: white !important;
-        padding: 18px;
+        padding: 16px;
         border-radius: 16px;
         box-shadow: 0 8px 18px rgba(0,0,0,0.14);
-        margin-bottom: 16px;
+        margin-bottom: 12px;
         text-align: center;
         font-weight: 700;
     }
@@ -468,10 +485,10 @@ st.markdown("""
     .auth-box {
         background: linear-gradient(135deg, #0f172a, #334155);
         color: white !important;
-        padding: 18px;
+        padding: 16px;
         border-radius: 16px;
         box-shadow: 0 8px 18px rgba(0,0,0,0.14);
-        margin-bottom: 16px;
+        margin-bottom: 12px;
         text-align: center;
         font-weight: 700;
     }
@@ -481,17 +498,17 @@ st.markdown("""
         border: 2px solid #cbd5e1;
         border-radius: 14px;
         padding: 14px;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
 
     .stMetric {
         background: #ffffff;
-        padding: 16px;
+        padding: 14px;
         border-radius: 14px;
         border: 1px solid #d9e2ec;
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
         text-align: center;
-        margin-bottom: 14px;
+        margin-bottom: 10px;
     }
 
     .stTextInput label, .stNumberInput label, .stSlider label {
@@ -518,8 +535,8 @@ st.markdown("""
     .stButton > button {
         width: 100%;
         border-radius: 12px;
-        height: 3.2rem;
-        font-size: 1.02rem;
+        height: 3.1rem;
+        font-size: 1rem;
         font-weight: 700;
         background: #2563eb;
         color: white;
@@ -537,7 +554,7 @@ st.markdown("""
         display: inline-block;
         text-align: center;
         border-radius: 12px;
-        padding: 0.9rem 1rem;
+        padding: 0.85rem 1rem;
         background: #06c755;
         color: white !important;
         font-weight: 700;
@@ -548,12 +565,25 @@ st.markdown("""
     div[data-testid="stDownloadButton"] button {
         width: 100%;
         border-radius: 12px;
-        height: 3.2rem;
+        height: 3.1rem;
         font-size: 0.98rem;
         font-weight: 700;
         background: #0f766e;
         color: white;
         border: none;
+    }
+
+    .stAlert {
+        margin-top: 0.3rem !important;
+        margin-bottom: 0.6rem !important;
+    }
+
+    hr {
+        display: none !important;
+    }
+
+    [data-testid="stVerticalBlock"] > div:empty {
+        display: none !important;
     }
 
     @media (max-width: 640px) {
@@ -606,7 +636,6 @@ if st.session_state["is_pro_logged_in"]:
             for key, value in loaded.items():
                 st.session_state[key] = value
             st.rerun()
-
 else:
     st.markdown("<div class='input-highlight'>", unsafe_allow_html=True)
     st.text_input("Pro ID を入力", key="login_id")
@@ -628,7 +657,6 @@ else:
         else:
             st.error("Pro ID かパスワードが違います。")
     st.markdown("</div>", unsafe_allow_html=True)
-
     st.caption("管理者が発行したPro IDでログインしてください。")
 
 st.markdown("</div>", unsafe_allow_html=True)
@@ -662,6 +690,27 @@ if st.session_state.get("is_pro_logged_in") and st.session_state.get("auth_role"
                 st.error(msg)
     st.markdown("</div>", unsafe_allow_html=True)
 
+    st.markdown("<div class='input-highlight'>", unsafe_allow_html=True)
+    st.subheader("🔁 管理者専用：ユーザーパスワード再設定")
+    st.text_input("対象Pro ID", key="admin_reset_id")
+    st.text_input("新しいパスワード", type="password", key="admin_reset_pw")
+
+    if st.button("🔧 パスワード再設定"):
+        target_id = st.session_state.get("admin_reset_id", "").strip()
+        new_pw = st.session_state.get("admin_reset_pw", "").strip()
+
+        if not target_id or not new_pw:
+            st.warning("対象Pro IDと新しいパスワードを入れてください。")
+        elif len(new_pw) < 4:
+            st.warning("新しいパスワードは4文字以上にしてください。")
+        else:
+            ok, msg = admin_reset_user_password(target_id, new_pw)
+            if ok:
+                st.success(msg)
+            else:
+                st.error(msg)
+    st.markdown("</div>", unsafe_allow_html=True)
+
     users = load_users()
     rows = []
     for uid, info in users.items():
@@ -672,6 +721,38 @@ if st.session_state.get("is_pro_logged_in") and st.session_state.get("auth_role"
         })
     st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# ログインユーザーのパスワード変更
+# =========================
+if st.session_state.get("is_pro_logged_in"):
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("🔑 パスワード変更")
+
+    st.markdown("<div class='input-highlight'>", unsafe_allow_html=True)
+    st.text_input("現在のパスワード", type="password", key="change_current_pw")
+    st.text_input("新しいパスワード", type="password", key="change_new_pw")
+    st.text_input("新しいパスワード（確認）", type="password", key="change_new_pw_confirm")
+
+    if st.button("✅ パスワードを変更する"):
+        current_pw = st.session_state.get("change_current_pw", "").strip()
+        new_pw = st.session_state.get("change_new_pw", "").strip()
+        confirm_pw = st.session_state.get("change_new_pw_confirm", "").strip()
+
+        if not current_pw or not new_pw or not confirm_pw:
+            st.warning("全部入力してください。")
+        elif len(new_pw) < 4:
+            st.warning("新しいパスワードは4文字以上にしてください。")
+        elif new_pw != confirm_pw:
+            st.warning("新しいパスワードが一致していません。")
+        else:
+            ok, msg = update_password(st.session_state["auth_user"], current_pw, new_pw)
+            if ok:
+                st.success(msg)
+            else:
+                st.error(msg)
+    st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
@@ -716,13 +797,11 @@ is_pro = st.session_state["is_pro_logged_in"]
 if not is_pro and st.session_state.get("calc_count", 0) >= DEMO_LIMIT:
     st.error("⚠️ デモ版の利用回数は上限に達しました。")
     st.info("Pro版では計算回数が無制限になります。ログインするとPro機能が開きます。")
-
     col_stop1, col_stop2 = st.columns(2)
     with col_stop1:
         st.button("🔒 Proログインして続ける", disabled=True)
     with col_stop2:
         st.button("🔄 初期値に戻す", on_click=lambda: reset_state_for_user(None))
-
     st.stop()
 
 # =========================
@@ -929,7 +1008,7 @@ fig = go.Figure(go.Indicator(
         }
     }
 ))
-fig.update_layout(height=340, margin=dict(l=20, r=20, t=60, b=20), paper_bgcolor="#eef3f8")
+fig.update_layout(height=330, margin=dict(l=20, r=20, t=60, b=12), paper_bgcolor="#eef3f8")
 st.plotly_chart(fig, use_container_width=True)
 
 # =========================
@@ -1008,10 +1087,11 @@ if is_pro:
         title="📈 12ヶ月 現預金推移（予測）",
         xaxis_title="経過月",
         yaxis_title="現預金残高（万円）",
-        height=420,
+        height=390,
         paper_bgcolor="white",
         plot_bgcolor="white",
-        font=dict(color="#111827")
+        font=dict(color="#111827"),
+        margin=dict(l=20, r=20, t=60, b=20)
     )
     st.plotly_chart(fig2, use_container_width=True)
 
