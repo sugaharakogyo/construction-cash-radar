@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 import pandas as pd
 import json
 import re
+import hashlib
 from pathlib import Path
 from datetime import datetime
 from io import BytesIO
@@ -24,9 +25,13 @@ st.set_page_config(
 )
 
 # =========================
-# 設定
+# 基本設定
 # =========================
-SAVE_FILE = Path("cash_radar_state.json")
+APP_DIR = Path(".")
+USERS_FILE = APP_DIR / "pro_users.json"
+USER_DATA_DIR = APP_DIR / "user_data"
+USER_DATA_DIR.mkdir(exist_ok=True)
+
 DEMO_LIMIT = 6
 LINE_URL = "https://lin.ee/7m28VAs"
 
@@ -55,12 +60,69 @@ except Exception:
     PDF_FONT = "Helvetica"
 
 # =========================
-# 保存・読込
+# 認証まわり
 # =========================
-def load_state():
-    if SAVE_FILE.exists():
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+def load_users():
+    if USERS_FILE.exists():
         try:
-            with open(SAVE_FILE, "r", encoding="utf-8") as f:
+            with open(USERS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+def save_users(users):
+    with open(USERS_FILE, "w", encoding="utf-8") as f:
+        json.dump(users, f, ensure_ascii=False, indent=2)
+
+def ensure_default_admin():
+    users = load_users()
+    # 初回だけ管理用のサンプルアカウントを作る
+    # 必要ならあとでID/PASSを変更してください
+    if "admin" not in users:
+        users["admin"] = {
+            "password_hash": hash_password("admin1234"),
+            "display_name": "管理者"
+        }
+        save_users(users)
+
+def register_user(username: str, password: str, display_name: str = ""):
+    users = load_users()
+    if username in users:
+        return False, "このIDはすでに使われています。"
+    users[username] = {
+        "password_hash": hash_password(password),
+        "display_name": display_name or username
+    }
+    save_users(users)
+    return True, "Proユーザーを登録しました。"
+
+def authenticate_user(username: str, password: str):
+    users = load_users()
+    user = users.get(username)
+    if not user:
+        return False
+    return user.get("password_hash") == hash_password(password)
+
+def get_user_state_file(username: str) -> Path:
+    safe_name = re.sub(r'[\\/:*?"<>| ]', "_", username)
+    return USER_DATA_DIR / f"{safe_name}_state.json"
+
+# =========================
+# ユーザー別 保存・読込
+# =========================
+def load_state_for_user(username=None):
+    if username:
+        save_file = get_user_state_file(username)
+    else:
+        save_file = APP_DIR / "demo_state.json"
+
+    if save_file.exists():
+        try:
+            with open(save_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
             merged = DEFAULT_STATE.copy()
             merged.update(data)
@@ -69,7 +131,12 @@ def load_state():
             return DEFAULT_STATE.copy()
     return DEFAULT_STATE.copy()
 
-def save_state():
+def save_state_for_user(username=None):
+    if username:
+        save_file = get_user_state_file(username)
+    else:
+        save_file = APP_DIR / "demo_state.json"
+
     data = {
         "company_name": st.session_state.get("company_name", DEFAULT_STATE["company_name"]),
         "cash": st.session_state.get("cash", DEFAULT_STATE["cash"]),
@@ -82,25 +149,29 @@ def save_state():
         "calc_count": st.session_state.get("calc_count", DEFAULT_STATE["calc_count"])
     }
     try:
-        with open(SAVE_FILE, "w", encoding="utf-8") as f:
+        with open(save_file, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception:
         pass
 
-def reset_state():
+def reset_state_for_user(username=None):
     for key, value in DEFAULT_STATE.items():
         st.session_state[key] = value
-    save_state()
+    save_state_for_user(username)
+
+def change_and_save():
+    username = st.session_state.get("auth_user")
+    save_state_for_user(username if st.session_state.get("is_pro_logged_in") else None)
 
 def count_demo_use():
     if st.session_state.get("plan") == "デモ（無料）":
         current = st.session_state.get("calc_count", 0)
         st.session_state["calc_count"] = current + 1
-        save_state()
+        save_state_for_user(None)
 
-def change_and_save():
-    save_state()
-
+# =========================
+# 補助
+# =========================
 def sanitize_filename(text: str) -> str:
     text = text.strip()
     if not text:
@@ -240,12 +311,22 @@ def create_pdf_report(
     return buffer.getvalue()
 
 # =========================
-# 初期読込
+# 初期化
 # =========================
-loaded = load_state()
-for key, value in loaded.items():
-    if key not in st.session_state:
-        st.session_state[key] = value
+ensure_default_admin()
+
+if "is_pro_logged_in" not in st.session_state:
+    st.session_state["is_pro_logged_in"] = False
+if "auth_user" not in st.session_state:
+    st.session_state["auth_user"] = ""
+
+# 初回ロード
+if "app_initialized" not in st.session_state:
+    loaded = load_state_for_user(None)
+    for key, value in loaded.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+    st.session_state["app_initialized"] = True
 
 # =========================
 # CSS
@@ -259,22 +340,13 @@ st.markdown("""
         color: #111827 !important;
     }
 
-    .stApp {
-        background: #eef3f8;
-    }
-
-    .main {
-        background: #eef3f8;
-    }
+    .stApp { background: #eef3f8; }
+    .main { background: #eef3f8; }
 
     .block-container {
         max-width: 900px;
         padding-top: 1.2rem;
         padding-bottom: 2rem;
-    }
-
-    h1, h2, h3, p, label, div, span {
-        color: #111827;
     }
 
     .card {
@@ -385,6 +457,17 @@ st.markdown("""
         font-weight: 700;
     }
 
+    .auth-box {
+        background: linear-gradient(135deg, #0f172a, #334155);
+        color: white !important;
+        padding: 18px;
+        border-radius: 16px;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.14);
+        margin-bottom: 16px;
+        text-align: center;
+        font-weight: 700;
+    }
+
     .stMetric {
         background: #ffffff;
         padding: 16px;
@@ -393,22 +476,6 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
         text-align: center;
         margin-bottom: 14px;
-    }
-
-    .stMetric label, .stMetric div {
-        color: #111827 !important;
-    }
-
-    .stNumberInput label, .stSlider label, .stRadio label, .stTextInput label {
-        font-size: 1.05rem !important;
-        font-weight: 700 !important;
-        color: #0f172a !important;
-    }
-
-    .stNumberInput input, .stTextInput input {
-        color: #111827 !important;
-        background: #ffffff !important;
-        border: 1px solid #cbd5e1 !important;
     }
 
     .stButton > button {
@@ -439,12 +506,6 @@ st.markdown("""
         font-weight: 700;
         text-decoration: none;
         border: none;
-        box-shadow: 0 6px 14px rgba(6, 199, 85, 0.22);
-    }
-
-    div[data-testid="stLinkButton"] a:hover {
-        background: #03a84a;
-        color: white !important;
     }
 
     div[data-testid="stDownloadButton"] button {
@@ -458,40 +519,14 @@ st.markdown("""
         border: none;
     }
 
-    div[data-testid="stDownloadButton"] button:hover {
-        background: #115e59;
-        color: white;
-    }
-
-    .stInfo, .stSuccess, .stWarning, .stError {
-        border-radius: 12px;
-    }
-
     @media (max-width: 640px) {
         .block-container {
             padding-top: 0.8rem;
             padding-left: 0.8rem;
             padding-right: 0.8rem;
         }
-
-        .card, .center-card {
-            padding: 16px;
-            border-radius: 16px;
-        }
-
-        .big-status-font {
-            font-size: 3.0rem !important;
-        }
-
-        .sub-big {
-            font-size: 1rem;
-        }
-
-        .stButton > button,
-        div[data-testid="stDownloadButton"] button {
-            height: 3rem;
-            font-size: 0.95rem;
-        }
+        .card, .center-card { padding: 16px; border-radius: 16px; }
+        .big-status-font { font-size: 3.0rem !important; }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -503,15 +538,81 @@ st.title("🏗️ 建設キャッシュレーダー")
 st.write("社長のための資金余命ダッシュボード。危険・注意・安定を一瞬で見える化。")
 
 # =========================
+# Proログイン
+# =========================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("🔐 Proログイン")
+
+if st.session_state["is_pro_logged_in"]:
+    st.markdown(f"""
+        <div class="auth-box">
+            ログイン中: <b>{st.session_state["auth_user"]}</b>
+        </div>
+    """, unsafe_allow_html=True)
+
+    col_auth1, col_auth2 = st.columns(2)
+    with col_auth1:
+        if st.button("🔓 Proとして使う"):
+            st.session_state["plan"] = "Pro（月9,800円）"
+            loaded = load_state_for_user(st.session_state["auth_user"])
+            for key, value in loaded.items():
+                st.session_state[key] = value
+            st.rerun()
+    with col_auth2:
+        if st.button("🚪 ログアウト"):
+            st.session_state["is_pro_logged_in"] = False
+            st.session_state["auth_user"] = ""
+            st.session_state["plan"] = "デモ（無料）"
+            loaded = load_state_for_user(None)
+            for key, value in loaded.items():
+                st.session_state[key] = value
+            st.rerun()
+
+else:
+    tab1, tab2 = st.tabs(["ログイン", "Proユーザー登録"])
+
+    with tab1:
+        login_id = st.text_input("Pro ID", key="login_id")
+        login_pw = st.text_input("パスワード", type="password", key="login_pw")
+
+        if st.button("🔑 ログインする"):
+            if authenticate_user(login_id, login_pw):
+                st.session_state["is_pro_logged_in"] = True
+                st.session_state["auth_user"] = login_id
+                st.session_state["plan"] = "Pro（月9,800円）"
+                loaded = load_state_for_user(login_id)
+                for key, value in loaded.items():
+                    st.session_state[key] = value
+                st.success("ログインしました。")
+                st.rerun()
+            else:
+                st.error("IDかパスワードが違います。")
+
+    with tab2:
+        new_id = st.text_input("新しいPro ID", key="new_id")
+        new_name = st.text_input("表示名", key="new_name")
+        new_pw = st.text_input("新しいパスワード", type="password", key="new_pw")
+
+        if st.button("👤 Proユーザー登録"):
+            if not new_id.strip() or not new_pw.strip():
+                st.warning("IDとパスワードを入れてください。")
+            elif len(new_pw) < 4:
+                st.warning("パスワードは4文字以上にしてください。")
+            else:
+                ok, msg = register_user(new_id.strip(), new_pw.strip(), new_name.strip())
+                if ok:
+                    st.success(msg)
+                else:
+                    st.error(msg)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
 # 会社名入力
 # =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.subheader("🏢 会社情報")
-st.text_input(
-    "会社名",
-    key="company_name",
-    on_change=change_and_save
-)
+st.text_input("会社名", key="company_name", on_change=change_and_save)
 st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
@@ -520,17 +621,16 @@ st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.subheader("🎫 プラン")
 
-st.radio(
-    "プランを選んでください",
-    ["デモ（無料）", "Pro（月9,800円）"],
-    key="plan",
-    horizontal=True,
-    on_change=change_and_save
-)
-
-is_pro = st.session_state["plan"] == "Pro（月9,800円）"
-
-if not is_pro:
+if st.session_state["is_pro_logged_in"]:
+    st.session_state["plan"] = "Pro（月9,800円）"
+    st.markdown("""
+        <div class="pro-box">
+            <b>Pro版</b><br>
+            保存 / CSV / PDF / 12ヶ月推移 / LINE導線 が使えます
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    st.session_state["plan"] = "デモ（無料）"
     remain = max(0, DEMO_LIMIT - st.session_state.get("calc_count", 0))
     st.markdown(f"""
         <div class="demo-box">
@@ -538,34 +638,24 @@ if not is_pro:
             残り計算回数：<b>{remain} / {DEMO_LIMIT}</b>
         </div>
     """, unsafe_allow_html=True)
-else:
-    st.markdown("""
-        <div class="pro-box">
-            <b>Pro版</b><br>
-            保存 / CSV / PDF / 12ヶ月推移 / LINE導線 が使えます
-        </div>
-    """, unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
+
+is_pro = st.session_state["is_pro_logged_in"]
 
 # =========================
 # デモ上限
 # =========================
 if not is_pro and st.session_state.get("calc_count", 0) >= DEMO_LIMIT:
     st.error("⚠️ デモ版の利用回数は上限に達しました。")
-    st.info("Pro版では計算回数が無制限になります。")
+    st.info("Pro版では計算回数が無制限になります。ログインするとPro機能が開きます。")
 
     col_stop1, col_stop2 = st.columns(2)
     with col_stop1:
-        if st.button("💎 Proに切り替える"):
-            st.session_state["plan"] = "Pro（月9,800円）"
-            save_state()
-            st.rerun()
+        st.button("🔒 Proログインして続ける", disabled=True)
     with col_stop2:
-        st.button("🔄 初期値に戻す", on_click=reset_state)
+        st.button("🔄 初期値に戻す", on_click=lambda: reset_state_for_user(None))
 
-    st.markdown("<div class='line-box'><b>LINEで相談したい方はこちら</b></div>", unsafe_allow_html=True)
-    st.link_button("📱 LINE追加", LINE_URL)
     st.stop()
 
 # =========================
@@ -577,64 +667,33 @@ st.subheader("💰 月次入力")
 col1, col2 = st.columns(2)
 
 with col1:
-    st.number_input(
-        "現在の現預金 (万円)",
-        min_value=0,
-        step=100,
-        key="cash",
-        on_change=change_and_save if is_pro else None
-    )
-    st.number_input(
-        "月平均売上 (万円)",
-        min_value=0,
-        step=50,
-        key="revenue",
-        on_change=change_and_save if is_pro else None
-    )
-    st.number_input(
-        "月平均原価 (万円)",
-        min_value=0,
-        step=10,
-        key="cost",
-        on_change=change_and_save if is_pro else None
-    )
+    st.number_input("現在の現預金 (万円)", min_value=0, step=100, key="cash", on_change=change_and_save if is_pro else None)
+    st.number_input("月平均売上 (万円)", min_value=0, step=50, key="revenue", on_change=change_and_save if is_pro else None)
+    st.number_input("月平均原価 (万円)", min_value=0, step=10, key="cost", on_change=change_and_save if is_pro else None)
 
 with col2:
-    st.number_input(
-        "月平均固定費 (万円)",
-        min_value=0,
-        step=10,
-        key="fixed_cost",
-        on_change=change_and_save if is_pro else None
-    )
-    st.number_input(
-        "月の借入返済 (万円)",
-        min_value=0,
-        step=5,
-        key="loan_pay",
-        on_change=change_and_save if is_pro else None
-    )
-    st.slider(
-        "税率（概算）",
-        min_value=0.0,
-        max_value=0.5,
-        step=0.01,
-        key="tax_rate",
-        on_change=change_and_save if is_pro else None
-    )
+    st.number_input("月平均固定費 (万円)", min_value=0, step=10, key="fixed_cost", on_change=change_and_save if is_pro else None)
+    st.number_input("月の借入返済 (万円)", min_value=0, step=5, key="loan_pay", on_change=change_and_save if is_pro else None)
+    st.slider("税率（概算）", min_value=0.0, max_value=0.5, step=0.01, key="tax_rate", on_change=change_and_save if is_pro else None)
 
 col_btn1, col_btn2, col_btn3 = st.columns(3)
 with col_btn1:
-    st.button("📊 計算する", on_click=count_demo_use if not is_pro else None)
+    if is_pro:
+        st.button("📊 計算する")
+    else:
+        st.button("📊 計算する", on_click=count_demo_use)
 with col_btn2:
     if is_pro:
         if st.button("💾 保存"):
-            save_state()
+            save_state_for_user(st.session_state["auth_user"])
             st.success("保存しました。")
     else:
         st.button("🔒 保存（Pro）", disabled=True)
 with col_btn3:
-    st.button("🔄 初期値に戻す", on_click=reset_state)
+    if is_pro:
+        st.button("🔄 初期値に戻す", on_click=lambda: reset_state_for_user(st.session_state["auth_user"]))
+    else:
+        st.button("🔄 初期値に戻す", on_click=lambda: reset_state_for_user(None))
 
 st.markdown("</div>", unsafe_allow_html=True)
 
@@ -715,7 +774,7 @@ df_forecast = pd.DataFrame({
 })
 
 # =========================
-# CSVデータ
+# CSV / PDF
 # =========================
 summary_rows = [
     {"出力日": today_str, "会社名": company_name, "分類": "基本情報", "項目名": "利用プラン", "数値・内容": plan, "単位": ""},
@@ -736,13 +795,9 @@ summary_rows = [
 ]
 
 if danger_month is not None:
-    summary_rows.append(
-        {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "資金ショート想定時期", "数値・内容": danger_month, "単位": "ヶ月後"}
-    )
+    summary_rows.append({"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "資金ショート想定時期", "数値・内容": danger_month, "単位": "ヶ月後"})
 else:
-    summary_rows.append(
-        {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "資金ショート想定時期", "数値・内容": "12ヶ月以内なし", "単位": ""}
-    )
+    summary_rows.append({"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "資金ショート想定時期", "数値・内容": "12ヶ月以内なし", "単位": ""})
 
 df_summary = pd.DataFrame(summary_rows)
 summary_csv = df_summary.to_csv(index=False).encode("utf-8-sig")
@@ -807,11 +862,7 @@ fig = go.Figure(go.Indicator(
         }
     }
 ))
-fig.update_layout(
-    height=340,
-    margin=dict(l=20, r=20, t=60, b=20),
-    paper_bgcolor="#eef3f8"
-)
+fig.update_layout(height=340, margin=dict(l=20, r=20, t=60, b=20), paper_bgcolor="#eef3f8")
 st.plotly_chart(fig, use_container_width=True)
 
 # =========================
@@ -833,7 +884,7 @@ with col_b:
 st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
-# Pro限定エリア
+# Pro限定 / デモは一部だけ
 # =========================
 if is_pro:
     st.markdown("""
@@ -886,7 +937,6 @@ if is_pro:
         mode="lines+markers",
         name="税引後現預金"
     ))
-
     fig2.update_layout(
         title="📈 12ヶ月 現預金推移（予測）",
         xaxis_title="経過月",
@@ -914,13 +964,21 @@ else:
         </div>
     """, unsafe_allow_html=True)
 
+    # デモは一部だけ見せる
+    preview_col1, preview_col2 = st.columns(2)
+    with preview_col1:
+        st.metric("12ヶ月後の税引後現預金（プレビュー）", f"{cash_after_tax[-1]:,.0f} 万円")
+    with preview_col2:
+        preview_text = f"{danger_month}ヶ月後" if danger_month is not None else "12ヶ月以内なし"
+        st.metric("資金ショート想定時期（プレビュー）", preview_text)
+
     lock_col1, lock_col2 = st.columns(2)
     with lock_col1:
         st.button("🔒 CSV出力（Pro）", disabled=True)
     with lock_col2:
         st.button("🔒 PDF出力（Pro）", disabled=True)
 
-    st.info("Pro版では、12ヶ月推移・提出用CSV・1枚レポートPDF・保存機能が使えます。")
+    st.info("Pro版では、12ヶ月推移グラフ・提出用CSV・1枚レポートPDF・保存機能が使えます。")
 
 # =========================
 # 危険月表示
@@ -971,14 +1029,12 @@ if status == "危険":
     st.write("- 原価を最優先で見直す")
     st.write("- 固定費と借入返済の圧縮余地を確認")
     st.write("- 必要なら短期資金の確保も視野に入れる")
-
 elif status == "注意":
     st.warning("**注意が必要です。**")
     st.write("- 黒字幅をもう一段上げたい状態です")
     st.write("- 現場ごとの粗利バラつきを確認")
     st.write("- 数ヶ月先の資金繰りを先回りで見る")
     st.write("- 利益が残る案件構成に寄せる")
-
 else:
     st.success("**資金状況は安全です！**")
     st.write("- 安全圏を維持しながら事業拡大を検討")
@@ -995,4 +1051,4 @@ if not is_pro:
     remain = max(0, DEMO_LIMIT - st.session_state.get("calc_count", 0))
     st.info(f"デモ版の残り計算回数：{remain} / {DEMO_LIMIT}")
 else:
-    st.success("Pro版をご利用中です。計算回数は無制限です。")
+    st.success(f"Pro版をご利用中です。ログインユーザー: {st.session_state['auth_user']}")
