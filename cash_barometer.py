@@ -1203,24 +1203,7 @@ else:
     st.write("- 採用や設備投資の判断に活用")
 
 st.markdown("</div>", unsafe_allow_html=True)
-st.markdown("""
-<div style='margin-top:10px;'>
-<a href="https://lin.ee/7m28VAs" target="_blank"
-style="
-display:block;
-text-align:center;
-background:#06c755;
-color:white;
-padding:16px;
-border-radius:14px;
-text-decoration:none;
-font-weight:bold;
-font-size:18px;
-">
-📱 LINEで相談　PRO版へ
-</a>
-</div>
-""", unsafe_allow_html=True)
+
 
 # =========================
 # フッター
