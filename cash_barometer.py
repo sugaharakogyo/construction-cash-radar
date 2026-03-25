@@ -1203,7 +1203,7 @@ text-decoration:none;
 font-weight:bold;
 font-size:18px;
 ">
-📱 LINEで相談する
+📱 LINEで相談　PRO版へ
 </a>
 </div>
 """, unsafe_allow_html=True)
