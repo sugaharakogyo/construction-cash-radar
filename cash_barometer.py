@@ -5,6 +5,16 @@ import json
 from pathlib import Path
 
 # =========================
+# ページ設定
+# =========================
+st.set_page_config(
+    page_title="建設キャッシュレーダー",
+    page_icon="🏗️",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
+
+# =========================
 # 保存ファイル設定
 # =========================
 SAVE_FILE = Path("cash_radar_state.json")
@@ -15,8 +25,12 @@ DEFAULT_STATE = {
     "cost": 558,
     "fixed_cost": 260,
     "loan_pay": 50,
-    "tax_rate": 0.30
+    "tax_rate": 0.30,
+    "plan": "デモ（無料）",
+    "calc_count": 0
 }
+
+DEMO_LIMIT = 6
 
 # =========================
 # 保存・読込関数
@@ -38,7 +52,9 @@ def save_state():
         "cost": st.session_state.get("cost", DEFAULT_STATE["cost"]),
         "fixed_cost": st.session_state.get("fixed_cost", DEFAULT_STATE["fixed_cost"]),
         "loan_pay": st.session_state.get("loan_pay", DEFAULT_STATE["loan_pay"]),
-        "tax_rate": st.session_state.get("tax_rate", DEFAULT_STATE["tax_rate"])
+        "tax_rate": st.session_state.get("tax_rate", DEFAULT_STATE["tax_rate"]),
+        "plan": st.session_state.get("plan", DEFAULT_STATE["plan"]),
+        "calc_count": st.session_state.get("calc_count", DEFAULT_STATE["calc_count"])
     }
     with open(SAVE_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
@@ -48,6 +64,11 @@ def reset_state():
         st.session_state[key] = value
     save_state()
 
+def count_demo_use():
+    if st.session_state.get("plan") == "デモ（無料）":
+        st.session_state["calc_count"] = st.session_state.get("calc_count", 0) + 1
+        save_state()
+
 # =========================
 # 初期読込
 # =========================
@@ -56,16 +77,6 @@ loaded = load_state()
 for key, value in loaded.items():
     if key not in st.session_state:
         st.session_state[key] = value
-
-# =========================
-# ページ設定
-# =========================
-st.set_page_config(
-    page_title="建設キャッシュレーダー",
-    page_icon="🏗️",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
 
 # =========================
 # CSS
@@ -82,8 +93,8 @@ st.markdown("""
         background-color: #f0f2f6;
     }
 
-    .stNumberInput label, .stSlider label {
-        font-size: 1.1rem !important;
+    .stNumberInput label, .stSlider label, .stRadio label {
+        font-size: 1.05rem !important;
         font-weight: bold;
         color: #333333;
     }
@@ -118,11 +129,6 @@ st.markdown("""
         font-weight: bold;
     }
 
-    .mini-note {
-        font-size: 0.95rem;
-        color: #666666;
-    }
-
     .action-box {
         background: #f8f9fa;
         border-left: 8px solid #007bff;
@@ -130,6 +136,26 @@ st.markdown("""
         border-radius: 12px;
         margin-top: 10px;
         margin-bottom: 10px;
+    }
+
+    .pro-box {
+        background: linear-gradient(135deg, #1f2937, #111827);
+        color: white;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .demo-box {
+        background: #fff8e1;
+        color: #333333;
+        padding: 18px;
+        border-radius: 14px;
+        border: 2px solid #ffe082;
+        margin-bottom: 20px;
+        text-align: center;
     }
 
     .stMetric {
@@ -155,10 +181,6 @@ st.markdown("""
     .stButton>button:hover {
         background-color: #0056b3;
     }
-
-    div[data-testid="stHorizontalBlock"] > div {
-        width: 100%;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -169,9 +191,54 @@ st.title("🏗️ 建設キャッシュレーダー")
 st.write("社長のための資金余命ダッシュボード。危険・注意・安定を一瞬で見える化。")
 
 # =========================
-# 保存状態表示
+# プラン選択
 # =========================
-st.caption(f"保存ファイル: {SAVE_FILE.name}")
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("🎫 プラン")
+
+st.radio(
+    "プランを選んでください",
+    ["デモ（無料）", "Pro（月9,800円）"],
+    key="plan",
+    horizontal=True,
+    on_change=save_state
+)
+
+if st.session_state["plan"] == "デモ（無料）":
+    remain = max(0, DEMO_LIMIT - st.session_state.get("calc_count", 0))
+    st.markdown(f"""
+        <div class="demo-box">
+            <b>デモ版</b><br>
+            残り計算回数：<b>{remain} / {DEMO_LIMIT}</b>
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+        <div class="pro-box">
+            <b>Pro版</b><br>
+            計算回数 無制限 / 将来の追加機能も拡張しやすい状態です
+        </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# デモ制限チェック
+# =========================
+if st.session_state["plan"] == "デモ（無料）" and st.session_state.get("calc_count", 0) >= DEMO_LIMIT:
+    st.error("⚠️ デモ版の利用回数は上限に達しました。Pro版をご利用ください。")
+    st.info("Pro版では、計算回数が無制限になります。")
+    col_p1, col_p2 = st.columns(2)
+    with col_p1:
+        if st.button("💎 Proに切り替える"):
+            st.session_state["plan"] = "Pro（月9,800円）"
+            save_state()
+            st.rerun()
+    with col_p2:
+        if st.button("🔄 初期化する"):
+            reset_state()
+            st.rerun()
+    st.stop()
 
 # =========================
 # 入力欄
@@ -229,15 +296,20 @@ with st.container():
             on_change=save_state
         )
 
-    col_btn1, col_btn2 = st.columns(2)
+    col_btn1, col_btn2, col_btn3 = st.columns(3)
     with col_btn1:
-        if st.button("💾 今の内容を保存"):
+        if st.button("📊 計算する"):
+            count_demo_use()
+            st.rerun()
+    with col_btn2:
+        if st.button("💾 保存"):
             save_state()
             st.success("保存しました。")
-    with col_btn2:
+    with col_btn3:
         if st.button("🔄 初期値に戻す"):
             reset_state()
             st.success("初期値に戻しました。")
+            st.rerun()
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -256,18 +328,14 @@ tax_rate = st.session_state["tax_rate"]
 # =========================
 gross_profit = revenue - cost
 operating_balance = gross_profit - fixed_cost - loan_pay
-
-# 黒字のときだけ税金を計算
 estimated_tax = max(0, operating_balance * tax_rate)
 after_tax_balance = operating_balance - estimated_tax
 
-# 資金余命
 if after_tax_balance >= 0:
     runway = 12
 else:
     runway = cash / abs(after_tax_balance) if after_tax_balance != 0 else 12
 
-# 判定
 if runway >= 6:
     status = "安全"
     color = "#28a745"
@@ -278,13 +346,11 @@ else:
     status = "危険"
     color = "#dc3545"
 
-# 安全ライン不足額
 if after_tax_balance < 0:
     shortage_for_safety = max(0, abs(after_tax_balance) * 6 - cash)
 else:
     shortage_for_safety = 0
 
-# 必要改善額
 needed_improvement = max(0, abs(after_tax_balance))
 needed_sales_up = needed_improvement
 needed_cost_down = needed_improvement
@@ -360,13 +426,11 @@ cash_after_tax = []
 
 current_before_tax = cash
 current_after_tax = cash
-
 danger_month = None
 
 for m in months:
     cash_before_tax.append(current_before_tax)
     cash_after_tax.append(current_after_tax)
-
     current_before_tax += operating_balance
     current_after_tax += after_tax_balance
 
@@ -472,4 +536,11 @@ else:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-st.info("※ 判定基準：6ヶ月以上=安全、3〜6ヶ月=注意、3ヶ月未満=危険")
+# =========================
+# フッター
+# =========================
+if st.session_state["plan"] == "デモ（無料）":
+    remain = max(0, DEMO_LIMIT - st.session_state.get("calc_count", 0))
+    st.info(f"デモ版の残り計算回数：{remain} / {DEMO_LIMIT}")
+else:
+    st.success("Pro版をご利用中です。計算回数は無制限です。")
