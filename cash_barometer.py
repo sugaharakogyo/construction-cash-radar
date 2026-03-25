@@ -15,9 +15,13 @@ st.set_page_config(
 )
 
 # =========================
-# 保存ファイル設定
+# 設定
 # =========================
 SAVE_FILE = Path("cash_radar_state.json")
+DEMO_LIMIT = 6
+
+# ここだけ自分のLINE追加URLに差し替えてOK
+LINE_URL = "https://line.me/R/ti/p/@your_line_id"
 
 DEFAULT_STATE = {
     "cash": 1000,
@@ -30,17 +34,17 @@ DEFAULT_STATE = {
     "calc_count": 0
 }
 
-DEMO_LIMIT = 6
-
 # =========================
-# 保存・読込関数
+# 保存・読込
 # =========================
 def load_state():
     if SAVE_FILE.exists():
         try:
             with open(SAVE_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            return {**DEFAULT_STATE, **data}
+            merged = DEFAULT_STATE.copy()
+            merged.update(data)
+            return merged
         except Exception:
             return DEFAULT_STATE.copy()
     return DEFAULT_STATE.copy()
@@ -56,24 +60,36 @@ def save_state():
         "plan": st.session_state.get("plan", DEFAULT_STATE["plan"]),
         "calc_count": st.session_state.get("calc_count", DEFAULT_STATE["calc_count"])
     }
-    with open(SAVE_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    try:
+        with open(SAVE_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
 
 def reset_state():
-    for key, value in DEFAULT_STATE.items():
-        st.session_state[key] = value
+    st.session_state["cash"] = DEFAULT_STATE["cash"]
+    st.session_state["revenue"] = DEFAULT_STATE["revenue"]
+    st.session_state["cost"] = DEFAULT_STATE["cost"]
+    st.session_state["fixed_cost"] = DEFAULT_STATE["fixed_cost"]
+    st.session_state["loan_pay"] = DEFAULT_STATE["loan_pay"]
+    st.session_state["tax_rate"] = DEFAULT_STATE["tax_rate"]
+    st.session_state["plan"] = DEFAULT_STATE["plan"]
+    st.session_state["calc_count"] = DEFAULT_STATE["calc_count"]
     save_state()
 
 def count_demo_use():
     if st.session_state.get("plan") == "デモ（無料）":
-        st.session_state["calc_count"] = st.session_state.get("calc_count", 0) + 1
+        current = st.session_state.get("calc_count", 0)
+        st.session_state["calc_count"] = current + 1
         save_state()
+
+def change_and_save():
+    save_state()
 
 # =========================
 # 初期読込
 # =========================
 loaded = load_state()
-
 for key, value in loaded.items():
     if key not in st.session_state:
         st.session_state[key] = value
@@ -158,6 +174,16 @@ st.markdown("""
         text-align: center;
     }
 
+    .line-box {
+        background: linear-gradient(135deg, #06c755, #03a84a);
+        color: white;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.14);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
     .stMetric {
         background-color: white;
         padding: 18px;
@@ -167,7 +193,7 @@ st.markdown("""
         margin-bottom: 16px;
     }
 
-    .stButton>button {
+    .stButton > button {
         width: 100%;
         border-radius: 10px;
         height: 3.2rem;
@@ -178,8 +204,26 @@ st.markdown("""
         border: none;
     }
 
-    .stButton>button:hover {
+    .stButton > button:hover {
         background-color: #0056b3;
+    }
+
+    div[data-testid="stLinkButton"] a {
+        width: 100%;
+        display: inline-block;
+        text-align: center;
+        border-radius: 10px;
+        padding: 0.85rem 1rem;
+        background: #06c755;
+        color: white !important;
+        font-weight: bold;
+        text-decoration: none;
+        border: none;
+    }
+
+    div[data-testid="stLinkButton"] a:hover {
+        background: #03a84a;
+        color: white !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -191,7 +235,7 @@ st.title("🏗️ 建設キャッシュレーダー")
 st.write("社長のための資金余命ダッシュボード。危険・注意・安定を一瞬で見える化。")
 
 # =========================
-# プラン選択
+# プラン
 # =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.subheader("🎫 プラン")
@@ -201,7 +245,7 @@ st.radio(
     ["デモ（無料）", "Pro（月9,800円）"],
     key="plan",
     horizontal=True,
-    on_change=save_state
+    on_change=change_and_save
 )
 
 if st.session_state["plan"] == "デモ（無料）":
@@ -216,102 +260,99 @@ else:
     st.markdown("""
         <div class="pro-box">
             <b>Pro版</b><br>
-            計算回数 無制限 / 将来の追加機能も拡張しやすい状態です
+            計算回数 無制限 / 今後の追加機能にも対応しやすい状態です
         </div>
     """, unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
-# デモ制限チェック
+# デモ上限
 # =========================
 if st.session_state["plan"] == "デモ（無料）" and st.session_state.get("calc_count", 0) >= DEMO_LIMIT:
-    st.error("⚠️ デモ版の利用回数は上限に達しました。Pro版をご利用ください。")
-    st.info("Pro版では、計算回数が無制限になります。")
-    col_p1, col_p2 = st.columns(2)
-    with col_p1:
+    st.error("⚠️ デモ版の利用回数は上限に達しました。")
+    st.info("Pro版では計算回数が無制限になります。")
+
+    col_stop1, col_stop2 = st.columns(2)
+    with col_stop1:
         if st.button("💎 Proに切り替える"):
             st.session_state["plan"] = "Pro（月9,800円）"
             save_state()
             st.rerun()
-    with col_p2:
-        if st.button("🔄 初期化する"):
-            reset_state()
-            st.rerun()
+    with col_stop2:
+        st.button("🔄 初期値に戻す", on_click=reset_state)
+
+    st.markdown("<div class='line-box'><b>LINEで相談したい方はこちら</b></div>", unsafe_allow_html=True)
+    st.link_button("📱 LINE追加", LINE_URL)
+
     st.stop()
 
 # =========================
 # 入力欄
 # =========================
-with st.container():
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("💰 月次入力")
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("💰 月次入力")
 
-    col1, col2 = st.columns(2)
+col1, col2 = st.columns(2)
 
-    with col1:
-        st.number_input(
-            "現在の現預金 (万円)",
-            min_value=0,
-            step=100,
-            key="cash",
-            on_change=save_state
-        )
-        st.number_input(
-            "月平均売上 (万円)",
-            min_value=0,
-            step=50,
-            key="revenue",
-            on_change=save_state
-        )
-        st.number_input(
-            "月平均原価 (万円)",
-            min_value=0,
-            step=10,
-            key="cost",
-            on_change=save_state
-        )
+with col1:
+    st.number_input(
+        "現在の現預金 (万円)",
+        min_value=0,
+        step=100,
+        key="cash",
+        on_change=change_and_save
+    )
+    st.number_input(
+        "月平均売上 (万円)",
+        min_value=0,
+        step=50,
+        key="revenue",
+        on_change=change_and_save
+    )
+    st.number_input(
+        "月平均原価 (万円)",
+        min_value=0,
+        step=10,
+        key="cost",
+        on_change=change_and_save
+    )
 
-    with col2:
-        st.number_input(
-            "月平均固定費 (万円)",
-            min_value=0,
-            step=10,
-            key="fixed_cost",
-            on_change=save_state
-        )
-        st.number_input(
-            "月の借入返済 (万円)",
-            min_value=0,
-            step=5,
-            key="loan_pay",
-            on_change=save_state
-        )
-        st.slider(
-            "税率（概算）",
-            min_value=0.0,
-            max_value=0.5,
-            step=0.01,
-            key="tax_rate",
-            on_change=save_state
-        )
+with col2:
+    st.number_input(
+        "月平均固定費 (万円)",
+        min_value=0,
+        step=10,
+        key="fixed_cost",
+        on_change=change_and_save
+    )
+    st.number_input(
+        "月の借入返済 (万円)",
+        min_value=0,
+        step=5,
+        key="loan_pay",
+        on_change=change_and_save
+    )
+    st.slider(
+        "税率（概算）",
+        min_value=0.0,
+        max_value=0.5,
+        step=0.01,
+        key="tax_rate",
+        on_change=change_and_save
+    )
 
-    col_btn1, col_btn2, col_btn3 = st.columns(3)
-    with col_btn1:
-        if st.button("📊 計算する"):
-            count_demo_use()
-            st.rerun()
-    with col_btn2:
-        if st.button("💾 保存"):
-            save_state()
-            st.success("保存しました。")
-    with col_btn3:
-        if st.button("🔄 初期値に戻す"):
-            reset_state()
-            st.success("初期値に戻しました。")
-            st.rerun()
+col_btn1, col_btn2, col_btn3 = st.columns(3)
+with col_btn1:
+    st.button("📊 計算する", on_click=count_demo_use)
+with col_btn2:
+    if st.button("💾 保存"):
+        save_state()
+        st.success("保存しました。")
+with col_btn3:
+    st.button("🔄 初期値に戻す", on_click=reset_state)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
 # 値取得
@@ -467,7 +508,6 @@ fig2.update_layout(
     paper_bgcolor="white",
     plot_bgcolor="white"
 )
-
 st.plotly_chart(fig2, use_container_width=True)
 
 # =========================
@@ -535,6 +575,18 @@ else:
     st.write("- 採用や設備投資の判断に活用")
 
 st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# LINE追加
+# =========================
+st.markdown("""
+    <div class="line-box">
+        <b>相談・最新情報はLINEから</b><br>
+        気になることがあればLINE追加してください
+    </div>
+""", unsafe_allow_html=True)
+
+st.link_button("📱 LINE追加ボタン", LINE_URL)
 
 # =========================
 # フッター
