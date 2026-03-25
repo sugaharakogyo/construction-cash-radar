@@ -1,507 +1,475 @@
-import pandas as pd
 import streamlit as st
+import plotly.graph_objects as go
+import pandas as pd
+import json
+from pathlib import Path
 
-# =====================================
-# 基本設定
-# =====================================
+# =========================
+# 保存ファイル設定
+# =========================
+SAVE_FILE = Path("cash_radar_state.json")
+
+DEFAULT_STATE = {
+    "cash": 1000,
+    "revenue": 900,
+    "cost": 558,
+    "fixed_cost": 260,
+    "loan_pay": 50,
+    "tax_rate": 0.30
+}
+
+# =========================
+# 保存・読込関数
+# =========================
+def load_state():
+    if SAVE_FILE.exists():
+        try:
+            with open(SAVE_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return {**DEFAULT_STATE, **data}
+        except Exception:
+            return DEFAULT_STATE.copy()
+    return DEFAULT_STATE.copy()
+
+def save_state():
+    data = {
+        "cash": st.session_state.get("cash", DEFAULT_STATE["cash"]),
+        "revenue": st.session_state.get("revenue", DEFAULT_STATE["revenue"]),
+        "cost": st.session_state.get("cost", DEFAULT_STATE["cost"]),
+        "fixed_cost": st.session_state.get("fixed_cost", DEFAULT_STATE["fixed_cost"]),
+        "loan_pay": st.session_state.get("loan_pay", DEFAULT_STATE["loan_pay"]),
+        "tax_rate": st.session_state.get("tax_rate", DEFAULT_STATE["tax_rate"])
+    }
+    with open(SAVE_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+def reset_state():
+    for key, value in DEFAULT_STATE.items():
+        st.session_state[key] = value
+    save_state()
+
+# =========================
+# 初期読込
+# =========================
+loaded = load_state()
+
+for key, value in loaded.items():
+    if key not in st.session_state:
+        st.session_state[key] = value
+
+# =========================
+# ページ設定
+# =========================
 st.set_page_config(
     page_title="建設キャッシュレーダー",
     page_icon="🏗️",
     layout="centered",
+    initial_sidebar_state="collapsed"
 )
 
-LINE_URL = "https://lin.ee/7m28VAs"
-DEMO_LIMIT = 6
-SALES_BUFFER = 1.3
-PRO_ACCESS_CODE = "sugahara9800"   # あとで自由に変更OK
-
-# =====================================
-# 見た目
-# =====================================
+# =========================
+# CSS
+# =========================
 st.markdown("""
-<style>
-.block-container{
-    padding-top: 1.2rem;
-    padding-bottom: 3rem;
-    max-width: 900px;
-}
-h1, h2, h3, p, div, span, label {
-    color: #111 !important;
-}
-.stApp {
-    background: #f7f7f7;
-}
-.result-card{
-    border-radius: 18px;
-    padding: 22px;
-    margin-top: 18px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-}
-.card-danger{
-    background:#ffe5e5;
-    border-left:12px solid #ff4d4f;
-}
-.card-warn{
-    background:#fff3cd;
-    border-left:12px solid #f4b400;
-}
-.card-safe{
-    background:#e6f7e6;
-    border-left:12px solid #2e7d32;
-}
-.card-white{
-    background:#ffffff;
-    border:3px solid #ececec;
-}
-.pro-box{
-    background:#eef9f0;
-    border:4px solid #2e7d32;
-    border-radius:20px;
-    padding:24px;
-    margin-top:22px;
-    text-align:center;
-    box-shadow:0 4px 14px rgba(0,0,0,0.05);
-}
-.metric-box{
-    background:#f8f9fb;
-    border-radius:16px;
-    padding:16px;
-    border:1px solid #ececec;
-    margin-top:10px;
-    text-align:center;
-}
-.small-note{
-    color:#666 !important;
-    font-size:14px;
-    line-height:1.8;
-    margin-top:16px;
-}
-.logo-mini{
-    font-size:14px;
-    color:#666 !important;
-    margin-bottom:8px;
-}
-.input-box{
-    background:#ffffff;
-    border:2px solid #ececec;
-    border-radius:18px;
-    padding:18px;
-    margin-top:16px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.04);
-}
-.section-title{
-    font-size:20px;
-    font-weight:900;
-    margin-bottom:10px;
-}
-div.stLinkButton > a {
-    background: #111827 !important;
-    color: white !important;
-    border: 2px solid #111827 !important;
-    border-radius: 14px !important;
-    font-weight: 800 !important;
-    font-size: 18px !important;
-    padding: 14px 18px !important;
-    text-align: center !important;
-    display: block !important;
-}
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700;900&display=swap');
 
-div.stLinkButton > a:hover {
-    background: #000000 !important;
-    color: white !important;
-}
+    html, body, [class*="st-"] {
+        font-family: 'Noto Sans JP', sans-serif;
+    }
 
-</style>
+    .main {
+        background-color: #f0f2f6;
+    }
+
+    .stNumberInput label, .stSlider label {
+        font-size: 1.1rem !important;
+        font-weight: bold;
+        color: #333333;
+    }
+
+    .card {
+        background-color: white;
+        padding: 25px;
+        border-radius: 18px;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+        margin-bottom: 20px;
+    }
+
+    .center-card {
+        background-color: white;
+        padding: 25px;
+        border-radius: 18px;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .big-status-font {
+        font-size: 4.2rem !important;
+        font-weight: 900 !important;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+
+    .sub-big {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .mini-note {
+        font-size: 0.95rem;
+        color: #666666;
+    }
+
+    .action-box {
+        background: #f8f9fa;
+        border-left: 8px solid #007bff;
+        padding: 18px;
+        border-radius: 12px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .stMetric {
+        background-color: white;
+        padding: 18px;
+        border-radius: 14px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        text-align: center;
+        margin-bottom: 16px;
+    }
+
+    .stButton>button {
+        width: 100%;
+        border-radius: 10px;
+        height: 3.2rem;
+        font-size: 1.05rem;
+        font-weight: bold;
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+
+    .stButton>button:hover {
+        background-color: #0056b3;
+    }
+
+    div[data-testid="stHorizontalBlock"] > div {
+        width: 100%;
+    }
+    </style>
 """, unsafe_allow_html=True)
 
-# =====================================
-# ヘルパー
-# =====================================
-def yen(n):
-    try:
-        return f"{int(round(float(n))):,}円"
-    except Exception:
-        return "0円"
+# =========================
+# タイトル
+# =========================
+st.title("🏗️ 建設キャッシュレーダー")
+st.write("社長のための資金余命ダッシュボード。危険・注意・安定を一瞬で見える化。")
 
-def months_to_shortage(cash_on_hand, monthly_after_tax_delta):
-    if monthly_after_tax_delta >= 0:
-        return None
-    burn = abs(monthly_after_tax_delta)
-    if burn == 0:
-        return None
-    return cash_on_hand / burn
+# =========================
+# 保存状態表示
+# =========================
+st.caption(f"保存ファイル: {SAVE_FILE.name}")
 
-# =====================================
-# セッション
-# =====================================
-if "calc_count" not in st.session_state:
-    st.session_state.calc_count = 0
-
-if "last_calc" not in st.session_state:
-    st.session_state.last_calc = False
-
-if "is_pro" not in st.session_state:
-    st.session_state.is_pro = False
-
-# =====================================
-# ヘッダー
-# =====================================
-st.markdown('<div class="logo-mini">建設業向け診断ツール</div>', unsafe_allow_html=True)
-st.title("建設キャッシュレーダー")
-st.write("売上と現場コストを入れるだけ。『いつ資金ショートするか』『安全にするには月いくら必要か』が一発で見える。")
-
-# =====================================
-# Proコード
-# =====================================
-st.markdown('<div class="input-box">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">🔒 プラン</div>', unsafe_allow_html=True)
-
-pro_code_input = st.text_input("Proコード", type="password", placeholder="Pro版の方だけ入力")
-
-if pro_code_input == PRO_ACCESS_CODE:
-    st.session_state.is_pro = True
-    st.success("Pro版が有効です")
-elif pro_code_input:
-    st.session_state.is_pro = False
-    st.error("Proコードが違います")
-
-is_pro = st.session_state.is_pro
-
-if is_pro:
-    st.caption("✅ Pro版：機能無制限")
-else:
-    st.caption(f"※ デモは計算ボタン {DEMO_LIMIT} 回まで")
-st.markdown('</div>', unsafe_allow_html=True)
-
-# =====================================
+# =========================
 # 入力欄
-# =====================================
-st.markdown('<div class="input-box">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">📊 月次入力</div>', unsafe_allow_html=True)
+# =========================
+with st.container():
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("💰 月次入力")
 
-sales = st.number_input("売上（月）", min_value=0, value=8300000, step=100000)
-cost = st.number_input("原価（月） ※材料+外注など", min_value=0, value=3700000, step=100000)
-fixed_total = st.number_input("固定費（全部） ※人件費/家賃/返済/リース/その他", min_value=0, value=5300000, step=100000)
-cash_on_hand = st.number_input("現在の現金残高", min_value=0, value=300000, step=100000)
+    col1, col2 = st.columns(2)
 
-st.markdown('<div class="section-title" style="margin-top:14px;">⚙️ 設定（ざっくり）</div>', unsafe_allow_html=True)
-tax_rate = st.slider("税率（概算）", min_value=0.0, max_value=0.6, value=0.30, step=0.01)
-safety_months = st.slider("安全ライン（月）", min_value=1, max_value=12, value=6, step=1)
+    with col1:
+        st.number_input(
+            "現在の現預金 (万円)",
+            min_value=0,
+            step=100,
+            key="cash",
+            on_change=save_state
+        )
+        st.number_input(
+            "月平均売上 (万円)",
+            min_value=0,
+            step=50,
+            key="revenue",
+            on_change=save_state
+        )
+        st.number_input(
+            "月平均原価 (万円)",
+            min_value=0,
+            step=10,
+            key="cost",
+            on_change=save_state
+        )
 
-st.markdown('</div>', unsafe_allow_html=True)
+    with col2:
+        st.number_input(
+            "月平均固定費 (万円)",
+            min_value=0,
+            step=10,
+            key="fixed_cost",
+            on_change=save_state
+        )
+        st.number_input(
+            "月の借入返済 (万円)",
+            min_value=0,
+            step=5,
+            key="loan_pay",
+            on_change=save_state
+        )
+        st.slider(
+            "税率（概算）",
+            min_value=0.0,
+            max_value=0.5,
+            step=0.01,
+            key="tax_rate",
+            on_change=save_state
+        )
 
-# =====================================
-# Pro機能入力
-# =====================================
-st.markdown('<div class="input-box">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">📋 現場利益（Pro機能）</div>', unsafe_allow_html=True)
-site_sales = st.number_input("現場売上", min_value=0, value=1000000, step=10000)
-site_cost = st.number_input("現場原価", min_value=0, value=650000, step=10000)
+    col_btn1, col_btn2 = st.columns(2)
+    with col_btn1:
+        if st.button("💾 今の内容を保存"):
+            save_state()
+            st.success("保存しました。")
+    with col_btn2:
+        if st.button("🔄 初期値に戻す"):
+            reset_state()
+            st.success("初期値に戻しました。")
 
-st.markdown('<div class="section-title" style="margin-top:14px;">🧮 利益シミュレーター（Pro機能）</div>', unsafe_allow_html=True)
-sim_sales_up = st.number_input("売上をいくら増やす？", min_value=0, value=1000000, step=100000)
-sim_cost_down_pct = st.slider("原価を何%下げる？", min_value=0.0, max_value=20.0, value=5.0, step=0.5)
-st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# =====================================
+# =========================
+# 値取得
+# =========================
+cash = st.session_state["cash"]
+revenue = st.session_state["revenue"]
+cost = st.session_state["cost"]
+fixed_cost = st.session_state["fixed_cost"]
+loan_pay = st.session_state["loan_pay"]
+tax_rate = st.session_state["tax_rate"]
+
+# =========================
 # 計算
-# =====================================
-sales = float(sales)
-cost = float(cost)
-fixed_total = float(fixed_total)
-cash_on_hand = float(cash_on_hand)
-tax_rate = float(tax_rate)
-safety_months = int(safety_months)
+# =========================
+gross_profit = revenue - cost
+operating_balance = gross_profit - fixed_cost - loan_pay
 
-gross_profit = sales - cost
-before_tax_profit = gross_profit - fixed_total
-after_tax_profit = before_tax_profit * (1.0 - tax_rate) if before_tax_profit > 0 else before_tax_profit
-delta_after = after_tax_profit
+# 黒字のときだけ税金を計算
+estimated_tax = max(0, operating_balance * tax_rate)
+after_tax_balance = operating_balance - estimated_tax
 
-safe_cash = fixed_total * safety_months
-lack_cash = max(0.0, safe_cash - cash_on_hand)
-
-need_after_per_month = abs(delta_after) if delta_after < 0 else 0.0
-need_sales_per_month = need_after_per_month / max(0.01, (1.0 - tax_rate))
-need_sales_safe = need_sales_per_month * SALES_BUFFER if need_sales_per_month > 0 else 0.0
-
-runway_months = months_to_shortage(cash_on_hand, delta_after)
-
-site_sales = float(site_sales)
-site_cost = float(site_cost)
-site_profit = site_sales - site_cost
-site_rate = (site_profit / site_sales * 100.0) if site_sales > 0 else 0.0
-
-sim_new_sales = sales + sim_sales_up
-sim_new_cost = cost * (1.0 - sim_cost_down_pct / 100.0)
-sim_new_gross = sim_new_sales - sim_new_cost
-sim_new_before_tax = sim_new_gross - fixed_total
-sim_new_after_tax = sim_new_before_tax * (1.0 - tax_rate) if sim_new_before_tax > 0 else sim_new_before_tax
-sim_diff = sim_new_after_tax - after_tax_profit
-
-demo_locked = (st.session_state.calc_count >= DEMO_LIMIT) and (not is_pro)
-
-# =====================================
-# 計算ボタン
-# =====================================
-calc = st.button("計算する", type="primary", disabled=demo_locked, use_container_width=False)
-
-if is_pro:
-    st.caption("✅ Pro版：機能無制限")
+# 資金余命
+if after_tax_balance >= 0:
+    runway = 12
 else:
-    st.caption(f"※ デモは計算ボタンが {DEMO_LIMIT} 回まで")
+    runway = cash / abs(after_tax_balance) if after_tax_balance != 0 else 12
 
-if calc and (not demo_locked):
-    if not is_pro:
-        st.session_state.calc_count += 1
-    st.session_state.last_calc = True
+# 判定
+if runway >= 6:
+    status = "安全"
+    color = "#28a745"
+elif runway >= 3:
+    status = "注意"
+    color = "#ffc107"
+else:
+    status = "危険"
+    color = "#dc3545"
 
-if demo_locked:
-    st.error("⛔ デモは6回までです。続きはProでご利用ください。")
+# 安全ライン不足額
+if after_tax_balance < 0:
+    shortage_for_safety = max(0, abs(after_tax_balance) * 6 - cash)
+else:
+    shortage_for_safety = 0
 
-# =====================================
-# 結果表示
-# =====================================
-if calc or st.session_state.get("last_calc", False):
-    if not demo_locked:
-        months_left = 0
-        if runway_months is not None:
-            months_left = max(0, int(runway_months))
+# 必要改善額
+needed_improvement = max(0, abs(after_tax_balance))
+needed_sales_up = needed_improvement
+needed_cost_down = needed_improvement
 
-        # ① 資金ショート結果カード
-        if runway_months is None:
-            st.markdown(f"""
-            <div class="result-card card-safe">
-                <div style="font-size:40px; font-weight:900; line-height:1.3;">🟢 いまは安全です</div>
-                <div style="font-size:18px; line-height:1.8; margin-top:10px;">
-                    税後でも黒字で、資金ショートの心配は小さい状態です。<br>
-                    安全ライン（{safety_months}ヶ月分の固定費）: <b>{yen(safe_cash)}</b>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown(f"""
-            <div class="result-card card-danger">
-                <div style="font-size:42px; font-weight:900; line-height:1.3;">⚠ 資金ショートまで<br>あと {months_left} ヶ月</div>
-                <div style="font-size:18px; line-height:1.8; margin-top:10px;">
-                    このままだと毎月 <b>{yen(abs(delta_after))}</b> ずつ現金が減ります。<br>
-                    年間では <b>{yen(abs(delta_after) * 12)}</b> のキャッシュ減少です。
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # ② 安全ラインカード
-        if lack_cash > 0:
-            st.markdown(f"""
-            <div class="result-card card-warn">
-                <div style="font-size:30px; font-weight:900; line-height:1.4;">安全ラインまで不足<br>{yen(lack_cash)}</div>
-                <div style="font-size:18px; line-height:1.8; margin-top:10px;">
-                    安全にするには、ざっくり<br>
-                    <b>売上 +{yen(need_sales_safe)} / 月</b><br>
-                    を目安に見直す必要があります。
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown(f"""
-            <div class="result-card card-safe">
-                <div style="font-size:30px; font-weight:900; line-height:1.4;">安全ラインクリア</div>
-                <div style="font-size:18px; line-height:1.8; margin-top:10px;">
-                    現在の現金は、{safety_months}ヶ月安全ラインを超えています。
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # ③ 今すぐ分かる結論
-        urgency = "危険"
-        urgency_msg = f"資金余命は約 {months_left} ヶ月。今月中に改善が必要です。"
-
-        if runway_months is None:
-            urgency = "安全"
-            urgency_msg = "税後でも黒字です。まずは今の水準維持を優先してください。"
-        elif months_left >= 12:
-            urgency = "注意"
-            urgency_msg = f"まだ余裕はありますが、放置すると {months_left} ヶ月後に危険です。"
-
-        st.markdown(f"""
-        <div class="result-card card-white">
-            <div style="font-size:20px; font-weight:900;">⚡ 今すぐ分かる結論</div>
-            <div style="margin-top:10px; font-size:17px; line-height:1.8;">
-                <b>{urgency}</b>。{urgency_msg}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # ④ 今日やる打ち手
-        actions = []
-
-        if lack_cash > 0:
-            actions.append(f"まず <b>売上 +{yen(need_sales_safe)} / 月</b> を目安に改善する")
-        if delta_after < 0:
-            actions.append("入金を早くする（請求締め・入金サイト短縮）")
-            actions.append("固定費と返済額を見直す")
-            actions.append("原価率の高い現場を洗い出す")
-
-        if not actions:
-            actions.append("今の利益率と現金残高を維持する")
-            actions.append("原価率が高い現場だけ毎月チェックする")
-
-        actions_html = "".join([f"<li style='margin-bottom:8px;'>{a}</li>" for a in actions[:4]])
-
-        st.markdown(f"""
-        <div class="result-card card-white">
-            <div style="font-size:20px; font-weight:900;">✅ 今日やる打ち手（最短で効く順）</div>
-            <div style="margin-top:10px; font-size:17px; line-height:1.8;">
-                <ul style="padding-left:22px; margin:0;">
-                    {actions_html}
-                </ul>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # =====================================
-        # Pro機能
-        # =====================================
-        if is_pro:
-            # ⑤ 12ヶ月資金推移グラフ
-            months = list(range(1, 13))
-            cash_list = []
-            current_cash = cash_on_hand
-
-            for _ in months:
-                current_cash = current_cash + delta_after
-                cash_list.append(current_cash)
-
-            df_cash = pd.DataFrame({
-                "月": months,
-                "現金残高": cash_list
-            })
-
-            st.markdown("""
-            <div class="result-card card-white">
-                <div style="font-size:20px; font-weight:900;">📈 12ヶ月資金推移</div>
-                <div style="margin-top:10px; font-size:16px; line-height:1.8;">
-                    今の条件のまま進んだ場合、現金が12ヶ月でどう動くかを確認できます。
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            st.line_chart(df_cash.set_index("月"))
-
-            # ⑥ 銀行提出サマリー
-            st.markdown("""
-            <div class="result-card card-white">
-                <div style="font-size:20px; font-weight:900;">🏦 銀行提出サマリー</div>
-                <div style="margin-top:10px; font-size:16px; line-height:1.9;">
-                    そのまま銀行や税理士に見せやすい形です。
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            c1, c2 = st.columns(2)
-            with c1:
-                st.markdown(f'<div class="metric-box"><b>月商</b><br>{yen(sales)}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="metric-box"><b>原価</b><br>{yen(cost)}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="metric-box"><b>固定費</b><br>{yen(fixed_total)}</div>', unsafe_allow_html=True)
-            with c2:
-                st.markdown(f'<div class="metric-box"><b>税後利益</b><br>{yen(delta_after)}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="metric-box"><b>現在現金</b><br>{yen(cash_on_hand)}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="metric-box"><b>安全ライン</b><br>{yen(safe_cash)}</div>', unsafe_allow_html=True)
-
-            # ⑦ 現場利益10秒入力
-            st.markdown("""
-            <div class="result-card card-white">
-                <div style="font-size:20px; font-weight:900;">📋 現場利益 10秒チェック</div>
-                <div style="margin-top:10px; font-size:16px; line-height:1.9;">
-                    この現場が儲かっているかをすぐ確認できます。
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            s1, s2, s3 = st.columns(3)
-            with s1:
-                st.markdown(f'<div class="metric-box"><b>現場売上</b><br>{yen(site_sales)}</div>', unsafe_allow_html=True)
-            with s2:
-                st.markdown(f'<div class="metric-box"><b>現場利益</b><br>{yen(site_profit)}</div>', unsafe_allow_html=True)
-            with s3:
-                st.markdown(f'<div class="metric-box"><b>利益率</b><br>{site_rate:.1f}%</div>', unsafe_allow_html=True)
-
-            # ⑧ 改善アドバイス
-            if delta_after < 0:
-                advice = "資金が減少しています。売上アップか固定費削減を最優先で見直してください。"
-            elif site_rate < 15:
-                advice = "現場利益率が低めです。材料費・外注費・値決めの見直し余地があります。"
-            else:
-                advice = "利益状態は良好です。この利益率を維持しつつ、現金残高を厚くしていきましょう。"
-
-            st.markdown("""
-            <div class="result-card card-white">
-                <div style="font-size:20px; font-weight:900;">💡 改善アドバイス</div>
-            </div>
-            """, unsafe_allow_html=True)
-            st.info(advice)
-
-            # ⑨ 利益シミュレーター
-            st.markdown("""
-            <div class="result-card card-white">
-                <div style="font-size:20px; font-weight:900;">🧮 利益シミュレーター</div>
-                <div style="margin-top:10px; font-size:16px; line-height:1.9;">
-                    売上を増やした場合・原価を下げた場合の利益変化を見られます。
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            sim1, sim2 = st.columns(2)
-            with sim1:
-                st.markdown(f'<div class="metric-box"><b>改善後の税後利益</b><br>{yen(sim_new_after_tax)}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="metric-box"><b>改善後の売上</b><br>{yen(sim_new_sales)}</div>', unsafe_allow_html=True)
-            with sim2:
-                st.markdown(f'<div class="metric-box"><b>今との差額</b><br>{yen(sim_diff)}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="metric-box"><b>改善後の原価</b><br>{yen(sim_new_cost)}</div>', unsafe_allow_html=True)
-
-        else:
-            st.markdown("""
-            <div class="pro-box">
-                <div style="font-size:34px; font-weight:900; line-height:1.4;">
-                    続きは Pro版へ
-                </div>
-                <div style="font-size:18px; line-height:1.9; margin-top:12px;">
-                    Pro版では<br>
-                    <b>12ヶ月資金推移</b>・<b>現場利益管理</b>・<b>銀行提出サマリー</b><br>
-                    ・<b>利益改善シミュレーター</b> まで使えます。
-                </div>
-                <div style="font-size:44px; font-weight:900; margin-top:16px;">
-                    月 9,800円
-                </div>
-                <div style="font-size:16px; margin-top:8px;">
-                    デモは6回まで / Proは無制限
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
+# =========================
+# 結果カード
+# =========================
 st.markdown(f"""
-<a href="{LINE_URL}" target="_blank"
-style="
-display:block;
-text-align:center;
-background:#111827;
-color:white;
-padding:16px;
-border-radius:14px;
-font-size:20px;
-font-weight:800;
-text-decoration:none;
-margin-top:10px;
-">
-🚀 LINEでProを申し込む
-</a>
+    <div class="center-card" style="background-color:{color}; color:white;">
+        <div class="sub-big">現在の資金状況</div>
+        <div class="big-status-font">{status}</div>
+        <div style="font-size:1.2rem;">資金余命の目安：{min(runway, 12):.1f} ヶ月</div>
+    </div>
 """, unsafe_allow_html=True)
-# =====================================
-# フッター
-# =====================================
-st.markdown("""
-<div class="small-note">
-※ スマホでも見やすく設計しています。<br>
-※ プロフィール・チラシ・車両QRからそのまま使えます。
-</div>
-""", unsafe_allow_html=True)
+
+# =========================
+# メーター
+# =========================
+fig = go.Figure(go.Indicator(
+    mode="gauge+number",
+    value=min(runway, 12),
+    domain={"x": [0, 1], "y": [0, 1]},
+    title={"text": "資金余命（目安）", "font": {"size": 28, "color": "#333333"}},
+    gauge={
+        "axis": {"range": [0, 12], "tickwidth": 1, "tickcolor": "#555555"},
+        "bar": {"color": color},
+        "bgcolor": "white",
+        "borderwidth": 2,
+        "bordercolor": "gray",
+        "steps": [
+            {"range": [0, 3], "color": "#ffe0e0"},
+            {"range": [3, 6], "color": "#fff8e0"},
+            {"range": [6, 12], "color": "#e0ffe0"}
+        ],
+        "threshold": {
+            "line": {"color": "red", "width": 4},
+            "thickness": 0.75,
+            "value": min(runway, 12)
+        }
+    }
+))
+fig.update_layout(
+    height=350,
+    margin=dict(l=20, r=20, t=60, b=20),
+    paper_bgcolor="#f0f2f6"
+)
+st.plotly_chart(fig, use_container_width=True)
+
+# =========================
+# 詳細データ
+# =========================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("📊 詳細データ")
+
+col_a, col_b = st.columns(2)
+with col_a:
+    st.metric("粗利", f"{gross_profit:,.0f} 万円")
+    st.metric("固定費", f"{fixed_cost:,.0f} 万円")
+    st.metric("概算税金", f"{estimated_tax:,.0f} 万円")
+with col_b:
+    st.metric("借入返済", f"{loan_pay:,.0f} 万円")
+    st.metric("税引後 月次増減", f"{after_tax_balance:,.0f} 万円")
+    st.metric("安全ラインまでの不足額", f"{shortage_for_safety:,.0f} 万円")
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# 12ヶ月推移
+# =========================
+months = list(range(13))
+cash_before_tax = []
+cash_after_tax = []
+
+current_before_tax = cash
+current_after_tax = cash
+
+danger_month = None
+
+for m in months:
+    cash_before_tax.append(current_before_tax)
+    cash_after_tax.append(current_after_tax)
+
+    current_before_tax += operating_balance
+    current_after_tax += after_tax_balance
+
+for i, v in enumerate(cash_after_tax):
+    if v < 0:
+        danger_month = i
+        break
+
+df = pd.DataFrame({
+    "月": months,
+    "税前キャッシュ": cash_before_tax,
+    "税後キャッシュ": cash_after_tax
+})
+
+fig2 = go.Figure()
+fig2.add_trace(go.Scatter(
+    x=df["月"],
+    y=df["税前キャッシュ"],
+    mode="lines+markers",
+    name="税前キャッシュ"
+))
+fig2.add_trace(go.Scatter(
+    x=df["月"],
+    y=df["税後キャッシュ"],
+    mode="lines+markers",
+    name="税後キャッシュ"
+))
+
+fig2.update_layout(
+    title="📈 12ヶ月 現金推移（予測）",
+    xaxis_title="月",
+    yaxis_title="現金残高（万円）",
+    height=420,
+    paper_bgcolor="white",
+    plot_bgcolor="white"
+)
+
+st.plotly_chart(fig2, use_container_width=True)
+
+# =========================
+# 危険月表示
+# =========================
+if danger_month is not None:
+    st.error(f"⚠️ このままだと **{danger_month}ヶ月後** に資金ショートの可能性があります。")
+else:
+    st.success("✅ 12ヶ月以内の資金ショートリスクは低いです。")
+
+# =========================
+# 一撃アクション
+# =========================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("🎯 一撃アクション")
+
+if after_tax_balance < 0:
+    st.markdown(f"""
+    <div class="action-box">
+        <b>今月のままだと毎月 {abs(after_tax_balance):,.0f} 万円ずつ減る計算です。</b><br><br>
+        安全ラインに近づけるには、まず次のどれかをやるのが最短です。<br>
+        ・売上を <b>あと {needed_sales_up:,.0f} 万円</b> 上げる<br>
+        ・原価を <b>あと {needed_cost_down:,.0f} 万円</b> 下げる<br>
+        ・固定費や返済を見直して、月の支出を圧縮する
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown(f"""
+    <div class="action-box">
+        <b>今月は税引後でも {after_tax_balance:,.0f} 万円プラスです。</b><br><br>
+        今の状態はかなり良いです。<br>
+        ・現預金をさらに積み増す<br>
+        ・利益率の高い現場を増やす<br>
+        ・採用・設備投資の判断材料としてこの数字を使う
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# 改善ポイント
+# =========================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("💡 改善ポイント")
+
+if status == "危険":
+    st.error("**緊急対応が必要です！**")
+    st.write("- 売上の前倒し請求、回収サイト短縮を検討")
+    st.write("- 原価を最優先で見直す")
+    st.write("- 固定費と借入返済の圧縮余地を確認")
+    st.write("- 必要なら短期資金の確保も視野に入れる")
+
+elif status == "注意":
+    st.warning("**注意が必要です。**")
+    st.write("- 黒字幅をもう一段上げたい状態です")
+    st.write("- 現場ごとの粗利バラつきを確認")
+    st.write("- 数ヶ月先の資金繰りを先回りで見る")
+    st.write("- 利益が残る案件構成に寄せる")
+
+else:
+    st.success("**資金状況は安全です！**")
+    st.write("- 安全圏を維持しながら事業拡大を検討")
+    st.write("- 利益率の高い受注を優先")
+    st.write("- 現預金を厚くしてさらに安定化")
+    st.write("- 採用や設備投資の判断に活用")
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+st.info("※ 判定基準：6ヶ月以上=安全、3〜6ヶ月=注意、3ヶ月未満=危険")
