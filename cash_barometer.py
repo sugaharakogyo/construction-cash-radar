@@ -603,6 +603,20 @@ st.markdown("""
 # =========================
 st.title("🏗️ 建設キャッシュレーダー")
 st.write("社長のための資金余命ダッシュボード。危険・注意・安定を一瞬で見える化。")
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.markdown("""
+    <div class="line-box">
+        <b>まずはLINEで相談できます</b><br>
+        資金の不安や使い方を、登録前でも相談できます
+    </div>
+""", unsafe_allow_html=True)
+
+st.link_button(
+    "📱 登録前にLINEで相談する",
+    "https://lin.ee/7m28VAs?text=建設キャッシュレーダーについて相談したいです"
+)
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
 # Proログイン
