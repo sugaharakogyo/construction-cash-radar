@@ -8,7 +8,7 @@ from datetime import datetime
 from io import BytesIO
 
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.colors import HexColor, white, black
+from reportlab.lib.colors import HexColor, white
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
@@ -43,7 +43,7 @@ DEFAULT_STATE = {
 }
 
 # =========================
-# フォント登録（PDF用）
+# PDFフォント
 # =========================
 try:
     pdfmetrics.registerFont(UnicodeCIDFont("HeiseiKakuGo-W5"))
@@ -124,11 +124,6 @@ def draw_label_value(c, x, y, label, value, width=230, height=54):
     c.setFont(PDF_FONT_BOLD, 16)
     c.drawString(x + 12, y - 38, value)
 
-def draw_small_note(c, x, y, text):
-    c.setFillColor(HexColor("#475569"))
-    c.setFont(PDF_FONT, 9)
-    c.drawString(x, y, text)
-
 def create_pdf_report(
     company_name,
     today_str,
@@ -154,11 +149,9 @@ def create_pdf_report(
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    # 背景
     c.setFillColor(HexColor("#eef3f8"))
     c.rect(0, 0, width, height, fill=1, stroke=0)
 
-    # ヘッダー
     c.setFillColor(HexColor("#0f172a"))
     c.roundRect(28, height - 105, width - 56, 78, 18, fill=1, stroke=0)
 
@@ -172,7 +165,6 @@ def create_pdf_report(
     c.setFont(PDF_FONT, 9)
     c.drawRightString(width - 46, height - 76, f"出力日: {today_str}")
 
-    # ステータス帯
     c.setFillColor(HexColor(color))
     c.roundRect(28, height - 180, width - 56, 58, 16, fill=1, stroke=0)
 
@@ -186,19 +178,16 @@ def create_pdf_report(
     c.setFont(PDF_FONT, 11)
     c.drawRightString(width - 46, height - 146, f"資金余命の目安: {min(runway, 12):.1f}ヶ月")
 
-    # メインカード
     card_top = height - 205
     left = 28
     card_w = width - 56
     c.setFillColor(white)
     c.roundRect(left, 150, card_w, card_top - 150, 18, fill=1, stroke=0)
 
-    # セクションタイトル
     c.setFillColor(HexColor("#0f172a"))
     c.setFont(PDF_FONT_BOLD, 12)
     c.drawString(46, card_top - 22, "主要数値サマリー")
 
-    # 数値カード
     y1 = card_top - 36
     draw_label_value(c, 46, y1, "現在の現預金残高", f"{cash:,.0f} 万円", width=150)
     draw_label_value(c, 206, y1, "月平均売上高", f"{revenue:,.0f} 万円", width=150)
@@ -218,15 +207,10 @@ def create_pdf_report(
     draw_label_value(c, 46, y4, "営業ベース月次増減額", f"{operating_balance:,.0f} 万円", width=150)
     draw_label_value(c, 206, y4, "6ヶ月安全ライン不足額", f"{shortage_for_safety:,.0f} 万円", width=150)
 
-    if danger_month is not None:
-        danger_text = f"{danger_month}ヶ月後"
-    else:
-        danger_text = "12ヶ月以内なし"
+    danger_text = f"{danger_month}ヶ月後" if danger_month is not None else "12ヶ月以内なし"
     draw_label_value(c, 366, y4, "資金ショート想定時期", danger_text, width=150)
 
-    # コメント欄
     comment_y = y4 - 88
-
     c.setFillColor(HexColor("#e0f2fe"))
     c.roundRect(46, comment_y - 70, 470, 70, 14, fill=1, stroke=0)
 
@@ -246,7 +230,6 @@ def create_pdf_report(
         c.drawString(280, comment_y - 38, "- 採用・設備投資判断に活用")
         c.drawString(280, comment_y - 54, "- 安全圏を維持しながら拡大")
 
-    # フッター
     c.setFillColor(HexColor("#64748b"))
     c.setFont(PDF_FONT, 8)
     c.drawString(32, 26, "本レポートは建設キャッシュレーダーに基づく簡易試算です。税務・融資判断は専門家確認を推奨します。")
@@ -354,6 +337,17 @@ st.markdown("""
         border-radius: 14px;
         border: 2px solid #f4c542;
         margin-bottom: 18px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .locked-box {
+        background: linear-gradient(135deg, #7c2d12, #b91c1c);
+        color: white !important;
+        padding: 18px;
+        border-radius: 16px;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.14);
+        margin-bottom: 16px;
         text-align: center;
         font-weight: 700;
     }
@@ -534,7 +528,9 @@ st.radio(
     on_change=change_and_save
 )
 
-if st.session_state["plan"] == "デモ（無料）":
+is_pro = st.session_state["plan"] == "Pro（月9,800円）"
+
+if not is_pro:
     remain = max(0, DEMO_LIMIT - st.session_state.get("calc_count", 0))
     st.markdown(f"""
         <div class="demo-box">
@@ -546,7 +542,7 @@ else:
     st.markdown("""
         <div class="pro-box">
             <b>Pro版</b><br>
-            計算回数 無制限 / 今後の追加機能にも対応しやすい状態です
+            保存 / CSV / PDF / 12ヶ月推移 / LINE導線 が使えます
         </div>
     """, unsafe_allow_html=True)
 
@@ -555,7 +551,7 @@ st.markdown("</div>", unsafe_allow_html=True)
 # =========================
 # デモ上限
 # =========================
-if st.session_state["plan"] == "デモ（無料）" and st.session_state.get("calc_count", 0) >= DEMO_LIMIT:
+if not is_pro and st.session_state.get("calc_count", 0) >= DEMO_LIMIT:
     st.error("⚠️ デモ版の利用回数は上限に達しました。")
     st.info("Pro版では計算回数が無制限になります。")
 
@@ -586,21 +582,21 @@ with col1:
         min_value=0,
         step=100,
         key="cash",
-        on_change=change_and_save
+        on_change=change_and_save if is_pro else None
     )
     st.number_input(
         "月平均売上 (万円)",
         min_value=0,
         step=50,
         key="revenue",
-        on_change=change_and_save
+        on_change=change_and_save if is_pro else None
     )
     st.number_input(
         "月平均原価 (万円)",
         min_value=0,
         step=10,
         key="cost",
-        on_change=change_and_save
+        on_change=change_and_save if is_pro else None
     )
 
 with col2:
@@ -609,14 +605,14 @@ with col2:
         min_value=0,
         step=10,
         key="fixed_cost",
-        on_change=change_and_save
+        on_change=change_and_save if is_pro else None
     )
     st.number_input(
         "月の借入返済 (万円)",
         min_value=0,
         step=5,
         key="loan_pay",
-        on_change=change_and_save
+        on_change=change_and_save if is_pro else None
     )
     st.slider(
         "税率（概算）",
@@ -624,16 +620,19 @@ with col2:
         max_value=0.5,
         step=0.01,
         key="tax_rate",
-        on_change=change_and_save
+        on_change=change_and_save if is_pro else None
     )
 
 col_btn1, col_btn2, col_btn3 = st.columns(3)
 with col_btn1:
-    st.button("📊 計算する", on_click=count_demo_use)
+    st.button("📊 計算する", on_click=count_demo_use if not is_pro else None)
 with col_btn2:
-    if st.button("💾 保存"):
-        save_state()
-        st.success("保存しました。")
+    if is_pro:
+        if st.button("💾 保存"):
+            save_state()
+            st.success("保存しました。")
+    else:
+        st.button("🔒 保存（Pro）", disabled=True)
 with col_btn3:
     st.button("🔄 初期値に戻す", on_click=reset_state)
 
@@ -746,13 +745,9 @@ else:
     )
 
 df_summary = pd.DataFrame(summary_rows)
-
 summary_csv = df_summary.to_csv(index=False).encode("utf-8-sig")
 forecast_csv = df_forecast.to_csv(index=False).encode("utf-8-sig")
 
-# =========================
-# PDFデータ
-# =========================
 pdf_bytes = create_pdf_report(
     company_name=company_name,
     today_str=today_str,
@@ -838,72 +833,94 @@ with col_b:
 st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
-# 出力エリア
+# Pro限定エリア
 # =========================
-st.markdown("""
-    <div class="csv-box">
-        <b>📄 税理士・銀行向けCSV出力</b><br>
-        会社名入りで提出や共有に使いやすい形で出力できます
-    </div>
-""", unsafe_allow_html=True)
+if is_pro:
+    st.markdown("""
+        <div class="csv-box">
+            <b>📄 税理士・銀行向けCSV出力</b><br>
+            会社名入りで提出や共有に使いやすい形で出力できます
+        </div>
+    """, unsafe_allow_html=True)
 
-csv_col1, csv_col2 = st.columns(2)
-with csv_col1:
+    csv_col1, csv_col2 = st.columns(2)
+    with csv_col1:
+        st.download_button(
+            label="⬇️ サマリーCSV出力",
+            data=summary_csv,
+            file_name=f"{safe_company_name}_cash_summary_{today_str}.csv",
+            mime="text/csv"
+        )
+    with csv_col2:
+        st.download_button(
+            label="⬇️ 12ヶ月推移CSV出力",
+            data=forecast_csv,
+            file_name=f"{safe_company_name}_cash_forecast_{today_str}.csv",
+            mime="text/csv"
+        )
+
+    st.markdown("""
+        <div class="pdf-box">
+            <b>🧾 1枚レポートPDF出力</b><br>
+            税理士・銀行・社内共有向けの見やすい1ページ資料です
+        </div>
+    """, unsafe_allow_html=True)
+
     st.download_button(
-        label="⬇️ サマリーCSV出力",
-        data=summary_csv,
-        file_name=f"{safe_company_name}_cash_summary_{today_str}.csv",
-        mime="text/csv"
-    )
-with csv_col2:
-    st.download_button(
-        label="⬇️ 12ヶ月推移CSV出力",
-        data=forecast_csv,
-        file_name=f"{safe_company_name}_cash_forecast_{today_str}.csv",
-        mime="text/csv"
+        label="⬇️ 1枚レポートPDF出力",
+        data=pdf_bytes,
+        file_name=f"{safe_company_name}_cash_report_{today_str}.pdf",
+        mime="application/pdf"
     )
 
-st.markdown("""
-    <div class="pdf-box">
-        <b>🧾 1枚レポートPDF出力</b><br>
-        税理士・銀行・社内共有向けの見やすい1ページ資料です
-    </div>
-""", unsafe_allow_html=True)
+    fig2 = go.Figure()
+    fig2.add_trace(go.Scatter(
+        x=df_forecast["経過月"],
+        y=df_forecast["税引前現預金残高_万円"],
+        mode="lines+markers",
+        name="税引前現預金"
+    ))
+    fig2.add_trace(go.Scatter(
+        x=df_forecast["経過月"],
+        y=df_forecast["税引後現預金残高_万円"],
+        mode="lines+markers",
+        name="税引後現預金"
+    ))
 
-st.download_button(
-    label="⬇️ 1枚レポートPDF出力",
-    data=pdf_bytes,
-    file_name=f"{safe_company_name}_cash_report_{today_str}.pdf",
-    mime="application/pdf"
-)
+    fig2.update_layout(
+        title="📈 12ヶ月 現預金推移（予測）",
+        xaxis_title="経過月",
+        yaxis_title="現預金残高（万円）",
+        height=420,
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        font=dict(color="#111827")
+    )
+    st.plotly_chart(fig2, use_container_width=True)
 
-# =========================
-# 12ヶ月推移グラフ
-# =========================
-fig2 = go.Figure()
-fig2.add_trace(go.Scatter(
-    x=df_forecast["経過月"],
-    y=df_forecast["税引前現預金残高_万円"],
-    mode="lines+markers",
-    name="税引前現預金"
-))
-fig2.add_trace(go.Scatter(
-    x=df_forecast["経過月"],
-    y=df_forecast["税引後現預金残高_万円"],
-    mode="lines+markers",
-    name="税引後現預金"
-))
+    st.markdown("""
+        <div class="line-box">
+            <b>相談・最新情報はLINEから</b><br>
+            気になることがあればLINE追加してください
+        </div>
+    """, unsafe_allow_html=True)
+    st.link_button("📱 LINE追加ボタン", LINE_URL)
 
-fig2.update_layout(
-    title="📈 12ヶ月 現預金推移（予測）",
-    xaxis_title="経過月",
-    yaxis_title="現預金残高（万円）",
-    height=420,
-    paper_bgcolor="white",
-    plot_bgcolor="white",
-    font=dict(color="#111827")
-)
-st.plotly_chart(fig2, use_container_width=True)
+else:
+    st.markdown("""
+        <div class="locked-box">
+            <b>🔒 ここから先はPro版の機能です</b><br>
+            保存 / CSV / PDF / 12ヶ月推移 / LINE相談導線 が使えます
+        </div>
+    """, unsafe_allow_html=True)
+
+    lock_col1, lock_col2 = st.columns(2)
+    with lock_col1:
+        st.button("🔒 CSV出力（Pro）", disabled=True)
+    with lock_col2:
+        st.button("🔒 PDF出力（Pro）", disabled=True)
+
+    st.info("Pro版では、12ヶ月推移・提出用CSV・1枚レポートPDF・保存機能が使えます。")
 
 # =========================
 # 危険月表示
@@ -972,21 +989,9 @@ else:
 st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
-# LINE追加
-# =========================
-st.markdown("""
-    <div class="line-box">
-        <b>相談・最新情報はLINEから</b><br>
-        気になることがあればLINE追加してください
-    </div>
-""", unsafe_allow_html=True)
-
-st.link_button("📱 LINE追加ボタン", LINE_URL)
-
-# =========================
 # フッター
 # =========================
-if st.session_state["plan"] == "デモ（無料）":
+if not is_pro:
     remain = max(0, DEMO_LIMIT - st.session_state.get("calc_count", 0))
     st.info(f"デモ版の残り計算回数：{remain} / {DEMO_LIMIT}")
 else:
