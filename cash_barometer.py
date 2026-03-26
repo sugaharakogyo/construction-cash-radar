@@ -1206,7 +1206,7 @@ if is_pro:
 else:
     st.markdown("""
         <div class="locked-box">
-            <b>🔒 ここから先はPro版の機能です</b><br>
+            <b>🔒 この先はPRO限定</b><br>
             保存 / CSV / PDF / 12ヶ月推移 /  が使えます
             ＊目安としてお使いください。
         </div>
@@ -1225,7 +1225,7 @@ else:
     with lock_col2:
         st.button("🔒 PDF出力（Pro）", disabled=True)
 
-    st.info("この先はPRO限定：保存・CSV・PDF・12か月予測が使えます。")
+    st.info("PRO版では、12か月推移グラフ・提出用CSV・1枚レポートPDF・保存機能が使えます")
 
 
 # =========================
