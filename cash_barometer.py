@@ -36,11 +36,11 @@ DEMO_LIMIT = 6
 LINE_URL = "https://lin.ee/7m28VAs"
 
 DEFAULT_STATE = {
-    "company_name": "株式会社サンプル建設",
-    "cash": 1000,
-    "revenue": 900,
-    "cost": 558,
-    "fixed_cost": 260,
+    "company_name": "株式会社○○",
+    "cash": 500,
+    "revenue": 500,
+    "cost": 250,
+    "fixed_cost": 130,
     "loan_pay": 50,
     "tax_rate": 0.30,
     "plan": "デモ（無料）",
