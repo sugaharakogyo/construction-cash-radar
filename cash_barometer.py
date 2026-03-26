@@ -617,7 +617,7 @@ font-weight:bold;
 font-size:18px;
 margin-top:10px;
 ">
-まずは無料でお試し！！🚀 PRO版　月額9,800円
+まずは無料でお試し！！🚀 PRO版は月額9,800円
 </a>
 """, unsafe_allow_html=True)
 
