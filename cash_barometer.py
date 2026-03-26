@@ -617,6 +617,23 @@ st.link_button(
 )
 
 st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("""
+<a href="https://buy.stripe.com/あなたのURL" target="_blank"
+style="
+display:block;
+text-align:center;
+background:linear-gradient(135deg,#6366f1,#4f46e5);
+color:white;
+padding:18px;
+border-radius:16px;
+text-decoration:none;
+font-weight:bold;
+font-size:18px;
+margin-top:10px;
+">
+🚀 今すぐ資金を安定させる（月9,800円）
+</a>
+""", unsafe_allow_html=True)
 
 # =========================
 # Proログイン
