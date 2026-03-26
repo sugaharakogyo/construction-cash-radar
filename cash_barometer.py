@@ -605,8 +605,7 @@ st.title("🏗️ 建設キャッシュレーダー")
 st.write("社長のための資金余命ダッシュボード。危険・注意・安定を一瞬で見える化。")
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.markdown("""
-    <div class="line-box">
-        <b>まずはDEMO体験！！</b><br>
+   
         
     </div>
 """, unsafe_allow_html=True)
