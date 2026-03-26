@@ -1046,6 +1046,89 @@ else:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
+
+
+# =========================
+# 危険月表示
+# =========================
+if danger_month is not None:
+    st.error(f"⚠️ このままだと **{danger_month}ヶ月後** に資金ショートの可能性があります。")
+else:
+    st.success("✅ 12ヶ月以内の資金ショートリスクは低いです。")
+
+# =========================
+# 一撃アクション
+# =========================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("🎯 一撃アクション")
+
+if after_tax_balance < 0:
+    st.markdown(f"""
+    <div class="action-box">
+        <b>今月のままだと毎月 {abs(after_tax_balance):,.0f} 万円ずつ減る計算です。</b><br><br>
+        安全ラインに近づけるには、まず次のどれかをやるのが最短です。<br>
+        ・売上を <b>あと {needed_sales_up:,.0f} 万円</b> 上げる<br>
+        ・原価を <b>あと {needed_cost_down:,.0f} 万円</b> 下げる<br>
+        ・固定費や返済を見直して、月の支出を圧縮する
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown(f"""
+    <div class="action-box">
+        <b>今月は税引後でも {after_tax_balance:,.0f} 万円プラスです。</b><br><br>
+        今の状態はかなり良いです。<br>
+        ・現預金をさらに積み増す<br>
+        ・利益率の高い受注を増やす<br>
+        ・採用・設備投資の判断材料としてこの数字を使う
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# 改善ポイント
+# =========================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("💡 改善ポイント")
+
+if status == "危険":
+    st.error("**緊急対応が必要です！**")
+    st.write("- 売上の前倒し請求、回収サイト短縮を検討")
+    st.write("- 原価を最優先で見直す")
+    st.write("- 固定費と借入返済の圧縮余地を確認")
+    st.write("- 必要なら短期資金の確保も視野に入れる")
+elif status == "注意":
+    st.warning("**注意が必要です。**")
+    st.write("- 黒字幅をもう一段上げたい状態です")
+    st.write("- 現場ごとの粗利バラつきを確認")
+    st.write("- 数ヶ月先の資金繰りを先回りで見る")
+    st.write("- 利益が残る案件構成に寄せる")
+else:
+    st.success("**資金状況は安全です！**")
+    st.write("- 安全圏を維持しながら事業拡大を検討")
+    st.write("- 利益率の高い受注を優先")
+    st.write("- 現預金を厚くしてさらに安定化")
+    st.write("- 採用や設備投資の判断に活用")
+
+st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("""
+<div style='margin-top:10px;'>
+<a href="https://lin.ee/7m28VAs" target="_blank"
+style="
+display:block;
+text-align:center;
+background:#06c755;
+color:white;
+padding:16px;
+border-radius:14px;
+text-decoration:none;
+font-weight:bold;
+font-size:18px;
+">
+📱 LINEで友達追加！
+</a>
+</div>
+""", unsafe_allow_html=True)
 # =========================
 # Pro限定 / デモ一部表示
 # =========================
@@ -1143,88 +1226,6 @@ else:
         st.button("🔒 PDF出力（Pro）", disabled=True)
 
     st.info("Pro版では、12ヶ月推移グラフ・提出用CSV・1枚レポートPDF・保存機能が使えます。")
-
-# =========================
-# 危険月表示
-# =========================
-if danger_month is not None:
-    st.error(f"⚠️ このままだと **{danger_month}ヶ月後** に資金ショートの可能性があります。")
-else:
-    st.success("✅ 12ヶ月以内の資金ショートリスクは低いです。")
-
-# =========================
-# 一撃アクション
-# =========================
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.subheader("🎯 一撃アクション")
-
-if after_tax_balance < 0:
-    st.markdown(f"""
-    <div class="action-box">
-        <b>今月のままだと毎月 {abs(after_tax_balance):,.0f} 万円ずつ減る計算です。</b><br><br>
-        安全ラインに近づけるには、まず次のどれかをやるのが最短です。<br>
-        ・売上を <b>あと {needed_sales_up:,.0f} 万円</b> 上げる<br>
-        ・原価を <b>あと {needed_cost_down:,.0f} 万円</b> 下げる<br>
-        ・固定費や返済を見直して、月の支出を圧縮する
-    </div>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown(f"""
-    <div class="action-box">
-        <b>今月は税引後でも {after_tax_balance:,.0f} 万円プラスです。</b><br><br>
-        今の状態はかなり良いです。<br>
-        ・現預金をさらに積み増す<br>
-        ・利益率の高い受注を増やす<br>
-        ・採用・設備投資の判断材料としてこの数字を使う
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-# =========================
-# 改善ポイント
-# =========================
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.subheader("💡 改善ポイント")
-
-if status == "危険":
-    st.error("**緊急対応が必要です！**")
-    st.write("- 売上の前倒し請求、回収サイト短縮を検討")
-    st.write("- 原価を最優先で見直す")
-    st.write("- 固定費と借入返済の圧縮余地を確認")
-    st.write("- 必要なら短期資金の確保も視野に入れる")
-elif status == "注意":
-    st.warning("**注意が必要です。**")
-    st.write("- 黒字幅をもう一段上げたい状態です")
-    st.write("- 現場ごとの粗利バラつきを確認")
-    st.write("- 数ヶ月先の資金繰りを先回りで見る")
-    st.write("- 利益が残る案件構成に寄せる")
-else:
-    st.success("**資金状況は安全です！**")
-    st.write("- 安全圏を維持しながら事業拡大を検討")
-    st.write("- 利益率の高い受注を優先")
-    st.write("- 現預金を厚くしてさらに安定化")
-    st.write("- 採用や設備投資の判断に活用")
-
-st.markdown("</div>", unsafe_allow_html=True)
-st.markdown("""
-<div style='margin-top:10px;'>
-<a href="https://lin.ee/7m28VAs" target="_blank"
-style="
-display:block;
-text-align:center;
-background:#06c755;
-color:white;
-padding:16px;
-border-radius:14px;
-text-decoration:none;
-font-weight:bold;
-font-size:18px;
-">
-📱 LINEで友達追加！
-</a>
-</div>
-""", unsafe_allow_html=True)
 
 
 # =========================
