@@ -611,7 +611,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.link_button(
-    "📱 LINEで友達追加",
+    "📱 LINEで友達追加！！",
     "https://lin.ee/7m28VAs?text=建設キャッシュレーダーについて相談したいです"
 )
 
