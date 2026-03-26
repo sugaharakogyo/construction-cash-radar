@@ -1069,6 +1069,7 @@ else:
         <div class="locked-box">
             <b>🔒 ここから先はPro版の機能です</b><br>
             保存 / CSV / PDF / 12ヶ月推移 /  が使えます
+            ＊目安としてお使いください。
         </div>
     """, unsafe_allow_html=True)
 
