@@ -310,7 +310,7 @@ st.markdown('<div class="section-title">使い方はかんたんです</div>',un
 
 st.markdown('<div class="list"><b>STEP1</b> 数字を入力</div>',unsafe_allow_html=True)
 st.markdown('<div class="list"><b>STEP2</b> 診断結果を見る</div>',unsafe_allow_html=True)
-st.markdown('<div class="list"><b>STEP4</b> Pro版で管理</div>',unsafe_allow_html=True)
+st.markdown('<div class="list"><b>STEP3</b> Pro版で管理</div>',unsafe_allow_html=True)
 
 # price
 
