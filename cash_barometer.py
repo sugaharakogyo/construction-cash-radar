@@ -989,6 +989,62 @@ with col_b:
     st.metric("6ヶ月安全ライン不足額", f"{shortage_for_safety:,.0f} 万円")
 
 st.markdown("</div>", unsafe_allow_html=True)
+# =========================
+# Proログイン
+# =========================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("🔐 Proログイン")
+
+if st.session_state["is_pro_logged_in"]:
+    st.markdown(f"""
+        <div class="auth-box">
+            ログイン中: <b>{st.session_state["auth_user"]}</b>
+            {" / 管理者" if st.session_state["auth_role"] == "admin" else ""}
+        </div>
+    """, unsafe_allow_html=True)
+
+    col_auth1, col_auth2 = st.columns(2)
+    with col_auth1:
+        if st.button("🔓 Proとして使う"):
+            st.session_state["plan"] = "Pro（月9,800円）"
+            loaded = load_state_for_user(st.session_state["auth_user"])
+            for key, value in loaded.items():
+                st.session_state[key] = value
+            st.rerun()
+    with col_auth2:
+        if st.button("🚪 ログアウト"):
+            st.session_state["is_pro_logged_in"] = False
+            st.session_state["auth_user"] = ""
+            st.session_state["auth_role"] = ""
+            st.session_state["plan"] = "デモ（無料）"
+            loaded = load_state_for_user(None)
+            for key, value in loaded.items():
+                st.session_state[key] = value
+            st.rerun()
+else:
+    st.markdown("<div class='input-highlight'>", unsafe_allow_html=True)
+    st.text_input("Pro ID を入力", key="login_id")
+    st.text_input("パスワードを入力", type="password", key="login_pw")
+    if st.button("🔑 ログインする"):
+        login_id = st.session_state.get("login_id", "").strip()
+        login_pw = st.session_state.get("login_pw", "").strip()
+        if authenticate_user(login_id, login_pw):
+            user_info = get_user_info(login_id)
+            st.session_state["is_pro_logged_in"] = True
+            st.session_state["auth_user"] = login_id
+            st.session_state["auth_role"] = user_info.get("role", "user")
+            st.session_state["plan"] = "Pro（月9,800円）"
+            loaded = load_state_for_user(login_id)
+            for key, value in loaded.items():
+                st.session_state[key] = value
+            st.success("ログインしました。")
+            st.rerun()
+        else:
+            st.error("Pro ID かパスワードが違います。")
+    st.markdown("</div>", unsafe_allow_html=True)
+    st.caption("管理者が発行したPro IDでログインしてください。")
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
 # Pro限定 / デモ一部表示
@@ -1169,62 +1225,7 @@ font-size:18px;
 </a>
 </div>
 """, unsafe_allow_html=True)
-# =========================
-# Proログイン
-# =========================
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.subheader("🔐 Proログイン")
 
-if st.session_state["is_pro_logged_in"]:
-    st.markdown(f"""
-        <div class="auth-box">
-            ログイン中: <b>{st.session_state["auth_user"]}</b>
-            {" / 管理者" if st.session_state["auth_role"] == "admin" else ""}
-        </div>
-    """, unsafe_allow_html=True)
-
-    col_auth1, col_auth2 = st.columns(2)
-    with col_auth1:
-        if st.button("🔓 Proとして使う"):
-            st.session_state["plan"] = "Pro（月9,800円）"
-            loaded = load_state_for_user(st.session_state["auth_user"])
-            for key, value in loaded.items():
-                st.session_state[key] = value
-            st.rerun()
-    with col_auth2:
-        if st.button("🚪 ログアウト"):
-            st.session_state["is_pro_logged_in"] = False
-            st.session_state["auth_user"] = ""
-            st.session_state["auth_role"] = ""
-            st.session_state["plan"] = "デモ（無料）"
-            loaded = load_state_for_user(None)
-            for key, value in loaded.items():
-                st.session_state[key] = value
-            st.rerun()
-else:
-    st.markdown("<div class='input-highlight'>", unsafe_allow_html=True)
-    st.text_input("Pro ID を入力", key="login_id")
-    st.text_input("パスワードを入力", type="password", key="login_pw")
-    if st.button("🔑 ログインする"):
-        login_id = st.session_state.get("login_id", "").strip()
-        login_pw = st.session_state.get("login_pw", "").strip()
-        if authenticate_user(login_id, login_pw):
-            user_info = get_user_info(login_id)
-            st.session_state["is_pro_logged_in"] = True
-            st.session_state["auth_user"] = login_id
-            st.session_state["auth_role"] = user_info.get("role", "user")
-            st.session_state["plan"] = "Pro（月9,800円）"
-            loaded = load_state_for_user(login_id)
-            for key, value in loaded.items():
-                st.session_state[key] = value
-            st.success("ログインしました。")
-            st.rerun()
-        else:
-            st.error("Pro ID かパスワードが違います。")
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.caption("管理者が発行したPro IDでログインしてください。")
-
-st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
 # フッター
