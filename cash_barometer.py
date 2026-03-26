@@ -603,7 +603,23 @@ st.markdown("""
 # =========================
 st.title("🏗️ 建設キャッシュレーダー")
 st.write("社長のための資金余命ダッシュボード。危険・注意・安定を一瞬で見える化。")
-
+st.markdown("""
+<a href="https://buy.stripe.com/あなたのURL" target="_blank"
+style="
+display:block;
+text-align:center;
+background:linear-gradient(135deg,#6366f1,#4f46e5);
+color:white;
+padding:18px;
+border-radius:16px;
+text-decoration:none;
+font-weight:bold;
+font-size:18px;
+margin-top:10px;
+">
+🚀 今すぐ資金を安定させる（月9,800円）
+</a>
+""", unsafe_allow_html=True)
 # =========================
 # Proログイン
 # =========================
