@@ -610,10 +610,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-st.link_button(
-    "📱 詳しくはLINEから",
-    "https://lin.ee/7m28VAs?text=建設キャッシュレーダーについて相談したいです"
-)
+
 
 st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("""
