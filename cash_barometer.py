@@ -1068,7 +1068,7 @@ else:
     st.markdown("""
         <div class="locked-box">
             <b>🔒 ここから先はPro版の機能です</b><br>
-            保存 / CSV / PDF / 12ヶ月推移 / LINE相談導線 が使えます
+            保存 / CSV / PDF / 12ヶ月推移 /  が使えます
         </div>
     """, unsafe_allow_html=True)
 
@@ -1164,7 +1164,7 @@ text-decoration:none;
 font-weight:bold;
 font-size:18px;
 ">
-📱 LINEで相談する
+📱 LINEで友達追加！
 </a>
 </div>
 """, unsafe_allow_html=True)
