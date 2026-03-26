@@ -1225,7 +1225,7 @@ else:
     with lock_col2:
         st.button("🔒 PDF出力（Pro）", disabled=True)
 
-    st.info("この先はPRO限定：保存・CSV・PDF・12か月予測が使えます")
+    st.info("この先はPRO限定：保存・CSV・PDF・12か月予測が使えます。")
 
 
 # =========================
