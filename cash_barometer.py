@@ -627,7 +627,7 @@ font-weight:bold;
 font-size:18px;
 margin-top:10px;
 ">
-🚀 今すぐ資金を安定させる（月9,800円）
+まずは無料でお試し！！🚀 気に入ったら月額9,800円
 </a>
 """, unsafe_allow_html=True)
 
