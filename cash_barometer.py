@@ -619,23 +619,10 @@ margin-top:10px;
 ">
 STRIPE_URL = "https://buy.stripe.com/6oU28rarietE5gM6m87N600"
 
-st.markdown(f"""
-<a href="{STRIPE_URL}" target="_blank" style="
-display:block;
-text-align:center;
-background:linear-gradient(135deg,#6366f1,#4f46e5);
-color:white;
-padding:18px;
-border-radius:16px;
-text-decoration:none;
-font-weight:bold;
-font-size:18px;
-margin-top:10px;
-box-shadow: 0 8px 18px rgba(79,70,229,0.28);
-">
-今すぐ使う（30秒で開始）🚀 月額9,800円
-</a>
-""", unsafe_allow_html=True)
+st.link_button(
+    "今すぐ使う（30秒で開始）🚀 月額9,800円",
+    STRIPE_URL
+)
 
 
 # =========================
