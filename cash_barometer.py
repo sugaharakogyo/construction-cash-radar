@@ -603,14 +603,9 @@ st.markdown("""
 # =========================
 st.title("🏗️ 建設キャッシュレーダー")
 st.write("社長のための資金余命ダッシュボード。危険・注意・安定を一瞬で見える化。あなたの心に安心を。")
-STRIPE_URL = "https://buy.stripe.com/6oU28rarietE5gM6m87N600"
 
-st.link_button(
-    "今すぐ使う（30秒で開始）🚀 月額9,800円",
-    STRIPE_URL
-)
 st.markdown("""
-<a href="https://buy.stripe.com/あなたのURL" target="_blank"
+<a href="https://buy.stripe.com/6oU28rarietE5gM6m87N600" target="_blank"
 style="
 display:block;
 text-align:center;
