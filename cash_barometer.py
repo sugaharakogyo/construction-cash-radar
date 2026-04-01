@@ -747,7 +747,7 @@ else:
     st.markdown(f"""
         <div class="demo-box">
             <b>デモ版</b><br>
-            残り計算回数：<b>{remain} / {DEMO_LIMIT}</b>
+            残り計算回数:<b>{remain} / {DEMO_LIMIT}</b>
         </div>
     """, unsafe_allow_html=True)
 
