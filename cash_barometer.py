@@ -617,12 +617,9 @@ font-weight:bold;
 font-size:18px;
 margin-top:10px;
 ">
-STRIPE_URL = "https://buy.stripe.com/6oU28rarietE5gM6m87N600"
-
-st.link_button(
-    "今すぐ使う（30秒で開始）🚀 月額9,800円",
-    STRIPE_URL
-)
+まずは無料でお試し！🚀 気に入ったら月額9,800円
+</a>
+""", unsafe_allow_html=True)
 
 
 # =========================
@@ -747,7 +744,7 @@ else:
     st.markdown(f"""
         <div class="demo-box">
             <b>デモ版</b><br>
-            残り計算回数:<b>{remain} / {DEMO_LIMIT}</b>
+            残り計算回数：<b>{remain} / {DEMO_LIMIT}</b>
         </div>
     """, unsafe_allow_html=True)
 
