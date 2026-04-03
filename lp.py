@@ -643,33 +643,7 @@ render("""
 </div>
 """)
 
-# ================================
-# CTA強化（ここが売上ポイント）
-# ================================
 
-render('<div class="kcr-section-label">ACTION</div>')
-render('<div class="kcr-section-title">まずは無料で確認してください</div>')
-render('<div class="kcr-section-sub">リスクを知るだけでも価値があります</div>')
-
-render(f'''
-<a href="{APP_URL}" target="_self" class="kcr-cta-primary">
-今すぐ資金状況を確認する
-</a>
-''')
-
-render('<div class="kcr-cta-subnote">※30秒・登録不要</div>')
-
-render(f'''
-<a href="{STRIPE_URL}" target="_blank" class="kcr-cta-secondary">
-PRO版で継続管理する（月額9,800円）
-</a>
-''')
-
-render(f'''
-<a href="{LINE_URL}" target="_blank" class="kcr-cta-line">
-LINEで相談する
-</a>
-''')
 
 # ================================
 # 最後の一押し（心理ブロック）
