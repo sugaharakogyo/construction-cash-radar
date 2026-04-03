@@ -10,6 +10,10 @@ APP_URL = "https://construction-cash-check.streamlit.app/"
 LINE_URL = "https://lin.ee/7m28VAs"
 STRIPE_URL = "https://buy.stripe.com/6oU28rarietE5gM6m87N600"
 
+TOKUSHO_URL = "https://wool-athlete-ae3.notion.site/333953f89b848056818cf44d9a9dbea9"
+TERMS_URL = "https://wool-athlete-ae3.notion.site/333953f89b848056818cf44d9a9dbea9"
+PRIVACY_URL = "https://wool-athlete-ae3.notion.site/333953f89b848056818cf44d9a9dbea9"
+
 st.markdown("""
 <style>
 .block-container{
@@ -26,7 +30,7 @@ st.markdown("""
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* ------- 共通 ------- */
+/* 共通 */
 .kcr-section-label{
     display:inline-block;
     background:#e0f2fe;
@@ -63,11 +67,7 @@ st.markdown("""
     box-shadow:0 12px 30px rgba(15,23,42,0.05);
 }
 
-.kcr-spacer{
-    height:10px;
-}
-
-/* ------- HERO ------- */
+/* HERO */
 .kcr-hero{
     position:relative;
     overflow:hidden;
@@ -171,7 +171,7 @@ st.markdown("""
     color:#1d4ed8;
 }
 
-/* ------- CTA ------- */
+/* CTA */
 .kcr-cta-primary{
     display:block;
     width:100%;
@@ -185,10 +185,6 @@ st.markdown("""
     font-weight:900;
     box-shadow:0 14px 28px rgba(37,99,235,0.24);
     margin:12px 0 8px 0;
-}
-
-.kcr-cta-primary:hover{
-    filter:brightness(1.02);
 }
 
 .kcr-cta-subnote{
@@ -230,7 +226,7 @@ st.markdown("""
     box-shadow:0 12px 24px rgba(22,163,74,0.20);
 }
 
-/* ------- 3つ分かる ------- */
+/* 3つ分かる */
 .kcr-feature-grid{
     display:grid;
     grid-template-columns:repeat(3, 1fr);
@@ -268,7 +264,43 @@ st.markdown("""
     font-weight:600;
 }
 
-/* ------- warning ------- */
+/* 導入メリット */
+.kcr-benefit-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:16px;
+    margin-top:10px;
+}
+
+.kcr-benefit-box{
+    background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);
+    border:1px solid #e5e7eb;
+    border-radius:20px;
+    padding:24px 20px;
+    box-shadow:0 10px 24px rgba(15,23,42,0.05);
+}
+
+.kcr-benefit-icon{
+    font-size:28px;
+    margin-bottom:10px;
+}
+
+.kcr-benefit-title{
+    font-size:22px;
+    font-weight:900;
+    line-height:1.45;
+    color:#0f172a;
+    margin-bottom:10px;
+}
+
+.kcr-benefit-text{
+    color:#475569;
+    font-size:16px;
+    line-height:1.9;
+    font-weight:600;
+}
+
+/* warning */
 .kcr-alert{
     background:linear-gradient(180deg,#fff1f2 0%,#ffe4e6 100%);
     border:1px solid #fecdd3;
@@ -294,7 +326,7 @@ st.markdown("""
     font-weight:700;
 }
 
-/* ------- sample ------- */
+/* sample */
 .kcr-sample{
     background:#fff;
     border:1px solid #e5e7eb;
@@ -338,7 +370,7 @@ st.markdown("""
     color:#1d4ed8;
 }
 
-/* ------- list ------- */
+/* list */
 .kcr-list{
     display:grid;
     gap:12px;
@@ -356,7 +388,7 @@ st.markdown("""
     line-height:1.8;
 }
 
-/* ------- steps ------- */
+/* steps */
 .kcr-step-grid{
     display:grid;
     gap:12px;
@@ -378,7 +410,36 @@ st.markdown("""
     color:#2563eb;
 }
 
-/* ------- price ------- */
+/* FAQ */
+.kcr-faq-wrap{
+    display:grid;
+    gap:12px;
+}
+
+.kcr-faq-item{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 8px 18px rgba(15,23,42,0.04);
+}
+
+.kcr-faq-q{
+    font-size:18px;
+    font-weight:900;
+    color:#0f172a;
+    margin-bottom:8px;
+    line-height:1.7;
+}
+
+.kcr-faq-a{
+    color:#475569;
+    font-size:16px;
+    line-height:1.95;
+    font-weight:600;
+}
+
+/* price */
 .kcr-price{
     background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 100%);
     border:2px solid #16a34a;
@@ -429,7 +490,29 @@ st.markdown("""
     font-weight:700;
 }
 
-/* ------- footer ------- */
+/* footer link */
+.kcr-footer-links{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:12px;
+    margin-top:18px;
+    margin-bottom:12px;
+}
+
+.kcr-footer-link{
+    display:inline-block;
+    text-decoration:none !important;
+    background:#ffffff;
+    color:#0f172a !important;
+    border:1px solid #d1d5db;
+    padding:11px 14px;
+    border-radius:12px;
+    font-size:14px;
+    font-weight:800;
+    box-shadow:0 6px 16px rgba(15,23,42,0.04);
+}
+
 .kcr-footer{
     background:#fff;
     border:1px solid #e5e7eb;
@@ -442,7 +525,7 @@ st.markdown("""
     margin-top:18px;
 }
 
-/* ------- mobile ------- */
+/* mobile */
 @media (max-width: 768px){
     .block-container{
         padding-left:0.85rem;
@@ -477,12 +560,14 @@ st.markdown("""
         font-size:15px;
     }
 
-    .kcr-feature-grid{
+    .kcr-feature-grid,
+    .kcr-benefit-grid{
         grid-template-columns:1fr;
         gap:12px;
     }
 
-    .kcr-feature-title{
+    .kcr-feature-title,
+    .kcr-benefit-title{
         font-size:20px;
     }
 
@@ -578,6 +663,42 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# 導入メリット
+st.markdown('<div class="kcr-section-label">BENEFITS</div>', unsafe_allow_html=True)
+st.markdown('<div class="kcr-section-title">導入メリット</div>', unsafe_allow_html=True)
+st.markdown('<div class="kcr-section-sub">数字が見えるようになるだけで、社長の判断スピードが変わります。</div>', unsafe_allow_html=True)
+
+st.markdown("""
+<div class="kcr-benefit-grid">
+    <div class="kcr-benefit-box">
+        <div class="kcr-benefit-icon">⚡</div>
+        <div class="kcr-benefit-title">判断が早くなる</div>
+        <div class="kcr-benefit-text">
+            資金が何ヶ月持つかが見えるので、
+            攻めるか守るかの判断が早くなります。
+        </div>
+    </div>
+
+    <div class="kcr-benefit-box">
+        <div class="kcr-benefit-icon">🏦</div>
+        <div class="kcr-benefit-title">銀行・税理士との会話が強くなる</div>
+        <div class="kcr-benefit-text">
+            現状と不足額を数字で把握できるため、
+            説明がしやすくなります。
+        </div>
+    </div>
+
+    <div class="kcr-benefit-box">
+        <div class="kcr-benefit-icon">📈</div>
+        <div class="kcr-benefit-title">改善ポイントが明確になる</div>
+        <div class="kcr-benefit-text">
+            原価・固定費・現金のどこを見直すべきか、
+            優先順位が見えやすくなります。
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 # WARNING
 st.markdown("""
 <div class="kcr-alert">
@@ -658,6 +779,43 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# FAQ
+st.markdown('<div class="kcr-section-label">FAQ</div>', unsafe_allow_html=True)
+st.markdown('<div class="kcr-section-title">よくある質問</div>', unsafe_allow_html=True)
+st.markdown('<div class="kcr-section-sub">導入前によく聞かれる内容をまとめています。</div>', unsafe_allow_html=True)
+
+st.markdown("""
+<div class="kcr-faq-wrap">
+    <div class="kcr-faq-item">
+        <div class="kcr-faq-q">Q. 会計ソフトがなくても使えますか？</div>
+        <div class="kcr-faq-a">
+            はい。売上・原価・固定費・現金などの数字が分かれば使えます。
+        </div>
+    </div>
+
+    <div class="kcr-faq-item">
+        <div class="kcr-faq-q">Q. 無料診断だけでも使えますか？</div>
+        <div class="kcr-faq-a">
+            はい。まずは無料診断だけで、今の資金状況を確認できます。
+        </div>
+    </div>
+
+    <div class="kcr-faq-item">
+        <div class="kcr-faq-q">Q. Pro版では何ができますか？</div>
+        <div class="kcr-faq-a">
+            12ヶ月資金推移、現場利益管理、銀行提出サマリー、利益改善シミュレーターなどが使えます。
+        </div>
+    </div>
+
+    <div class="kcr-faq-item">
+        <div class="kcr-faq-q">Q. サブスクはいつでも解約できますか？</div>
+        <div class="kcr-faq-a">
+            はい。解約後は次回請求が発生しません。詳細は特定商取引法に基づく表記をご確認ください。
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 # PLAN
 st.markdown('<div class="kcr-section-label">PLAN</div>', unsafe_allow_html=True)
 st.markdown('<div class="kcr-section-title">社長専用 Proダッシュボード</div>', unsafe_allow_html=True)
@@ -688,6 +846,18 @@ st.markdown(
 )
 st.markdown(
     f'<a href="{LINE_URL}" target="_blank" class="kcr-cta-line">LINEで問い合わせる</a>',
+    unsafe_allow_html=True
+)
+
+# 規約リンク
+st.markdown(
+    f"""
+    <div class="kcr-footer-links">
+        <a href="{TOKUSHO_URL}" target="_blank" class="kcr-footer-link">特定商取引法に基づく表記</a>
+        <a href="{TERMS_URL}" target="_blank" class="kcr-footer-link">利用規約</a>
+        <a href="{PRIVACY_URL}" target="_blank" class="kcr-footer-link">プライバシーポリシー</a>
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
