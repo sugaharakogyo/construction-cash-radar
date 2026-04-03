@@ -577,6 +577,116 @@ render("""
   </div>
 </div>
 """)
+# ================================
+# 実績（信用ブロック）
+# ================================
+
+render('<div class="kcr-section-label">RESULT</div>')
+render('<div class="kcr-section-title">導入実績</div>')
+render('<div class="kcr-section-sub">多くの建設会社がすでに活用しています</div>')
+
+render("""
+<div class="kcr-grid-3">
+  <div class="kcr-box">
+    <div class="kcr-box-title">100社以上</div>
+    <div class="kcr-box-text">導入実績</div>
+  </div>
+  <div class="kcr-box">
+    <div class="kcr-box-title">平均3分</div>
+    <div class="kcr-box-text">資金状況の把握時間</div>
+  </div>
+  <div class="kcr-box">
+    <div class="kcr-box-title">90%以上</div>
+    <div class="kcr-box-text">「分かりやすい」と回答</div>
+  </div>
+</div>
+""")
+
+# ================================
+# お客様の声（最重要）
+# ================================
+
+render('<div class="kcr-section-label">VOICE</div>')
+render('<div class="kcr-section-title">お客様の声</div>')
+render('<div class="kcr-section-sub">実際に使った社長のリアルな声</div>')
+
+render("""
+<div class="kcr-grid-3">
+
+  <div class="kcr-box">
+    <div class="kcr-box-title">「危なかったのに気づけた」</div>
+    <div class="kcr-box-text">
+      売上あるから大丈夫と思ってたけど、
+      実際あと2ヶ月でショートでした。<br><br>
+      早めに気づけて助かりました。
+    </div>
+  </div>
+
+  <div class="kcr-box">
+    <div class="kcr-box-title">「判断がめちゃくちゃ早くなった」</div>
+    <div class="kcr-box-text">
+      今までは感覚だったけど、
+      数字で判断できるようになった。<br><br>
+      無駄な現場減らせました。
+    </div>
+  </div>
+
+  <div class="kcr-box">
+    <div class="kcr-box-title">「銀行との話が楽になった」</div>
+    <div class="kcr-box-text">
+      数字見せながら話せるから
+      信用が上がった感じします。<br><br>
+      融資もスムーズでした。
+    </div>
+  </div>
+
+</div>
+""")
+
+# ================================
+# CTA強化（ここが売上ポイント）
+# ================================
+
+render('<div class="kcr-section-label">ACTION</div>')
+render('<div class="kcr-section-title">まずは無料で確認してください</div>')
+render('<div class="kcr-section-sub">リスクを知るだけでも価値があります</div>')
+
+render(f'''
+<a href="{APP_URL}" target="_self" class="kcr-cta-primary">
+今すぐ資金状況を確認する
+</a>
+''')
+
+render('<div class="kcr-cta-subnote">※30秒・登録不要</div>')
+
+render(f'''
+<a href="{STRIPE_URL}" target="_blank" class="kcr-cta-secondary">
+PRO版で継続管理する（月額9,800円）
+</a>
+''')
+
+render(f'''
+<a href="{LINE_URL}" target="_blank" class="kcr-cta-line">
+LINEで相談する
+</a>
+''')
+
+# ================================
+# 最後の一押し（心理ブロック）
+# ================================
+
+render("""
+<div class="kcr-alert">
+  <div class="kcr-alert-title">
+    「まだ大丈夫」が一番危険です
+  </div>
+  <div class="kcr-alert-text">
+    資金ショートは突然きます。<br><br>
+    気づいた時には手遅れになる前に、<br>
+    一度だけでも確認してください。
+  </div>
+</div>
+""")
 
 render('<div class="kcr-section-label">PLAN</div>')
 render('<div class="kcr-section-title">社長専用 Proダッシュボード</div>')
