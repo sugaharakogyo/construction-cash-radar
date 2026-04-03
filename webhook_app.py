@@ -4,8 +4,8 @@ from flask import Flask, request
 app = Flask(__name__)
 
 # 本番ではRenderのEnvironmentに入れるのが安全
-stripe.api_key = "sk_live_あなたのStripeシークレットキー"
-endpoint_secret = "whsec_あなたのWebhookシークレット"
+stripe.api_key ="sk_test_xhhUbwLqLkcNGGNJvdF2jH5oP90tY4gc"
+endpoint_secret ="whsec_OKnVudQrYN7ZgyBSC6RNuV3LEJLJLhXA"
 
 @app.route("/", methods=["GET"])
 def home():
