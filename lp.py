@@ -6,7 +6,7 @@ st.set_page_config(
     layout="centered"
 )
 
-APP_URL = "https://construction-cash-radar.streamlit.app/"
+APP_URL = "https://construction-cash-check.streamlit.app/"
 LINE_URL = "https://lin.ee/7m28VAs"
 STRIPE_URL = "https://buy.stripe.com/6oU28rarietE5gM6m87N600"
 TOKUSHO_URL = "https://wool-athlete-ae3.notion.site/333953f89b848056818cf44d9a9dbea9"
