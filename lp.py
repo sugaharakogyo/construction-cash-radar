@@ -9,7 +9,6 @@ st.set_page_config(
 APP_URL = "https://construction-cash-radar.streamlit.app/"
 LINE_URL = "https://lin.ee/7m28VAs"
 STRIPE_URL = "https://buy.stripe.com/6oU28rarietE5gM6m87N600"
-
 TOKUSHO_URL = "https://wool-athlete-ae3.notion.site/333953f89b848056818cf44d9a9dbea9"
 TERMS_URL = "https://wool-athlete-ae3.notion.site/333953f89b848056818cf44d9a9dbea9"
 PRIVACY_URL = "https://wool-athlete-ae3.notion.site/333953f89b848056818cf44d9a9dbea9"
@@ -577,9 +576,6 @@ render("""
   </div>
 </div>
 """)
-# ================================
-# 実績（信用ブロック）
-# ================================
 
 render('<div class="kcr-section-label">RESULT</div>')
 render('<div class="kcr-section-title">導入実績</div>')
@@ -602,17 +598,12 @@ render("""
 </div>
 """)
 
-# ================================
-# お客様の声（最重要）
-# ================================
-
 render('<div class="kcr-section-label">VOICE</div>')
 render('<div class="kcr-section-title">お客様の声</div>')
 render('<div class="kcr-section-sub">実際に使った社長のリアルな声</div>')
 
 render("""
 <div class="kcr-grid-3">
-
   <div class="kcr-box">
     <div class="kcr-box-title">「危なかったのに気づけた」</div>
     <div class="kcr-box-text">
@@ -621,7 +612,6 @@ render("""
       早めに気づけて助かりました。
     </div>
   </div>
-
   <div class="kcr-box">
     <div class="kcr-box-title">「判断がめちゃくちゃ早くなった」</div>
     <div class="kcr-box-text">
@@ -630,7 +620,6 @@ render("""
       無駄な現場減らせました。
     </div>
   </div>
-
   <div class="kcr-box">
     <div class="kcr-box-title">「銀行との話が楽になった」</div>
     <div class="kcr-box-text">
@@ -639,15 +628,8 @@ render("""
       融資もスムーズでした。
     </div>
   </div>
-
 </div>
 """)
-
-
-
-# ================================
-# 最後の一押し（心理ブロック）
-# ================================
 
 render("""
 <div class="kcr-alert">
