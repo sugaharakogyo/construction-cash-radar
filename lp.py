@@ -257,6 +257,21 @@ st.markdown("""
     
 </div>
 """, unsafe_allow_html=True)
+st.markdown("""
+<div class="card">
+    <div class="card-title">お客様の声
+    <div class="card-text">
+       「危なかったのに気づけた」
+        売上あるから大丈夫と思ってたけど、実際あと2ヶ月でショートでした。
+
+        「判断がめちゃくちゃ早くなった」
+        今までは感覚だったけど、数字で判断できるようになった。
+
+        「銀行との話が楽になった」
+        数字見せながら話せるから信用が上がった感じします。
+    
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="price">
