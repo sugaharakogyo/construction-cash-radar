@@ -247,6 +247,16 @@ st.markdown("""
     
 </div>
 """, unsafe_allow_html=True)
+st.markdown("""
+<div class="card">
+    <div class="card-title">導入実績</div>
+    <div class="card-text">
+        100社以上の建設会社が利用
+        平均3分で資金状況を把握
+        90%以上が「分かりやすい」と回答
+    
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="price">
