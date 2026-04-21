@@ -272,6 +272,16 @@ st.markdown("""
     
 </div>
 """, unsafe_allow_html=True)
+st.markdown("""
+<div class="notice">
+    <div class="notice-title">「まだ大丈夫」が一番危険です
+    <div class="notice-text">
+        資金ショートは突然きます。
+        気づいた時には手遅れになる前に、
+        一度だけでも確認してください。
+    
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="price">
