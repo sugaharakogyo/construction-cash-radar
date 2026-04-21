@@ -193,6 +193,19 @@ st.markdown("""
     </div>
 </div>
 """, unsafe_allow_html=True)
+st.markdown("""
+<div class="card">
+    <div class="card-title">診断結果のイメージ</div>
+    <div class="card-text">
+        <b>入力例</b><br>
+        売上 900万円 / 原価 620万円 / 固定費 260万円 / 現金 180万円<br><br>
+        <b>診断結果</b><br>
+        資金ショートまで：3.4ヶ月<br>
+        安全ライン不足額：あと380万円不足<br>
+        改善ポイント：原価率 -3%
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="card">
