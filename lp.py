@@ -229,6 +229,24 @@ st.markdown("""
     </div>
 </div>
 """, unsafe_allow_html=True)
+st.markdown("""
+<div class="card">
+    <div class="card-title">よくある質問</div>
+    <div class="card-text">
+        <b>Q. 会計ソフトがなくても使えますか？</b><br>
+        はい。売上・原価・固定費・現金などの数字が分かれば使えます。<br><br>
+
+        <b>Q. 無料診断だけでも使えますか？</b><br>
+        はい。まずは無料診断だけで、今の資金状況を確認できます。<br><br>
+
+        <b>Q. Pro版では何ができますか？</b><br>
+        12ヶ月資金推移、現場利益管理、銀行提出サマリー、利益改善シミュレーターなどが使えます。<br><br>
+
+        <b>Q. サブスクはいつでも解約できますか？</b><br>
+        はい。解約後は次回請求が発生しません。
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <div class="price">
