@@ -1421,18 +1421,43 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # =========================
-# メーター（改善版）
+# メーター（改善版・スマホ対応）
 # =========================
 fig = go.Figure(go.Indicator(
     mode="gauge+number",
     value=min(runway, 12),
     domain={"x": [0, 1], "y": [0, 1]},
-    title={"text": "あと何ヶ月もつ？", "font": {"size": 28, "color": "#111827"}},
+    title={
+        "text": "あと何ヶ月もつ？", 
+        "font": {
+            "size": 28,  # PCサイズ
+            "color": "#111827",
+            "family": "Noto Sans JP, sans-serif",
+            "weight": 700
+        }
+    },
+    number={
+        "suffix": " ヶ月",
+        "font": {
+            "size": 48,  # 数字を大きく
+            "color": "#0f172a",
+            "family": "Noto Sans JP, sans-serif",
+            "weight": 900
+        }
+    },
     gauge={
-        "axis": {"range": [0, 12], "tickwidth": 1, "tickcolor": "#334155"},
-        "bar": {"color": color},
+        "axis": {
+            "range": [0, 12], 
+            "tickwidth": 2,  # 目盛りを太く
+            "tickcolor": "#334155",
+            "tickfont": {
+                "size": 14,  # 目盛りの数字を大きく
+                "color": "#475569"
+            }
+        },
+        "bar": {"color": color, "thickness": 0.6},  # バーを太く
         "bgcolor": "white",
-        "borderwidth": 2,
+        "borderwidth": 3,  # 枠を太く
         "bordercolor": "#94a3b8",
         "steps": [
             {"range": [0, 3], "color": "#fee2e2"},
@@ -1440,14 +1465,24 @@ fig = go.Figure(go.Indicator(
             {"range": [6, 12], "color": "#dcfce7"}
         ],
         "threshold": {
-            "line": {"color": "#7f1d1d", "width": 4},
-            "thickness": 0.75,
+            "line": {"color": "#7f1d1d", "width": 5},  # しきい値線を太く
+            "thickness": 0.8,
             "value": min(runway, 12)
         }
-    },
-    number={"suffix": " ヶ月"}
+    }
 ))
-fig.update_layout(height=330, margin=dict(l=20, r=20, t=60, b=12), paper_bgcolor="#eef3f8")
+
+fig.update_layout(
+    height=330,
+    margin=dict(l=20, r=20, t=60, b=12),
+    paper_bgcolor="#eef3f8",
+    font=dict(
+        family="Noto Sans JP, sans-serif",
+        size=16,
+        color="#111827"
+    )
+)
+
 st.plotly_chart(fig, use_container_width=True)
 
 # =========================
