@@ -649,6 +649,254 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+# =========================
+# CSS（スマホ対応強化版）
+# =========================
+st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap');
+
+    html, body, [class*="st-"] {
+        font-family: 'Noto Sans JP', sans-serif;
+        color: #111827 !important;
+    }
+
+    .stApp { background: #eef3f8; }
+    .main { background: #eef3f8; }
+
+    .block-container {
+        max-width: 900px;
+        padding-top: 1rem;
+        padding-bottom: 1.2rem;
+    }
+
+    .card {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 18px;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.10);
+        margin-bottom: 14px;
+        border: 1px solid #dbe4ee;
+    }
+
+    .center-card {
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+        margin-bottom: 14px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    .big-status-font {
+        font-size: 4.0rem !important;
+        font-weight: 900 !important;
+        margin-top: 0.3rem;
+        margin-bottom: 0.3rem;
+        line-height: 1;
+        color: white !important;
+    }
+
+    .sub-big {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: white !important;
+    }
+
+    .action-box {
+        background: #f8fbff;
+        border-left: 8px solid #2563eb;
+        padding: 18px;
+        border-radius: 12px;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        color: #0f172a !important;
+    }
+
+    /* その他のスタイルは省略 */
+
+    /* ==================== */
+    /* スマホ対応強化（640px以下） */
+    /* ==================== */
+    @media (max-width: 640px) {
+        /* コンテナの余白調整 */
+        .block-container {
+            padding-top: 0.5rem !important;
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+            padding-bottom: 1rem !important;
+        }
+        
+        /* カードの余白調整 */
+        .card, .center-card { 
+            padding: 15px !important; 
+            border-radius: 14px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        /* 大きなステータス文字を少し小さく */
+        .big-status-font { 
+            font-size: 2.5rem !important; 
+        }
+        
+        /* サブタイトルも調整 */
+        .sub-big {
+            font-size: 1rem !important;
+        }
+        
+        /* h1タイトルを小さく */
+        h1 {
+            font-size: 1.8rem !important;
+        }
+        
+        /* h2サブタイトルを小さく */
+        h2 {
+            font-size: 1.4rem !important;
+        }
+        
+        /* h3以下も調整 */
+        h3 {
+            font-size: 1.2rem !important;
+        }
+        
+        h4 {
+            font-size: 1.1rem !important;
+        }
+        
+        /* 入力欄のラベルを見やすく */
+        .stNumberInput label, .stTextInput label, .stSlider label {
+            font-size: 0.95rem !important;
+            font-weight: 700 !important;
+        }
+        
+        /* 入力欄を大きく（指で押しやすく） */
+        .stNumberInput input, .stTextInput input {
+            font-size: 1.1rem !important;
+            padding: 0.9rem 0.8rem !important;
+            height: 3rem !important;
+        }
+        
+        /* ボタンを大きく */
+        .stButton > button {
+            height: 3.5rem !important;
+            font-size: 1.1rem !important;
+            padding: 0.8rem 1rem !important;
+        }
+        
+        /* メトリクスカードを調整 */
+        .stMetric {
+            padding: 12px !important;
+            margin-bottom: 8px !important;
+        }
+        
+        /* メトリクスのラベルを小さく */
+        [data-testid="stMetricLabel"] {
+            font-size: 0.85rem !important;
+        }
+        
+        /* メトリクスの値を見やすく */
+        [data-testid="stMetricValue"] {
+            font-size: 1.5rem !important;
+        }
+        
+        /* アクションボックスの余白調整 */
+        .action-box {
+            padding: 12px !important;
+            margin: 8px 0 !important;
+        }
+        
+        /* アクションボックス内の文字サイズ */
+        .action-box h4 {
+            font-size: 1rem !important;
+            line-height: 1.4 !important;
+        }
+        
+        .action-box p {
+            font-size: 0.9rem !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* ダウンロードボタンを大きく */
+        div[data-testid="stDownloadButton"] button {
+            height: 3.5rem !important;
+            font-size: 1.1rem !important;
+        }
+        
+        /* 2カラムレイアウトを1カラムに */
+        .row-widget.stHorizontal {
+            flex-direction: column !important;
+        }
+        
+        /* グラフの高さ調整 */
+        .js-plotly-plot {
+            max-height: 300px !important;
+        }
+        
+        /* テーブルのフォントサイズ */
+        .stDataFrame {
+            font-size: 0.85rem !important;
+        }
+        
+        /* エキスパンダー（折りたたみ）のタイトル */
+        .streamlit-expanderHeader {
+            font-size: 1rem !important;
+        }
+        
+        /* リンクボタンを大きく */
+        div[data-testid="stLinkButton"] a {
+            font-size: 1.1rem !important;
+            padding: 1rem !important;
+            height: auto !important;
+            min-height: 3.5rem !important;
+        }
+    }
+    
+    /* ==================== */
+    /* さらに小さい画面（480px以下） */
+    /* ==================== */
+    @media (max-width: 480px) {
+        .block-container {
+            padding-left: 0.3rem !important;
+            padding-right: 0.3rem !important;
+        }
+        
+        .card, .center-card {
+            padding: 12px !important;
+        }
+        
+        .big-status-font {
+            font-size: 2rem !important;
+        }
+        
+        h1 {
+            font-size: 1.5rem !important;
+        }
+        
+        h2 {
+            font-size: 1.3rem !important;
+        }
+        
+        .stButton > button {
+            font-size: 1rem !important;
+        }
+    }
+    
+    /* ==================== */
+    /* タブレット（641px〜1024px） */
+    /* ==================== */
+    @media (min-width: 641px) and (max-width: 1024px) {
+        .block-container {
+            max-width: 700px !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+        
+        .big-status-font {
+            font-size: 3.5rem !important;
+        }
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # =========================
 # タイトル
