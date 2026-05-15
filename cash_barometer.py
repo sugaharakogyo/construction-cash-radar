@@ -1,3 +1,10 @@
+# 📦 改善版フルコード【1/8】
+
+---
+
+## 🎯 冒頭部分（インポート〜基本設定）
+
+```python
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
@@ -134,6 +141,13 @@ def get_user_state_file(username: str) -> Path:
     safe_name = re.sub(r'[\\/:*?"<>| ]', "_", username)
     return USER_DATA_DIR / f"{safe_name}_state.json"
 
+# 📦 改善版フルコード【2/8】
+
+---
+
+## 🎯 データ保存・読込関数
+
+```python
 # =========================
 # ユーザー別 保存・読込
 # =========================
@@ -206,6 +220,13 @@ def sanitize_filename(text: str) -> str:
     text = text.replace(" ", "_")
     return text[:50]
 
+# 📦 改善版フルコード【3/8】
+
+---
+
+## 🎯 PDF作成関数（改善版）
+
+```python
 # =========================
 # PDF作成
 # =========================
@@ -265,13 +286,13 @@ def create_pdf_report(
 
     c.setFillColor(white)
     c.setFont(PDF_FONT_BOLD, 12)
-    c.drawString(46, height - 146, "現在の資金状況")
+    c.drawString(46, height - 146, "今の状態は？")
 
     c.setFont(PDF_FONT_BOLD, 22)
     c.drawString(170, height - 148, status)
 
     c.setFont(PDF_FONT, 11)
-    c.drawRightString(width - 46, height - 146, f"資金余命の目安: {min(runway, 12):.1f}ヶ月")
+    c.drawRightString(width - 46, height - 146, f"このままだと、あと {min(runway, 12):.1f}ヶ月もちます")
 
     card_top = height - 205
     left = 28
@@ -281,29 +302,36 @@ def create_pdf_report(
 
     c.setFillColor(HexColor("#0f172a"))
     c.setFont(PDF_FONT_BOLD, 12)
-    c.drawString(46, card_top - 22, "主要数値サマリー")
+    c.drawString(46, card_top - 22, "主要数値（社長目線）")
 
     y1 = card_top - 36
-    draw_label_value(c, 46, y1, "現在の現預金残高", f"{cash:,.0f} 万円", width=150)
-    draw_label_value(c, 206, y1, "月平均売上高", f"{revenue:,.0f} 万円", width=150)
-    draw_label_value(c, 366, y1, "月平均原価", f"{cost:,.0f} 万円", width=150)
+    draw_label_value(c, 46, y1, "今ある現金", f"{cash:,.0f} 万円", width=150)
+    draw_label_value(c, 206, y1, "月の売上", f"{revenue:,.0f} 万円", width=150)
+    draw_label_value(c, 366, y1, "外注・材料費", f"{cost:,.0f} 万円", width=150)
 
     y2 = y1 - 68
-    draw_label_value(c, 46, y2, "月平均固定費", f"{fixed_cost:,.0f} 万円", width=150)
-    draw_label_value(c, 206, y2, "月間借入返済額", f"{loan_pay:,.0f} 万円", width=150)
-    draw_label_value(c, 366, y2, "概算税率", f"{tax_rate * 100:.1f} %", width=150)
+    draw_label_value(c, 46, y2, "人件費・家賃など", f"{fixed_cost:,.0f} 万円", width=150)
+    draw_label_value(c, 206, y2, "借金の返済", f"{loan_pay:,.0f} 万円", width=150)
+    draw_label_value(c, 366, y2, "税金の割合", f"{tax_rate * 100:.1f} %", width=150)
 
     y3 = y2 - 68
-    draw_label_value(c, 46, y3, "粗利益", f"{gross_profit:,.0f} 万円", width=150)
-    draw_label_value(c, 206, y3, "概算納税額", f"{estimated_tax:,.0f} 万円", width=150)
-    draw_label_value(c, 366, y3, "税引後月次増減額", f"{after_tax_balance:,.0f} 万円", width=150)
+    draw_label_value(c, 46, y3, "手元に残る利益", f"{gross_profit:,.0f} 万円", width=150)
+    draw_label_value(c, 206, y3, "税金の支払い", f"{estimated_tax:,.0f} 万円", width=150)
+    
+    balance_label = "毎月いくら増える？" if after_tax_balance >= 0 else "毎月いくら減る？"
+    balance_value = f"+{after_tax_balance:,.0f}" if after_tax_balance >= 0 else f"{after_tax_balance:,.0f}"
+    draw_label_value(c, 366, y3, balance_label, f"{balance_value} 万円", width=150)
 
     y4 = y3 - 68
-    draw_label_value(c, 46, y4, "営業ベース月次増減額", f"{operating_balance:,.0f} 万円", width=150)
-    draw_label_value(c, 206, y4, "6ヶ月安全ライン不足額", f"{shortage_for_safety:,.0f} 万円", width=150)
+    draw_label_value(c, 46, y4, "営業キャッシュ", f"{operating_balance:,.0f} 万円", width=150)
+    
+    if shortage_for_safety > 0:
+        draw_label_value(c, 206, y4, "あといくら必要？", f"{shortage_for_safety:,.0f} 万円", width=150)
+    else:
+        draw_label_value(c, 206, y4, "安全ライン", "達成！", width=150)
 
     danger_text = f"{danger_month}ヶ月後" if danger_month is not None else "12ヶ月以内なし"
-    draw_label_value(c, 366, y4, "資金ショート想定時期", danger_text, width=150)
+    draw_label_value(c, 366, y4, "お金が足りなくなる時期", danger_text, width=150)
 
     comment_y = y4 - 88
     c.setFillColor(HexColor("#e0f2fe"))
@@ -311,18 +339,18 @@ def create_pdf_report(
 
     c.setFillColor(HexColor("#0f172a"))
     c.setFont(PDF_FONT_BOLD, 11)
-    c.drawString(60, comment_y - 18, "経営アクションの目安")
+    c.drawString(60, comment_y - 18, "今すぐやること")
 
     c.setFont(PDF_FONT, 10)
     if after_tax_balance < 0:
         c.drawString(60, comment_y - 38, f"- 売上をあと {needed_sales_up:,.0f} 万円 上げる")
         c.drawString(60, comment_y - 54, f"- 原価をあと {needed_cost_down:,.0f} 万円 下げる")
-        c.drawString(280, comment_y - 38, "- 固定費や返済の見直し")
-        c.drawString(280, comment_y - 54, "- 回収サイト短縮・前倒し請求")
+        c.drawString(280, comment_y - 38, "- 人件費や返済の見直し")
+        c.drawString(280, comment_y - 54, "- 売掛金の回収を早める")
     else:
-        c.drawString(60, comment_y - 38, "- 現預金をさらに積み増す")
-        c.drawString(60, comment_y - 54, "- 利益率の高い受注を優先する")
-        c.drawString(280, comment_y - 38, "- 採用・設備投資判断に活用")
+        c.drawString(60, comment_y - 38, "- 現金をもっと貯める")
+        c.drawString(60, comment_y - 54, "- 利益率の高い仕事を優先する")
+        c.drawString(280, comment_y - 38, "- 人を雇う・機械を買う判断に活用")
         c.drawString(280, comment_y - 54, "- 安全圏を維持しながら拡大")
 
     c.setFillColor(HexColor("#64748b"))
@@ -334,6 +362,13 @@ def create_pdf_report(
     buffer.seek(0)
     return buffer.getvalue()
 
+# 📦 改善版フルコード【4/8】
+
+---
+
+## 🎯 初期化＆CSS
+
+```python
 # =========================
 # 初期化
 # =========================
@@ -598,11 +633,18 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# 📦 改善版フルコード【5/8】
+
+---
+
+## 🎯 タイトル＆管理者機能＆入力欄
+
+```python
 # =========================
 # タイトル
 # =========================
 st.title("🏗️ 建設キャッシュレーダー")
-st.write("社長のための資金余命ダッシュボード。危険・注意・安定を一瞬で見える化。あなたの心に安心を。")
+st.write("社長が3秒で分かる。あと何ヶ月もつか、今すぐやることが見える。")
 
 st.markdown("""
 <a href="https://buy.stripe.com/6oU28rarietE5gM6m87N600" target="_blank"
@@ -767,22 +809,69 @@ if not is_pro and st.session_state.get("calc_count", 0) >= DEMO_LIMIT:
     st.stop()
 
 # =========================
-# 入力欄
+# 入力欄（改善版）
 # =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.subheader("💰 月次入力")
+st.subheader("💰 今月の数字を入れてください")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.number_input("現在の現預金 (万円)", min_value=0, step=100, key="cash", on_change=change_and_save if is_pro else None)
-    st.number_input("月平均売上 (万円)", min_value=0, step=50, key="revenue", on_change=change_and_save if is_pro else None)
-    st.number_input("月平均原価 (万円)", min_value=0, step=10, key="cost", on_change=change_and_save if is_pro else None)
+    st.number_input(
+        "💵 今ある現金（万円）", 
+        min_value=0, 
+        step=100, 
+        key="cash",
+        help="通帳に今いくらありますか？",
+        on_change=change_and_save if is_pro else None
+    )
+    
+    st.number_input(
+        "📈 月の売上（万円）", 
+        min_value=0, 
+        step=50, 
+        key="revenue",
+        help="1ヶ月でいくら売上がありますか？",
+        on_change=change_and_save if is_pro else None
+    )
+    
+    st.number_input(
+        "🔨 外注・材料費（万円）", 
+        min_value=0, 
+        step=10, 
+        key="cost",
+        help="職人さんへの支払いと材料代",
+        on_change=change_and_save if is_pro else None
+    )
 
 with col2:
-    st.number_input("月平均固定費 (万円)", min_value=0, step=10, key="fixed_cost", on_change=change_and_save if is_pro else None)
-    st.number_input("月の借入返済 (万円)", min_value=0, step=5, key="loan_pay", on_change=change_and_save if is_pro else None)
-    st.slider("税率（概算）", min_value=0.0, max_value=0.5, step=0.01, key="tax_rate", on_change=change_and_save if is_pro else None)
+    st.number_input(
+        "🏢 人件費・家賃など（万円）", 
+        min_value=0, 
+        step=10, 
+        key="fixed_cost",
+        help="社員の給料、事務所の家賃など",
+        on_change=change_and_save if is_pro else None
+    )
+    
+    st.number_input(
+        "💳 借金の返済（万円）", 
+        min_value=0, 
+        step=5, 
+        key="loan_pay",
+        help="銀行への返済額（月）",
+        on_change=change_and_save if is_pro else None
+    )
+    
+    st.slider(
+        "📊 税金の割合（だいたい）", 
+        min_value=0.0, 
+        max_value=0.5, 
+        step=0.01, 
+        key="tax_rate",
+        help="利益の30%くらいが目安",
+        on_change=change_and_save if is_pro else None
+    )
 
 col_btn1, col_btn2, col_btn3 = st.columns(3)
 with col_btn1:
@@ -805,6 +894,13 @@ with col_btn3:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
+# 📦 改善版フルコード【6/8】
+
+---
+
+## 🎯 計算ロジック＆結果表示
+
+```python
 # =========================
 # 値取得
 # =========================
@@ -876,9 +972,9 @@ for i, v in enumerate(cash_after_tax):
 
 df_forecast = pd.DataFrame({
     "会社名": [company_name] * len(months),
-    "経過月": months,
-    "税引前現預金残高_万円": cash_before_tax,
-    "税引後現預金残高_万円": cash_after_tax
+    "何ヶ月後": months,
+    "税引前残高_万円": cash_before_tax,
+    "税引後残高_万円": cash_after_tax
 })
 
 # =========================
@@ -886,26 +982,26 @@ df_forecast = pd.DataFrame({
 # =========================
 summary_rows = [
     {"出力日": today_str, "会社名": company_name, "分類": "基本情報", "項目名": "利用プラン", "数値・内容": plan, "単位": ""},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "現在の現預金残高", "数値・内容": cash, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "月平均売上高", "数値・内容": revenue, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "月平均原価", "数値・内容": cost, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "月平均固定費", "数値・内容": fixed_cost, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "月間借入返済額", "数値・内容": loan_pay, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "概算税率", "数値・内容": round(tax_rate * 100, 1), "単位": "%"},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "粗利益", "数値・内容": gross_profit, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "営業ベース月次増減額", "数値・内容": operating_balance, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "概算納税額", "数値・内容": estimated_tax, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "税引後月次増減額", "数値・内容": after_tax_balance, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "資金余命目安", "数値・内容": round(min(runway, 12), 1), "単位": "ヶ月"},
+    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "今ある現金", "数値・内容": cash, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "月の売上", "数値・内容": revenue, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "外注・材料費", "数値・内容": cost, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "人件費・家賃など", "数値・内容": fixed_cost, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "借金の返済", "数値・内容": loan_pay, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "税金の割合", "数値・内容": round(tax_rate * 100, 1), "単位": "%"},
+    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "手元に残る利益", "数値・内容": gross_profit, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "営業キャッシュ", "数値・内容": operating_balance, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "税金の支払い", "数値・内容": estimated_tax, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "毎月の増減", "数値・内容": after_tax_balance, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "あと何ヶ月もつ？", "数値・内容": round(min(runway, 12), 1), "単位": "ヶ月"},
     {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "資金判定", "数値・内容": status, "単位": ""},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "6ヶ月安全ライン不足額", "数値・内容": shortage_for_safety, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "あといくら必要？", "数値・内容": shortage_for_safety, "単位": "万円"},
     {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "改善必要額", "数値・内容": needed_improvement, "単位": "万円"},
 ]
 
 if danger_month is not None:
-    summary_rows.append({"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "資金ショート想定時期", "数値・内容": danger_month, "単位": "ヶ月後"})
+    summary_rows.append({"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "お金が足りなくなる時期", "数値・内容": danger_month, "単位": "ヶ月後"})
 else:
-    summary_rows.append({"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "資金ショート想定時期", "数値・内容": "12ヶ月以内なし", "単位": ""})
+    summary_rows.append({"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "お金が足りなくなる時期", "数値・内容": "12ヶ月以内なし", "単位": ""})
 
 df_summary = pd.DataFrame(summary_rows)
 summary_csv = df_summary.to_csv(index=False).encode("utf-8-sig")
@@ -934,24 +1030,26 @@ pdf_bytes = create_pdf_report(
 )
 
 # =========================
-# 結果カード
+# 結果カード（改善版）
 # =========================
 st.markdown(f"""
     <div class="center-card" style="background:{color}; color:white;">
-        <div class="sub-big">現在の資金状況</div>
+        <div class="sub-big">今の状態は？</div>
         <div class="big-status-font">{status}</div>
-        <div style="font-size:1.15rem; color:white;">資金余命の目安：{min(runway, 12):.1f} ヶ月</div>
+        <div style="font-size:1.15rem; color:white;">
+            このままだと、あと {min(runway, 12):.1f} ヶ月もちます
+        </div>
     </div>
 """, unsafe_allow_html=True)
 
 # =========================
-# メーター
+# メーター（改善版）
 # =========================
 fig = go.Figure(go.Indicator(
     mode="gauge+number",
     value=min(runway, 12),
     domain={"x": [0, 1], "y": [0, 1]},
-    title={"text": "資金余命（目安）", "font": {"size": 26, "color": "#111827"}},
+    title={"text": "あと何ヶ月もつ？", "font": {"size": 28, "color": "#111827"}},
     gauge={
         "axis": {"range": [0, 12], "tickwidth": 1, "tickcolor": "#334155"},
         "bar": {"color": color},
@@ -968,28 +1066,371 @@ fig = go.Figure(go.Indicator(
             "thickness": 0.75,
             "value": min(runway, 12)
         }
-    }
+    },
+    number={"suffix": " ヶ月"}
 ))
 fig.update_layout(height=330, margin=dict(l=20, r=20, t=60, b=12), paper_bgcolor="#eef3f8")
 st.plotly_chart(fig, use_container_width=True)
 
 # =========================
-# 詳細データ
+# 詳細データ（改善版）
 # =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.subheader("📊 詳細データ")
+st.subheader("📊 詳しく見る")
 
 col_a, col_b = st.columns(2)
+
 with col_a:
-    st.metric("粗利益", f"{gross_profit:,.0f} 万円")
-    st.metric("固定費", f"{fixed_cost:,.0f} 万円")
-    st.metric("概算納税額", f"{estimated_tax:,.0f} 万円")
+    st.metric(
+        "💰 手元に残る利益", 
+        f"{gross_profit:,.0f} 万円",
+        help="売上 - 外注材料費"
+    )
+    
+    # 最重要指標を強調
+    if after_tax_balance >= 0:
+        st.metric(
+            "📈 毎月いくら増える？", 
+            f"+{after_tax_balance:,.0f} 万円",
+            delta="増えています",
+            help="税金を払った後、毎月これだけ増えます"
+        )
+    else:
+        st.metric(
+            "📉 毎月いくら減る？", 
+            f"{after_tax_balance:,.0f} 万円",
+            delta="減っています",
+            delta_color="inverse",
+            help="税金を払った後、毎月これだけ減ります"
+        )
+
 with col_b:
-    st.metric("借入返済", f"{loan_pay:,.0f} 万円")
-    st.metric("税引後 月次増減額", f"{after_tax_balance:,.0f} 万円")
-    st.metric("6ヶ月安全ライン不足額", f"{shortage_for_safety:,.0f} 万円")
+    st.metric(
+        "💸 税金の支払い", 
+        f"{estimated_tax:,.0f} 万円",
+        help="だいたいこれくらい税金がかかります"
+    )
+    
+    if shortage_for_safety > 0:
+        st.metric(
+            "⚠️ あといくら必要？", 
+            f"{shortage_for_safety:,.0f} 万円",
+            help="6ヶ月安心して経営するために必要な金額"
+        )
+    else:
+        st.metric(
+            "✅ 安全ライン達成", 
+            "OK！",
+            help="6ヶ月分の余裕があります"
+        )
 
 st.markdown("</div>", unsafe_allow_html=True)
+
+# 📦 改善版フルコード【7/8】
+
+---
+
+## 🎯 危険月表示＆アクション提案＆改善ポイント
+
+```python
+# =========================
+# 危険月表示（改善版・強調）
+# =========================
+if danger_month is not None:
+    st.markdown(f"""
+    <div class="action-box" style="border-left: 8px solid #b91c1c; background: #fee2e2;">
+        <h3 style="color: #991b1b; margin-top: 0;">🚨 このままだと危険です！</h3>
+        <p style="font-size: 1.2rem; font-weight: bold; color: #7f1d1d;">
+            あと <span style="font-size: 2rem;">{danger_month}</span> ヶ月で現金が足りなくなります
+        </p>
+        <p style="color: #991b1b;">今すぐ対策が必要です ↓</p>
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown(f"""
+    <div class="action-box" style="border-left: 8px solid #15803d; background: #dcfce7;">
+        <h3 style="color: #15803d; margin-top: 0;">✅ 安心してください</h3>
+        <p style="font-size: 1.1rem; color: #166534;">
+            12ヶ月以内に現金が足りなくなる心配はありません
+        </p>
+        <p style="color: #15803d;">この調子で経営を続けましょう！</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# =========================
+# 一撃アクション（改善版・超具体的）
+# =========================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("🎯 今すぐやること")
+
+if after_tax_balance < 0:
+    st.markdown(f"""
+    <div class="action-box">
+        <h4 style="color: #0f172a; margin-top: 0;">
+            😰 今のままだと、毎月 <span style="color: #b91c1c; font-size: 1.3rem; font-weight: bold;">{abs(after_tax_balance):,.0f} 万円</span> ずつ減ります
+        </h4>
+        
+        <p style="font-weight: bold; font-size: 1.1rem; margin-top: 20px;">
+            すぐに次のどれかをやりましょう：
+        </p>
+        
+        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <p style="font-size: 1.05rem; margin: 5px 0;">
+                💡 <b>売上を増やす</b><br>
+                → <span style="color: #2563eb; font-weight: bold;">あと {needed_sales_up:,.0f} 万円</span> 売上を上げれば安全圏<br>
+                → 例：月1件、{needed_sales_up:,.0f}万円の案件を追加
+            </p>
+        </div>
+        
+        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <p style="font-size: 1.05rem; margin: 5px 0;">
+                💡 <b>コストを減らす</b><br>
+                → <span style="color: #2563eb; font-weight: bold;">あと {needed_cost_down:,.0f} 万円</span> 原価を下げれば安全圏<br>
+                → 例：外注費を見直す、材料の仕入れ先を検討
+            </p>
+        </div>
+        
+        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <p style="font-size: 1.05rem; margin: 5px 0;">
+                💡 <b>その他の対策</b><br>
+                → 人件費・家賃を見直せないか検討<br>
+                → 借金の返済額を相談できないか銀行に聞いてみる<br>
+                → 売掛金の回収を早められないか確認
+            </p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown(f"""
+    <div class="action-box" style="border-left: 8px solid #15803d;">
+        <h4 style="color: #0f172a; margin-top: 0;">
+            😊 良いですね！毎月 <span style="color: #15803d; font-size: 1.3rem; font-weight: bold;">+{after_tax_balance:,.0f} 万円</span> 増えています
+        </h4>
+        
+        <p style="font-weight: bold; font-size: 1.1rem; margin-top: 20px;">
+            今の良い状態を活かしましょう：
+        </p>
+        
+        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <p style="font-size: 1.05rem; margin: 5px 0;">
+                💰 <b>現金をもっと貯める</b><br>
+                → 今の調子で貯金を増やせば、もっと安心できます
+            </p>
+        </div>
+        
+        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <p style="font-size: 1.05rem; margin: 5px 0;">
+                📈 <b>利益の高い仕事を優先</b><br>
+                → 儲かる仕事を選んで受注しましょう
+            </p>
+        </div>
+        
+        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <p style="font-size: 1.05rem; margin: 5px 0;">
+                🚀 <b>会社を大きくする判断に使う</b><br>
+                → 人を雇う、機械を買う、などの判断材料にできます
+            </p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# 改善ポイント（改善版・よりシンプル）
+# =========================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("💡 状態別アドバイス")
+
+if status == "危険":
+    st.markdown("""
+    <div style="background: #fee2e2; padding: 20px; border-radius: 12px; border-left: 6px solid #b91c1c;">
+        <h4 style="color: #991b1b; margin-top: 0;">🚨 緊急対応が必要です</h4>
+        <ul style="color: #7f1d1d; font-size: 1.05rem; line-height: 1.8;">
+            <li><b>売掛金の回収を早める</b>（前倒し請求できないか交渉）</li>
+            <li><b>外注費・材料費を見直す</b>（相見積もり、仕入れ先変更）</li>
+            <li><b>人件費・家賃を圧縮できないか検討</b></li>
+            <li><b>銀行に返済の相談</b>（リスケジュール）</li>
+            <li><b>必要なら短期の資金調達も検討</b>（ビジネスローン等）</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+elif status == "注意":
+    st.markdown("""
+    <div style="background: #fef3c7; padding: 20px; border-radius: 12px; border-left: 6px solid #d97706;">
+        <h4 style="color: #92400e; margin-top: 0;">⚠️ 注意が必要です</h4>
+        <ul style="color: #78350f; font-size: 1.05rem; line-height: 1.8;">
+            <li><b>利益をもう少し増やしたい</b>（売上UP or コストDOWN）</li>
+            <li><b>現場ごとの利益を確認</b>（どの仕事が儲かってる？）</li>
+            <li><b>3〜6ヶ月先の資金繰りを確認</b>（大きな支払い予定は？）</li>
+            <li><b>利益が残る仕事を優先</b>（薄利の仕事は減らす）</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+else:
+    st.markdown("""
+    <div style="background: #dcfce7; padding: 20px; border-radius: 12px; border-left: 6px solid #15803d;">
+        <h4 style="color: #15803d; margin-top: 0;">✅ 資金状況は安全です</h4>
+        <ul style="color: #166534; font-size: 1.05rem; line-height: 1.8;">
+            <li><b>安全圏を維持しながら事業拡大</b></li>
+            <li><b>利益率の高い仕事を優先</b>（質の良い仕事を選ぶ）</li>
+            <li><b>現金をもっと厚くする</b>（もっと安心できる）</li>
+            <li><b>人を雇う、機械を買うなどの判断に活用</b></li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# LINE誘導
+# =========================
+st.markdown("""
+<div style='margin-top:10px;'>
+<a href="https://lin.ee/7m28VAs" target="_blank"
+style="
+display:block;
+text-align:center;
+background:#06c755;
+color:white;
+padding:16px;
+border-radius:14px;
+text-decoration:none;
+font-weight:bold;
+font-size:18px;
+">
+📱 LINEで友達追加！
+</a>
+</div>
+""", unsafe_allow_html=True)
+
+# =========================
+# Pro限定 / デモ一部表示
+# =========================
+if is_pro:
+    st.markdown("""
+        <div class="csv-box">
+            <b>📄 税理士・銀行向けCSV出力</b><br>
+            会社名入りで提出や共有に使いやすい形で出力できます
+        </div>
+    """, unsafe_allow_html=True)
+
+    csv_col1, csv_col2 = st.columns(2)
+    with csv_col1:
+        st.download_button(
+            label="⬇️ サマリーCSV出力",
+            data=summary_csv,
+            file_name=f"{safe_company_name}_cash_summary_{today_str}.csv",
+            mime="text/csv"
+        )
+    with csv_col2:
+        st.download_button(
+            label="⬇️ 12ヶ月推移CSV出力",
+            data=forecast_csv,
+            file_name=f"{safe_company_name}_cash_forecast_{today_str}.csv",
+            mime="text/csv"
+        )
+
+    st.markdown("""
+        <div class="pdf-box">
+            <b>🧾 1枚レポートPDF出力</b><br>
+            税理士・銀行・社内共有向けの見やすい1ページ資料です
+        </div>
+    """, unsafe_allow_html=True)
+
+    st.download_button(
+        label="⬇️ 1枚レポートPDF出力",
+        data=pdf_bytes,
+        file_name=f"{safe_company_name}_cash_report_{today_str}.pdf",
+        mime="application/pdf"
+    )
+
+    # =========================
+    # 12ヶ月推移グラフ（改善版・基準線追加）
+    # =========================
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("📈 このままだと12ヶ月後いくら残る？")
+    
+    fig2 = go.Figure()
+    
+    # 税引後現預金（メイン）
+    fig2.add_trace(go.Scatter(
+        x=df_forecast["何ヶ月後"],
+        y=df_forecast["税引後残高_万円"],
+        mode="lines+markers",
+        name="現金残高（予測）",
+        line=dict(color="#2563eb", width=3),
+        marker=dict(size=8)
+    ))
+    
+    # 0円ライン（危険ライン）
+    fig2.add_hline(
+        y=0,
+        line_dash="dash",
+        line_color="#b91c1c",
+        line_width=2,
+        annotation_text="⚠️ 危険ライン（0円）",
+        annotation_position="right"
+    )
+    
+    # 6ヶ月分の安全ライン
+    safe_line = (fixed_cost + loan_pay) * 6
+    fig2.add_hline(
+        y=safe_line,
+        line_dash="dash",
+        line_color="#15803d",
+        line_width=2,
+        annotation_text=f"✅ 安全ライン（{safe_line:,.0f}万円）",
+        annotation_position="right"
+    )
+    
+    fig2.update_layout(
+        xaxis_title="何ヶ月後？",
+        yaxis_title="現金残高（万円）",
+        height=450,
+        paper_bgcolor="white",
+        plot_bgcolor="#f8fafc",
+        font=dict(color="#111827", size=14),
+        margin=dict(l=20, r=20, t=20, b=20),
+        hovermode='x unified'
+    )
+    
+    st.plotly_chart(fig2, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("""
+        <div class="line-box">
+            <b>相談・最新情報はLINEから</b><br>
+            気になることがあればLINE追加してください
+        </div>
+    """, unsafe_allow_html=True)
+    st.link_button("📱 LINE追加ボタン", LINE_URL)
+
+else:
+    st.markdown("""
+        <div class="locked-box">
+            <b>🔒 この先はPRO限定</b><br>
+            保存 / CSV / PDF / 12ヶ月推移 が使えます
+        </div>
+    """, unsafe_allow_html=True)
+
+    preview_col1, preview_col2 = st.columns(2)
+    with preview_col1:
+        st.metric("12ヶ月後の現金残高（プレビュー）", f"{cash_after_tax[-1]:,.0f} 万円")
+    with preview_col2:
+        preview_text = f"{danger_month}ヶ月後" if danger_month is not None else "12ヶ月以内なし"
+        st.metric("お金が足りなくなる時期（プレビュー）", preview_text)
+
+    lock_col1, lock_col2 = st.columns(2)
+    with lock_col1:
+        st.button("🔒 CSV出力（Pro）", disabled=True)
+    with lock_col2:
+        st.button("🔒 PDF出力（Pro）", disabled=True)
+
+    st.info("PRO版では、12か月推移グラフ・提出用CSV・1枚レポートPDF・保存機能が使えます")
+
 # =========================
 # Proログイン
 # =========================
@@ -1047,206 +1488,24 @@ else:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-
-
 # =========================
-# 危険月表示
+# 法的表記
 # =========================
-if danger_month is not None:
-    st.error(f"⚠️ このままだと **{danger_month}ヶ月後** に資金ショートの可能性があります。")
-else:
-    st.success("✅ 12ヶ月以内の資金ショートリスクは低いです。")
-
-# =========================
-# 一撃アクション
-# =========================
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.subheader("🎯 一撃アクション")
-
-if after_tax_balance < 0:
-    st.markdown(f"""
-    <div class="action-box">
-        <b>今月のままだと毎月 {abs(after_tax_balance):,.0f} 万円ずつ減る計算です。</b><br><br>
-        安全ラインに近づけるには、まず次のどれかをやるのが最短です。<br>
-        ・売上を <b>あと {needed_sales_up:,.0f} 万円</b> 上げる<br>
-        ・原価を <b>あと {needed_cost_down:,.0f} 万円</b> 下げる<br>
-        ・固定費や返済を見直して、月の支出を圧縮する
-    </div>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown(f"""
-    <div class="action-box">
-        <b>今月は税引後でも {after_tax_balance:,.0f} 万円プラスです。</b><br><br>
-        今の状態はかなり良いです。<br>
-        ・現預金をさらに積み増す<br>
-        ・利益率の高い受注を増やす<br>
-        ・採用・設備投資の判断材料としてこの数字を使う
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-# =========================
-# 改善ポイント
-# =========================
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.subheader("💡 改善ポイント")
-
-if status == "危険":
-    st.error("**緊急対応が必要です！**")
-    st.write("- 売上の前倒し請求、回収サイト短縮を検討")
-    st.write("- 原価を最優先で見直す")
-    st.write("- 固定費と借入返済の圧縮余地を確認")
-    st.write("- 必要なら短期資金の確保も視野に入れる")
-elif status == "注意":
-    st.warning("**注意が必要です。**")
-    st.write("- 黒字幅をもう一段上げたい状態です")
-    st.write("- 現場ごとの粗利バラつきを確認")
-    st.write("- 数ヶ月先の資金繰りを先回りで見る")
-    st.write("- 利益が残る案件構成に寄せる")
-else:
-    st.success("**資金状況は安全です！**")
-    st.write("- 安全圏を維持しながら事業拡大を検討")
-    st.write("- 利益率の高い受注を優先")
-    st.write("- 現預金を厚くしてさらに安定化")
-    st.write("- 採用や設備投資の判断に活用")
-
-st.markdown("</div>", unsafe_allow_html=True)
-st.markdown("""
-<div style='margin-top:10px;'>
-<a href="https://lin.ee/7m28VAs" target="_blank"
-style="
-display:block;
-text-align:center;
-background:#06c755;
-color:white;
-padding:16px;
-border-radius:14px;
-text-decoration:none;
-font-weight:bold;
-font-size:18px;
-">
-📱 LINEで友達追加！
-</a>
-</div>
-""", unsafe_allow_html=True)
-# =========================
-# Pro限定 / デモ一部表示
-# =========================
-if is_pro:
-    st.markdown("""
-        <div class="csv-box">
-            <b>📄 税理士・銀行向けCSV出力</b><br>
-            会社名入りで提出や共有に使いやすい形で出力できます
-        </div>
-    """, unsafe_allow_html=True)
-
-    csv_col1, csv_col2 = st.columns(2)
-    with csv_col1:
-        st.download_button(
-            label="⬇️ サマリーCSV出力",
-            data=summary_csv,
-            file_name=f"{safe_company_name}_cash_summary_{today_str}.csv",
-            mime="text/csv"
-        )
-    with csv_col2:
-        st.download_button(
-            label="⬇️ 12ヶ月推移CSV出力",
-            data=forecast_csv,
-            file_name=f"{safe_company_name}_cash_forecast_{today_str}.csv",
-            mime="text/csv"
-        )
-
-    st.markdown("""
-        <div class="pdf-box">
-            <b>🧾 1枚レポートPDF出力</b><br>
-            税理士・銀行・社内共有向けの見やすい1ページ資料です
-        </div>
-    """, unsafe_allow_html=True)
-
-    st.download_button(
-        label="⬇️ 1枚レポートPDF出力",
-        data=pdf_bytes,
-        file_name=f"{safe_company_name}_cash_report_{today_str}.pdf",
-        mime="application/pdf"
-    )
-
-    fig2 = go.Figure()
-    fig2.add_trace(go.Scatter(
-        x=df_forecast["経過月"],
-        y=df_forecast["税引前現預金残高_万円"],
-        mode="lines+markers",
-        name="税引前現預金"
-    ))
-    fig2.add_trace(go.Scatter(
-        x=df_forecast["経過月"],
-        y=df_forecast["税引後現預金残高_万円"],
-        mode="lines+markers",
-        name="税引後現預金"
-    ))
-    fig2.update_layout(
-        title="📈 12ヶ月 現預金推移（予測）",
-        xaxis_title="経過月",
-        yaxis_title="現預金残高（万円）",
-        height=390,
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        font=dict(color="#111827"),
-        margin=dict(l=20, r=20, t=60, b=20)
-    )
-    st.plotly_chart(fig2, use_container_width=True)
-
-    st.markdown("""
-        <div class="line-box">
-            <b>相談・最新情報はLINEから</b><br>
-            気になることがあればLINE追加してください
-        </div>
-    """, unsafe_allow_html=True)
-    st.link_button("📱 LINE追加ボタン", LINE_URL)
-
-else:
-    st.markdown("""
-        <div class="locked-box">
-            <b>🔒 この先はPRO限定</b><br>
-            保存 / CSV / PDF / 12ヶ月推移 /  が使えます
-            ＊目安としてお使いください。
-        </div>
-    """, unsafe_allow_html=True)
-
-    preview_col1, preview_col2 = st.columns(2)
-    with preview_col1:
-        st.metric("12ヶ月後の税引後現預金（プレビュー）", f"{cash_after_tax[-1]:,.0f} 万円")
-    with preview_col2:
-        preview_text = f"{danger_month}ヶ月後" if danger_month is not None else "12ヶ月以内なし"
-        st.metric("資金ショート想定時期（プレビュー）", preview_text)
-
-    lock_col1, lock_col2 = st.columns(2)
-    with lock_col1:
-        st.button("🔒 CSV出力（Pro）", disabled=True)
-    with lock_col2:
-        st.button("🔒 PDF出力（Pro）", disabled=True)
-
-    st.info("PRO版では、12か月推移グラフ・提出用CSV・1枚レポートPDF・保存機能が使えます")
-
 st.header("特定商取引法に基づく表記")
 st.markdown("""
 **サービス概要**
 
 本サービスは、建設業の経営者向けに、
-売上・原価・固定費・借入返済・などを入力することで、
+売上・原価・固定費・借入返済などを入力することで、
 資金余命およびキャッシュフローを可視化し、
 資金ショートリスクを把握できるサブスクリプション型デジタルツールです。
 
 PRO版では以下の機能が利用可能です：
 
 ・12ヶ月キャッシュ予測
-
 ・資金ショート検知
-
 ・CSV出力
-
 ・PDFレポート出力
-
 ・データ保存機能
 
 **販売事業者**  
@@ -1255,9 +1514,7 @@ PRO版では以下の機能が利用可能です：
 **運営責任者**  
 菅原大輔
 
-
-**電話番号** 
-
+**電話番号**  
 メールにてお問合せください。
 
 **メールアドレス**  
@@ -1289,12 +1546,8 @@ PROプラン：月額9,800円（税込）（サブスクリプション）
 *解約は次回更新日前までに行ってください。
 """)
 
-
 st.header("利用規約")
-
 st.markdown("""
-
-
 本サービスは、経営判断の参考情報を提供するものであり、
 正確性・完全性を保証するものではありません。
 
@@ -1307,7 +1560,6 @@ st.markdown("""
 """)
 
 st.header("プライバシーポリシー")
-
 st.markdown("""
 本サービスでは、ユーザーの個人情報を適切に管理し、
 第三者に開示することはありません。
@@ -1317,8 +1569,6 @@ st.markdown("""
 法令に基づく場合を除き、ユーザーの同意なく情報を第三者に提供することはありません。
 """)
 
-
-
 # =========================
 # フッター
 # =========================
@@ -1327,3 +1577,16 @@ if not is_pro:
     st.info(f"デモ版の残り計算回数：{remain} / {DEMO_LIMIT}")
 else:
     st.success(f"Pro版をご利用中です。ログインユーザー: {st.session_state['auth_user']}")
+
+
+
+
+
+
+
+
+
+
+
+
+
