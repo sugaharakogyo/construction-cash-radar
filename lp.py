@@ -6,6 +6,37 @@ st.set_page_config(
     layout="centered"
 )
 
+# =========================
+# Streamlitメニューを非表示
+# =========================
+hide_streamlit_style = """
+<style>
+    header {
+        visibility: hidden !important;
+        height: 0 !important;
+    }
+    #MainMenu {
+        visibility: hidden !important;
+    }
+    footer {
+        visibility: hidden !important;
+    }
+    .stDeployButton {
+        display: none !important;
+    }
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+    .stApp > header {
+        display: none !important;
+    }
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+# =========================
+# URL設定
+# =========================
 APP_URL = "https://construction-cash-check.streamlit.app"
 LINE_URL = "https://lin.ee/7m28VAs"
 STRIPE_URL = "https://buy.stripe.com/6oU28rarietE5gM6m87N600"
@@ -13,6 +44,9 @@ TOKUSHO_URL = "https://wool-athlete-ae3.notion.site/333953f89b848056818cf44d9a9d
 TERMS_URL = "https://wool-athlete-ae3.notion.site/333953f89b848056818cf44d9a9dbea9"
 PRIVACY_URL = "https://wool-athlete-ae3.notion.site/333953f89b848056818cf44d9a9dbea9"
 
+# =========================
+# CSS
+# =========================
 st.markdown("""
 <style>
 .block-container {
@@ -123,26 +157,98 @@ st.markdown("""
     line-height: 1.9;
     margin-top: 16px;
 }
+
+/* スマホ対応 */
 @media (max-width: 768px) {
+    .block-container {
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+    }
+    .hero {
+        padding: 24px 18px;
+        border-radius: 20px;
+    }
     .hero-title {
-        font-size: 32px;
+        font-size: 28px;
     }
     .hero-sub {
         font-size: 15px;
     }
+    .card {
+        padding: 18px 16px;
+        border-radius: 18px;
+    }
     .card-title {
-        font-size: 21px;
+        font-size: 20px;
+    }
+    .card-text {
+        font-size: 15px;
+    }
+    .notice {
+        padding: 18px 16px;
     }
     .notice-title {
-        font-size: 23px;
+        font-size: 22px;
+    }
+    .notice-text {
+        font-size: 15px;
+    }
+    .price {
+        padding: 22px 16px;
     }
     .price-main {
-        font-size: 40px;
+        font-size: 36px;
     }
+}
+
+/* ボタンのスタイル調整 */
+.stButton > button {
+    width: 100%;
+    border-radius: 14px;
+    height: 3.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: #2563eb;
+    color: white;
+    border: none;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+    transition: all 0.3s ease;
+}
+
+.stButton > button:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.3);
+}
+
+/* リンクボタンのスタイル */
+div[data-testid="stLinkButton"] a {
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    border-radius: 14px;
+    padding: 1rem;
+    background: #2563eb;
+    color: white !important;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    font-size: 1.1rem;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+    transition: all 0.3s ease;
+}
+
+div[data-testid="stLinkButton"] a:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.3);
 }
 </style>
 """, unsafe_allow_html=True)
 
+# =========================
+# ヒーローセクション
+# =========================
 st.markdown("""
 <div class="hero">
     <div class="badge">建設会社専用 / 最短30秒 無料診断</div>
@@ -157,35 +263,43 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.link_button("30秒で無料診断する", APP_URL, use_container_width=True)
-st.caption("登録不要ですぐ使えます")
+st.link_button("🚀 30秒で無料診断する", APP_URL, use_container_width=True)
+st.caption("✅ 登録不要ですぐ使えます")
 
+st.markdown("<br>", unsafe_allow_html=True)
+
+# =========================
+# 3つの特徴
+# =========================
 col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown("""
     <div class="card">
-        <div class="card-title">資金ショートまでの期間</div>
+        <div class="card-title">⏰ 資金ショートまでの期間</div>
         <div class="card-text">あと何ヶ月持つかを、その場で把握できます。</div>
     </div>
     """, unsafe_allow_html=True)
 with col2:
     st.markdown("""
     <div class="card">
-        <div class="card-title">安全ラインとの差額</div>
+        <div class="card-title">💰 安全ラインとの差額</div>
         <div class="card-text">あといくら足りないかが明確になります。</div>
     </div>
     """, unsafe_allow_html=True)
 with col3:
     st.markdown("""
     <div class="card">
-        <div class="card-title">改善ポイント</div>
+        <div class="card-title">🎯 改善ポイント</div>
         <div class="card-text">どこを直せばいいか、優先順位が見えます。</div>
     </div>
     """, unsafe_allow_html=True)
 
+# =========================
+# 警告メッセージ
+# =========================
 st.markdown("""
 <div class="notice">
-    <div class="notice-title">売上があっても、現金が尽きたら終わりです。</div>
+    <div class="notice-title">🚨 売上があっても、現金が尽きたら終わりです。</div>
     <div class="notice-text">
         利益が出ていても、入金サイト・原価率・固定費のズレで、
         突然お金が回らなくなることがあります。<br>
@@ -193,9 +307,13 @@ st.markdown("""
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+# =========================
+# 診断結果のイメージ
+# =========================
 st.markdown("""
 <div class="card">
-    <div class="card-title">診断結果のイメージ</div>
+    <div class="card-title">📊 診断結果のイメージ</div>
     <div class="card-text">
         <b>入力例</b><br>
         売上 900万円 / 原価 620万円 / 固定費 260万円 / 現金 180万円<br><br>
@@ -207,82 +325,107 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# =========================
+# お悩み
+# =========================
 st.markdown("""
 <div class="card">
-    <div class="card-title">こんなお悩みありませんか？</div>
+    <div class="card-title">😰 こんなお悩みありませんか？</div>
     <div class="card-text">
-        ・売上はあるのにお金が残らない<br>
-        ・原価率が高い現場に後から気づく<br>
-        ・このままで本当に大丈夫か不安<br>
-        ・銀行や税理士に数字を説明しづらい
+        ✓ 売上はあるのにお金が残らない<br>
+        ✓ 原価率が高い現場に後から気づく<br>
+        ✓ このままで本当に大丈夫か不安<br>
+        ✓ 銀行や税理士に数字を説明しづらい
     </div>
 </div>
 """, unsafe_allow_html=True)
 
+# =========================
+# 向いている会社
+# =========================
 st.markdown("""
 <div class="card">
-    <div class="card-title">このサービスが向いている会社</div>
+    <div class="card-title">✅ このサービスが向いている会社</div>
     <div class="card-text">
-        ・月ごとの資金繰りを先に把握したい会社<br>
-        ・社長が数字判断を早くしたい会社<br>
-        ・税理士、銀行との会話を強くしたい会社
+        ✓ 月ごとの資金繰りを先に把握したい会社<br>
+        ✓ 社長が数字判断を早くしたい会社<br>
+        ✓ 税理士、銀行との会話を強くしたい会社
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+# =========================
+# FAQ
+# =========================
 st.markdown("""
 <div class="card">
-    <div class="card-title">よくある質問</div>
+    <div class="card-title">❓ よくある質問</div>
     <div class="card-text">
-        Q. 会計ソフトがなくても使えますか？
-        はい。売上・原価・固定費・現金などの数字が分かれば使えます。
+        <b>Q. 会計ソフトがなくても使えますか？</b><br>
+        はい。売上・原価・固定費・現金などの数字が分かれば使えます。<br><br>
 
-        Q. 無料診断だけでも使えますか？
-        はい。まずは無料診断だけで、今の資金状況を確認できます。
+        <b>Q. 無料診断だけでも使えますか？</b><br>
+        はい。まずは無料診断だけで、今の資金状況を確認できます。<br><br>
 
-        Q. Pro版では何ができますか？
-        12ヶ月資金推移、現場利益管理、銀行提出サマリー、利益改善シミュレーターなどが使えます。
+        <b>Q. Pro版では何ができますか？</b><br>
+        12ヶ月資金推移、現場利益管理、銀行提出サマリー、利益改善シミュレーターなどが使えます。<br><br>
 
-        Q. サブスクはいつでも解約できますか？
+        <b>Q. サブスクはいつでも解約できますか？</b><br>
         はい。解約後は次回請求が発生しません。
-    
+    </div>
 </div>
 """, unsafe_allow_html=True)
+
+# =========================
+# 導入実績
+# =========================
 st.markdown("""
 <div class="card">
-    <div class="card-title">導入実績</div>
+    <div class="card-title">📈 導入実績</div>
     <div class="card-text">
-        100社以上の建設会社が利用
-        平均3分で資金状況を把握
-        90%以上が「分かりやすい」と回答
-    
+        ✓ <b>100社以上</b>の建設会社が利用<br>
+        ✓ 平均<b>3分</b>で資金状況を把握<br>
+        ✓ <b>90%以上</b>が「分かりやすい」と回答
+    </div>
 </div>
 """, unsafe_allow_html=True)
+
+# =========================
+# お客様の声
+# =========================
 st.markdown("""
 <div class="card">
-    <div class="card-title">お客様の声
+    <div class="card-title">💬 お客様の声</div>
     <div class="card-text">
-       「危なかったのに気づけた」
-        売上あるから大丈夫と思ってたけど、実際あと2ヶ月でショートでした。
+        <b>「危なかったのに気づけた」</b><br>
+        売上あるから大丈夫と思ってたけど、実際あと2ヶ月でショートでした。<br><br>
 
-        「判断がめちゃくちゃ早くなった」
-        今までは感覚だったけど、数字で判断できるようになった。
+        <b>「判断がめちゃくちゃ早くなった」</b><br>
+        今までは感覚だったけど、数字で判断できるようになった。<br><br>
 
-        「銀行との話が楽になった」
+        <b>「銀行との話が楽になった」</b><br>
         数字見せながら話せるから信用が上がった感じします。
-    
+    </div>
 </div>
 """, unsafe_allow_html=True)
+
+# =========================
+# 最終警告
+# =========================
 st.markdown("""
 <div class="notice">
-    <div class="notice-title">「まだ大丈夫」が一番危険です
+    <div class="notice-title">⚠️ 「まだ大丈夫」が一番危険です</div>
     <div class="notice-text">
-        資金ショートは突然きます。
-        気づいた時には手遅れになる前に、
+        資金ショートは突然きます。<br>
+        気づいた時には手遅れになる前に、<br>
         一度だけでも確認してください。
-    
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
+# =========================
+# 料金プラン
+# =========================
 st.markdown("""
 <div class="price">
     <div style="font-size:13px;font-weight:900;color:#166534;">おすすめ</div>
@@ -290,30 +433,41 @@ st.markdown("""
         社長専用 Proダッシュボード
     </div>
     <div style="font-size:16px;line-height:1.9;color:#1f2937;font-weight:700;margin-top:10px;">
-        12ヶ月資金推移<br>
-        現場利益管理<br>
-        銀行提出サマリー<br>
-        利益改善シミュレーター
+        ✓ 12ヶ月資金推移<br>
+        ✓ 現場利益管理<br>
+        ✓ 銀行提出サマリー<br>
+        ✓ 利益改善シミュレーター
     </div>
     <div class="price-main">月 9,800円</div>
     <div style="font-size:14px;color:#475569;font-weight:700;">まずは無料診断から始められます</div>
 </div>
 """, unsafe_allow_html=True)
 
-st.link_button("PRO版を始める（月額9,800円）", STRIPE_URL, use_container_width=True)
-st.link_button("LINEで問い合わせる", LINE_URL, use_container_width=True)
+# =========================
+# CTAボタン
+# =========================
+st.link_button("💳 PRO版を始める（月額9,800円）", STRIPE_URL, use_container_width=True)
+st.link_button("💬 LINEで問い合わせる", LINE_URL, use_container_width=True)
 
+st.markdown("<br><br>", unsafe_allow_html=True)
+
+# =========================
+# 法的リンク
+# =========================
 c1, c2, c3 = st.columns(3)
 with c1:
-    st.link_button("特定商取引法に基づく表記", TOKUSHO_URL, use_container_width=True)
+    st.link_button("📄 特定商取引法", TOKUSHO_URL, use_container_width=True)
 with c2:
-    st.link_button("利用規約", TERMS_URL, use_container_width=True)
+    st.link_button("📜 利用規約", TERMS_URL, use_container_width=True)
 with c3:
-    st.link_button("プライバシーポリシー", PRIVACY_URL, use_container_width=True)
+    st.link_button("🔒 プライバシーポリシー", PRIVACY_URL, use_container_width=True)
 
+# =========================
+# フッター
+# =========================
 st.markdown("""
 <div class="footer-box">
-    建設会社の資金不安を、数字で見える化。<br>
+    🏗️ 建設会社の資金不安を、数字で見える化。<br>
     会計ソフトでは見えない未来のキャッシュを、すぐ確認できます。
 </div>
 """, unsafe_allow_html=True)
