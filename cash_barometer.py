@@ -899,6 +899,133 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
+# CSS（スマホ対応強化版 - ボタン＆12ヶ月表示改善）
+# =========================
+st.markdown("""
+    <style>
+    /* 既存のスタイル... */
+    
+    /* ==================== */
+    /* +/- ボタンを大きく（スマホ対応） */
+    /* ==================== */
+    
+    /* 数値入力欄全体のスタイル */
+    .stNumberInput {
+        position: relative;
+    }
+    
+    /* +/- ボタンのコンテナ */
+    .stNumberInput button {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        font-size: 1.3rem !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border-radius: 8px !important;
+        background: #2563eb !important;
+        color: white !important;
+        border: none !important;
+        cursor: pointer !important;
+    }
+    
+    /* +/- ボタンのホバー */
+    .stNumberInput button:hover {
+        background: #1d4ed8 !important;
+    }
+    
+    /* +/- ボタンのアクティブ */
+    .stNumberInput button:active {
+        background: #1e40af !important;
+        transform: scale(0.95);
+    }
+    
+    /* 入力欄の右側の+/-ボタンエリア */
+    .stNumberInput [data-baseweb="input"] > div {
+        gap: 0.3rem !important;
+    }
+    
+    /* ==================== */
+    /* スマホでさらに大きく */
+    /* ==================== */
+    @media (max-width: 640px) {
+        /* +/- ボタンをさらに大きく */
+        .stNumberInput button {
+            width: 3rem !important;
+            height: 3rem !important;
+            font-size: 1.5rem !important;
+            border-radius: 10px !important;
+        }
+        
+        /* 入力欄自体も大きく */
+        .stNumberInput input {
+            font-size: 1.2rem !important;
+            padding: 0.9rem 1rem !important;
+            height: 3.5rem !important;
+        }
+        
+        /* 数値入力欄のラベル */
+        .stNumberInput label {
+            font-size: 1rem !important;
+            font-weight: 700 !important;
+            margin-bottom: 0.5rem !important;
+        }
+    }
+    
+    /* ==================== */
+    /* 「12ヶ月」表示を見やすく */
+    /* ==================== */
+    
+    /* メーターグラフの数字部分 */
+    .js-plotly-plot .plotly text {
+        font-size: 1.8rem !important;
+        font-weight: bold !important;
+    }
+    
+    /* メーターグラフのタイトル */
+    .js-plotly-plot .gtitle {
+        font-size: 1.5rem !important;
+        font-weight: bold !important;
+    }
+    
+    /* グラフ内の数値 */
+    .indicator-value {
+        font-size: 2.5rem !important;
+        font-weight: 900 !important;
+    }
+    
+    /* ==================== */
+    /* スマホでグラフの文字を調整 */
+    /* ==================== */
+    @media (max-width: 640px) {
+        /* メーターの数値を大きく */
+        .js-plotly-plot .plotly text {
+            font-size: 1.5rem !important;
+        }
+        
+        /* メーターのタイトルを調整 */
+        .js-plotly-plot .gtitle {
+            font-size: 1.2rem !important;
+        }
+        
+        /* グラフ全体の高さを調整 */
+        .js-plotly-plot {
+            max-height: 280px !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        /* さらに小さい画面 */
+        .js-plotly-plot {
+            max-height: 250px !important;
+        }
+        
+        .js-plotly-plot .plotly text {
+            font-size: 1.3rem !important;
+        }
+    }
+    </style>
+""", unsafe_allow_html=True)
+# =========================
 # タイトル
 # =========================
 st.title("🏗️ 建設キャッシュレーダー")
