@@ -1,10 +1,3 @@
-# 📦 改善版フルコード【1/8】
-
----
-
-## 🎯 冒頭部分（インポート〜基本設定）
-
-```python
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
@@ -141,13 +134,7 @@ def get_user_state_file(username: str) -> Path:
     safe_name = re.sub(r'[\\/:*?"<>| ]', "_", username)
     return USER_DATA_DIR / f"{safe_name}_state.json"
 
-# 📦 改善版フルコード【2/8】
 
----
-
-## 🎯 データ保存・読込関数
-
-```python
 # =========================
 # ユーザー別 保存・読込
 # =========================
@@ -220,13 +207,7 @@ def sanitize_filename(text: str) -> str:
     text = text.replace(" ", "_")
     return text[:50]
 
-# 📦 改善版フルコード【3/8】
 
----
-
-## 🎯 PDF作成関数（改善版）
-
-```python
 # =========================
 # PDF作成
 # =========================
@@ -362,13 +343,7 @@ def create_pdf_report(
     buffer.seek(0)
     return buffer.getvalue()
 
-# 📦 改善版フルコード【4/8】
 
----
-
-## 🎯 初期化＆CSS
-
-```python
 # =========================
 # 初期化
 # =========================
@@ -633,13 +608,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 📦 改善版フルコード【5/8】
 
----
-
-## 🎯 タイトル＆管理者機能＆入力欄
-
-```python
 # =========================
 # タイトル
 # =========================
@@ -894,13 +863,7 @@ with col_btn3:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# 📦 改善版フルコード【6/8】
 
----
-
-## 🎯 計算ロジック＆結果表示
-
-```python
 # =========================
 # 値取得
 # =========================
@@ -1126,13 +1089,7 @@ with col_b:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# 📦 改善版フルコード【7/8】
 
----
-
-## 🎯 危険月表示＆アクション提案＆改善ポイント
-
-```python
 # =========================
 # 危険月表示（改善版・強調）
 # =========================
