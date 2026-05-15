@@ -363,18 +363,24 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
-# 診断結果のイメージ
+# 診断結果のイメージ（修正版）
 # =========================
 st.markdown("""
 <div class="card">
     <div class="card-title">📊 診断結果のイメージ</div>
     <div class="card-text">
         <b>入力例</b><br>
-        売上 900万円 / 原価 620万円 / 固定費 260万円 / 現金 180万円<br><br>
-        
-        <b>↓ 診断結果</b><br>
-        🚨 資金ショートまで：<span class="highlight">3.4ヶ月</span><br>
-        ⚠️ 安全ライン不足額：あと<span class="highlight">380万円不足</span><br>
+        売上 900万円 / 原価 620万円 / 固定費 260万円 / 現金 180万円
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="card" style="background: #fef3f2; border-left: 6px solid #ef4444;">
+    <div class="card-title" style="color: #991b1b;">↓ 診断結果</div>
+    <div class="card-text" style="color: #7f1d1d;">
+        🚨 資金ショートまで：<b style="background: #fef08a; padding: 2px 8px; border-radius: 4px; color: #854d0e;">3.4ヶ月</b><br><br>
+        ⚠️ 安全ライン不足額：あと<b style="background: #fef08a; padding: 2px 8px; border-radius: 4px; color: #854d0e;">380万円不足</b><br><br>
         💡 改善ポイント：原価率 -3%
     </div>
 </div>
@@ -430,40 +436,90 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# =========================
+# お客様の声（修正版・分割方式）
+# =========================
 st.markdown("""
 <div class="card">
     <div class="card-title">💬 お客様の声</div>
+</div>
+""", unsafe_allow_html=True)
+
+# 声1
+st.markdown("""
+<div class="card" style="background: #fef2f2; border-left: 4px solid #ef4444; margin-top: -10px;">
     <div class="card-text">
-        <b>「危なかったのに気づけた」</b><br>
-        売上あるから大丈夫と思ってたけど、実際あと2ヶ月でショートでした。<br><br>
+        <b style="font-size: 18px; color: #991b1b;">「危なかったのに気づけた」</b><br>
+        <span style="color: #7f1d1d;">売上あるから大丈夫と思ってたけど、実際あと2ヶ月でショートでした。</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-        <b>「判断がめちゃくちゃ早くなった」</b><br>
-        今までは感覚だったけど、数字で判断できるようになった。<br><br>
+# 声2
+st.markdown("""
+<div class="card" style="background: #f0f9ff; border-left: 4px solid #2563eb;">
+    <div class="card-text">
+        <b style="font-size: 18px; color: #1e40af;">「判断がめちゃくちゃ早くなった」</b><br>
+        <span style="color: #1e3a8a;">今までは感覚だったけど、数字で判断できるようになった。</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-        <b>「銀行との話が楽になった」</b><br>
-        数字見せながら話せるから信用が上がった感じします。
+# 声3
+st.markdown("""
+<div class="card" style="background: #f0fdf4; border-left: 4px solid #16a34a;">
+    <div class="card-text">
+        <b style="font-size: 18px; color: #15803d;">「銀行との話が楽になった」</b><br>
+        <span style="color: #166534;">数字見せながら話せるから信用が上がった感じします。</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 # =========================
-# FAQ
+# FAQ（修正版・分割方式）
 # =========================
 st.markdown("""
 <div class="card">
     <div class="card-title">❓ よくある質問</div>
+</div>
+""", unsafe_allow_html=True)
+
+# Q1
+st.markdown("""
+<div class="card" style="background: #f8fafc; margin-top: -10px;">
     <div class="card-text">
-        <b>Q. 会計ソフトがなくても使えますか？</b><br>
-        A. はい。売上・原価・固定費・現金などの数字が分かれば使えます。<br><br>
+        <b style="font-size: 17px; color: #0f172a;">Q. 会計ソフトがなくても使えますか？</b><br>
+        <span style="color: #475569;">A. はい。売上・原価・固定費・現金などの数字が分かれば使えます。</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-        <b>Q. 無料診断だけでも使えますか？</b><br>
-        A. はい。まずは無料診断だけで、今の資金状況を確認できます。<br><br>
+# Q2
+st.markdown("""
+<div class="card" style="background: #f8fafc;">
+    <div class="card-text">
+        <b style="font-size: 17px; color: #0f172a;">Q. 無料診断だけでも使えますか？</b><br>
+        <span style="color: #475569;">A. はい。まずは無料診断だけで、今の資金状況を確認できます。</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-        <b>Q. Pro版では何ができますか？</b><br>
-        A. 12ヶ月資金推移、現場利益管理、銀行提出サマリー、利益改善シミュレーターなどが使えます。<br><br>
+# Q3
+st.markdown("""
+<div class="card" style="background: #f8fafc;">
+    <div class="card-text">
+        <b style="font-size: 17px; color: #0f172a;">Q. Pro版では何ができますか？</b><br>
+        <span style="color: #475569;">A. 12ヶ月資金推移、現場利益管理、銀行提出サマリー、利益改善シミュレーターなどが使えます。</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-        <b>Q. サブスクはいつでも解約できますか？</b><br>
-        A. はい。解約後は次回請求が発生しません。
+# Q4
+st.markdown("""
+<div class="card" style="background: #f8fafc;">
+    <div class="card-text">
+        <b style="font-size: 17px; color: #0f172a;">Q. サブスクはいつでも解約できますか？</b><br>
+        <span style="color: #475569;">A. はい。解約後は次回請求が発生しません。</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
