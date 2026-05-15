@@ -1788,9 +1788,10 @@ if is_pro:
         mime="application/pdf"
     )
 
-    # =========================
-    # 12ヶ月推移グラフ（改善版・基準線追加）
-    # =========================
+# =========================
+# 12ヶ月推移グラフ（改善版・スマホ対応）
+# =========================
+if is_pro:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("📈 このままだと12ヶ月後いくら残る？")
     
@@ -1802,8 +1803,8 @@ if is_pro:
         y=df_forecast["税引後残高_万円"],
         mode="lines+markers",
         name="現金残高（予測）",
-        line=dict(color="#2563eb", width=3),
-        marker=dict(size=8)
+        line=dict(color="#2563eb", width=4),  # 線を太く
+        marker=dict(size=10)  # マーカーを大きく
     ))
     
     # 0円ライン（危険ライン）
@@ -1811,9 +1812,10 @@ if is_pro:
         y=0,
         line_dash="dash",
         line_color="#b91c1c",
-        line_width=2,
+        line_width=3,  # 線を太く
         annotation_text="⚠️ 危険ライン（0円）",
-        annotation_position="right"
+        annotation_position="right",
+        annotation_font_size=14  # 注釈を大きく
     )
     
     # 6ヶ月分の安全ライン
@@ -1822,9 +1824,10 @@ if is_pro:
         y=safe_line,
         line_dash="dash",
         line_color="#15803d",
-        line_width=2,
+        line_width=3,  # 線を太く
         annotation_text=f"✅ 安全ライン（{safe_line:,.0f}万円）",
-        annotation_position="right"
+        annotation_position="right",
+        annotation_font_size=14  # 注釈を大きく
     )
     
     fig2.update_layout(
@@ -1833,44 +1836,36 @@ if is_pro:
         height=450,
         paper_bgcolor="white",
         plot_bgcolor="#f8fafc",
-        font=dict(color="#111827", size=14),
+        font=dict(
+            color="#111827", 
+            size=16,  # 全体のフォントを大きく
+            family="Noto Sans JP, sans-serif"
+        ),
         margin=dict(l=20, r=20, t=20, b=20),
-        hovermode='x unified'
+        hovermode='x unified',
+        # 凡例を大きく
+        legend=dict(
+            font=dict(size=14),
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01
+        ),
+        # 軸のラベルを大きく
+        xaxis=dict(
+            title_font=dict(size=16, weight=700),
+            tickfont=dict(size=14)
+        ),
+        yaxis=dict(
+            title_font=dict(size=16, weight=700),
+            tickfont=dict(size=14)
+        )
     )
     
     st.plotly_chart(fig2, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("""
-        <div class="line-box">
-            <b>相談・最新情報はLINEから</b><br>
-            気になることがあればLINE追加してください
-        </div>
-    """, unsafe_allow_html=True)
-    st.link_button("📱 LINE追加ボタン", LINE_URL)
-
-else:
-    st.markdown("""
-        <div class="locked-box">
-            <b>🔒 この先はPRO限定</b><br>
-            保存 / CSV / PDF / 12ヶ月推移 が使えます
-        </div>
-    """, unsafe_allow_html=True)
-
-    preview_col1, preview_col2 = st.columns(2)
-    with preview_col1:
-        st.metric("12ヶ月後の現金残高（プレビュー）", f"{cash_after_tax[-1]:,.0f} 万円")
-    with preview_col2:
-        preview_text = f"{danger_month}ヶ月後" if danger_month is not None else "12ヶ月以内なし"
-        st.metric("お金が足りなくなる時期（プレビュー）", preview_text)
-
-    lock_col1, lock_col2 = st.columns(2)
-    with lock_col1:
-        st.button("🔒 CSV出力（Pro）", disabled=True)
-    with lock_col2:
-        st.button("🔒 PDF出力（Pro）", disabled=True)
-
-    st.info("PRO版では、12か月推移グラフ・提出用CSV・1枚レポートPDF・保存機能が使えます")
+  
 
 # =========================
 # Proログイン
