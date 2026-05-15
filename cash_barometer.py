@@ -361,6 +361,51 @@ if "app_initialized" not in st.session_state:
     st.session_state["app_initialized"] = True
 
 # =========================
+# Streamlitメニューを完全非表示
+# =========================
+hide_streamlit_style = """
+<style>
+    /* ヘッダー全体を非表示 */
+    header {
+        visibility: hidden !important;
+        height: 0 !important;
+    }
+    
+    /* ハンバーガーメニューを非表示 */
+    #MainMenu {
+        visibility: hidden !important;
+    }
+    
+    /* フッターを非表示 */
+    footer {
+        visibility: hidden !important;
+    }
+    
+    /* デプロイボタンを非表示 */
+    .stDeployButton {
+        display: none !important;
+    }
+    
+    /* ツールバーを非表示 */
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+    
+    /* ツールバー全体を削除 */
+    .stApp > header {
+        display: none !important;
+    }
+    
+    /* 余白を調整 */
+    .block-container {
+        padding-top: 2rem !important;
+    }
+</style>
+"""
+
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+# =========================
 # CSS
 # =========================
 st.markdown("""
