@@ -1787,9 +1787,8 @@ if is_pro:
         file_name=f"{safe_company_name}_cash_report_{today_str}.pdf",
         mime="application/pdf"
     )
-
 # =========================
-# 12ヶ月推移グラフ（改善版・スマホ対応）
+# 12ヶ月推移グラフ（見切れ防止版）
 # =========================
 if is_pro:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -1802,9 +1801,10 @@ if is_pro:
         x=df_forecast["何ヶ月後"],
         y=df_forecast["税引後残高_万円"],
         mode="lines+markers",
-        name="現金残高（予測）",
-        line=dict(color="#2563eb", width=4),  # 線を太く
-        marker=dict(size=10)  # マーカーを大きく
+        name="現金残高",
+        line=dict(color="#2563eb", width=4),
+        marker=dict(size=10),
+        hovertemplate='%{x}ヶ月後: %{y:,.0f}万円<extra></extra>'
     ))
     
     # 0円ライン（危険ライン）
@@ -1812,60 +1812,109 @@ if is_pro:
         y=0,
         line_dash="dash",
         line_color="#b91c1c",
-        line_width=3,  # 線を太く
-        annotation_text="⚠️ 危険ライン（0円）",
-        annotation_position="right",
-        annotation_font_size=14  # 注釈を大きく
+        line_width=3,
+        annotation_text="⚠️ 0円",
+        annotation_position="bottom right",
+        annotation_font=dict(size=12, color="#b91c1c")
     )
     
     # 6ヶ月分の安全ライン
     safe_line = (fixed_cost + loan_pay) * 6
-    fig2.add_hline(
-        y=safe_line,
-        line_dash="dash",
-        line_color="#15803d",
-        line_width=3,  # 線を太く
-        annotation_text=f"✅ 安全ライン（{safe_line:,.0f}万円）",
-        annotation_position="right",
-        annotation_font_size=14  # 注釈を大きく
-    )
+    if safe_line > 0:
+        fig2.add_hline(
+            y=safe_line,
+            line_dash="dash",
+            line_color="#15803d",
+            line_width=3,
+            annotation_text=f"✅ {safe_line:,.0f}万",
+            annotation_position="top right",
+            annotation_font=dict(size=12, color="#15803d")
+        )
     
+    # レイアウト設定（見切れ防止）
     fig2.update_layout(
-        xaxis_title="何ヶ月後？",
-        yaxis_title="現金残高（万円）",
-        height=450,
+        # X軸の設定
+        xaxis=dict(
+            title="何ヶ月後？",
+            title_font=dict(size=16, weight=700, color="#111827"),
+            tickfont=dict(size=14, color="#475569"),
+            tickmode='linear',
+            tick0=0,
+            dtick=1,  # 1ヶ月刻み
+            range=[-0.5, 12.5],  # 余白を持たせる
+            fixedrange=False,  # ズーム可能
+            showgrid=True,
+            gridcolor="#e5e7eb",
+            gridwidth=1
+        ),
+        
+        # Y軸の設定
+        yaxis=dict(
+            title="現金残高（万円）",
+            title_font=dict(size=16, weight=700, color="#111827"),
+            tickfont=dict(size=14, color="#475569"),
+            fixedrange=False,  # ズーム可能
+            showgrid=True,
+            gridcolor="#e5e7eb",
+            gridwidth=1,
+            zeroline=True,
+            zerolinecolor="#cbd5e1",
+            zerolinewidth=2
+        ),
+        
+        # 全体の設定
+        height=400,
         paper_bgcolor="white",
         plot_bgcolor="#f8fafc",
         font=dict(
-            color="#111827", 
-            size=16,  # 全体のフォントを大きく
-            family="Noto Sans JP, sans-serif"
+            family="Noto Sans JP, sans-serif",
+            size=14,
+            color="#111827"
         ),
-        margin=dict(l=20, r=20, t=20, b=20),
+        
+        # マージン設定（見切れ防止の重要ポイント）
+        margin=dict(
+            l=60,   # 左余白（Y軸ラベル用）
+            r=40,   # 右余白
+            t=40,   # 上余白
+            b=60    # 下余白（X軸ラベル用）
+        ),
+        
+        # ホバー設定
         hovermode='x unified',
-        # 凡例を大きく
+        hoverlabel=dict(
+            bgcolor="white",
+            font_size=14,
+            font_family="Noto Sans JP, sans-serif"
+        ),
+        
+        # 凡例設定
+        showlegend=True,
         legend=dict(
-            font=dict(size=14),
-            yanchor="top",
-            y=0.99,
+            orientation="h",  # 横並び
+            yanchor="bottom",
+            y=1.02,
             xanchor="left",
-            x=0.01
+            x=0,
+            font=dict(size=14),
+            bgcolor="rgba(255,255,255,0.8)"
         ),
-        # 軸のラベルを大きく
-        xaxis=dict(
-            title_font=dict(size=16, weight=700),
-            tickfont=dict(size=14)
-        ),
-        yaxis=dict(
-            title_font=dict(size=16, weight=700),
-            tickfont=dict(size=14)
-        )
+        
+        # レスポンシブ対応
+        autosize=True
     )
     
-    st.plotly_chart(fig2, use_container_width=True)
+    # グラフ表示（重要：use_container_width=True）
+    st.plotly_chart(fig2, use_container_width=True, config={
+        'displayModeBar': False,  # ツールバー非表示
+        'responsive': True
+    })
+    
     st.markdown("</div>", unsafe_allow_html=True)
 
-  
+
+
+
 
 # =========================
 # Proログイン
