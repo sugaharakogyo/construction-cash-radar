@@ -1,3 +1,10 @@
+# 📦 改善版フルコード【1/8】
+
+---
+
+## 🎯 冒頭部分（インポート〜基本設定）
+
+```python
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
@@ -134,7 +141,13 @@ def get_user_state_file(username: str) -> Path:
     safe_name = re.sub(r'[\\/:*?"<>| ]', "_", username)
     return USER_DATA_DIR / f"{safe_name}_state.json"
 
+# 📦 改善版フルコード【2/8】
 
+---
+
+## 🎯 データ保存・読込関数
+
+```python
 # =========================
 # ユーザー別 保存・読込
 # =========================
@@ -207,7 +220,13 @@ def sanitize_filename(text: str) -> str:
     text = text.replace(" ", "_")
     return text[:50]
 
+# 📦 改善版フルコード【3/8】
 
+---
+
+## 🎯 PDF作成関数（改善版）
+
+```python
 # =========================
 # PDF作成
 # =========================
@@ -343,7 +362,13 @@ def create_pdf_report(
     buffer.seek(0)
     return buffer.getvalue()
 
+# 📦 改善版フルコード【4/8】
 
+---
+
+## 🎯 初期化＆CSS
+
+```python
 # =========================
 # 初期化
 # =========================
@@ -608,7 +633,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# 📦 改善版フルコード【5/8】
 
+---
+
+## 🎯 タイトル＆管理者機能＆入力欄
+
+```python
 # =========================
 # タイトル
 # =========================
@@ -863,7 +894,13 @@ with col_btn3:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
+# 📦 改善版フルコード【6/8】
 
+---
+
+## 🎯 計算ロジック＆結果表示
+
+```python
 # =========================
 # 値取得
 # =========================
@@ -1089,7 +1126,13 @@ with col_b:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
+# 📦 改善版フルコード【7/8】
 
+---
+
+## 🎯 危険月表示＆アクション提案＆改善ポイント
+
+```python
 # =========================
 # 危険月表示（改善版・強調）
 # =========================
@@ -1115,49 +1158,13 @@ else:
     """, unsafe_allow_html=True)
 
 # =========================
-# 一撃アクション（改善版・超具体的）
+# 一撃アクション（完全修正版）
 # =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.subheader("🎯 今すぐやること")
 
-if after_tax_balance < 0:
-    st.markdown(f"""
-    <div class="action-box">
-        <h4 style="color: #0f172a; margin-top: 0;">
-            😰 今のままだと、毎月 <span style="color: #b91c1c; font-size: 1.3rem; font-weight: bold;">{abs(after_tax_balance):,.0f} 万円</span> ずつ減ります
-        </h4>
-        
-        <p style="font-weight: bold; font-size: 1.1rem; margin-top: 20px;">
-            すぐに次のどれかをやりましょう：
-        </p>
-        
-        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
-            <p style="font-size: 1.05rem; margin: 5px 0;">
-                💡 <b>売上を増やす</b><br>
-                → <span style="color: #2563eb; font-weight: bold;">あと {needed_sales_up:,.0f} 万円</span> 売上を上げれば安全圏<br>
-                → 例：月1件、{needed_sales_up:,.0f}万円の案件を追加
-            </p>
-        </div>
-        
-        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
-            <p style="font-size: 1.05rem; margin: 5px 0;">
-                💡 <b>コストを減らす</b><br>
-                → <span style="color: #2563eb; font-weight: bold;">あと {needed_cost_down:,.0f} 万円</span> 原価を下げれば安全圏<br>
-                → 例：外注費を見直す、材料の仕入れ先を検討
-            </p>
-        </div>
-        
-        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
-            <p style="font-size: 1.05rem; margin: 5px 0;">
-                💡 <b>その他の対策</b><br>
-                → 人件費・家賃を見直せないか検討<br>
-                → 借金の返済額を相談できないか銀行に聞いてみる<br>
-                → 売掛金の回収を早められないか確認
-            </p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-else:
+if after_tax_balance >= 0:
+    # 黒字の場合
     st.markdown(f"""
     <div class="action-box" style="border-left: 8px solid #15803d;">
         <h4 style="color: #0f172a; margin-top: 0;">
@@ -1167,31 +1174,89 @@ else:
         <p style="font-weight: bold; font-size: 1.1rem; margin-top: 20px;">
             今の良い状態を活かしましょう：
         </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # ボックス1
+    st.markdown("""
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
+        <p style="font-size: 1.05rem; margin: 5px 0;">
+            💰 <b>現金をもっと貯める</b><br>
+            → 今の調子で貯金を増やせば、もっと安心できます
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # ボックス2
+    st.markdown("""
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
+        <p style="font-size: 1.05rem; margin: 5px 0;">
+            📈 <b>利益の高い仕事を優先</b><br>
+            → 儲かる仕事を選んで受注しましょう
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # ボックス3
+    st.markdown("""
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
+        <p style="font-size: 1.05rem; margin: 5px 0;">
+            🚀 <b>会社を大きくする判断に使う</b><br>
+            → 人を雇う、機械を買う、などの判断材料にできます
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+else:
+    # 赤字の場合
+    st.markdown(f"""
+    <div class="action-box">
+        <h4 style="color: #0f172a; margin-top: 0;">
+            😰 今のままだと、毎月 <span style="color: #b91c1c; font-size: 1.3rem; font-weight: bold;">{abs(after_tax_balance):,.0f} 万円</span> ずつ減ります
+        </h4>
         
-        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
-            <p style="font-size: 1.05rem; margin: 5px 0;">
-                💰 <b>現金をもっと貯める</b><br>
-                → 今の調子で貯金を増やせば、もっと安心できます
-            </p>
-        </div>
-        
-        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
-            <p style="font-size: 1.05rem; margin: 5px 0;">
-                📈 <b>利益の高い仕事を優先</b><br>
-                → 儲かる仕事を選んで受注しましょう
-            </p>
-        </div>
-        
-        <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
-            <p style="font-size: 1.05rem; margin: 5px 0;">
-                🚀 <b>会社を大きくする判断に使う</b><br>
-                → 人を雇う、機械を買う、などの判断材料にできます
-            </p>
-        </div>
+        <p style="font-weight: bold; font-size: 1.1rem; margin-top: 20px;">
+            すぐに次のどれかをやりましょう：
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # ボックス1
+    st.markdown(f"""
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
+        <p style="font-size: 1.05rem; margin: 5px 0;">
+            💡 <b>売上を増やす</b><br>
+            → <span style="color: #2563eb; font-weight: bold;">あと {needed_sales_up:,.0f} 万円</span> 売上を上げれば安全圏<br>
+            → 例：月1件、{needed_sales_up:,.0f}万円の案件を追加
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # ボックス2
+    st.markdown(f"""
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
+        <p style="font-size: 1.05rem; margin: 5px 0;">
+            💡 <b>コストを減らす</b><br>
+            → <span style="color: #2563eb; font-weight: bold;">あと {needed_cost_down:,.0f} 万円</span> 原価を下げれば安全圏<br>
+            → 例：外注費を見直す、材料の仕入れ先を検討
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # ボックス3
+    st.markdown("""
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
+        <p style="font-size: 1.05rem; margin: 5px 0;">
+            💡 <b>その他の対策</b><br>
+            → 人件費・家賃を見直せないか検討<br>
+            → 借金の返済額を相談できないか銀行に聞いてみる<br>
+            → 売掛金の回収を早められないか確認
+        </p>
     </div>
     """, unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
+
 
 # =========================
 # 改善ポイント（改善版・よりシンプル）
