@@ -1,4 +1,3 @@
-import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 import json
@@ -134,7 +133,6 @@ def get_user_state_file(username: str) -> Path:
     safe_name = re.sub(r'[\\/:*?"<>| ]', "_", username)
     return USER_DATA_DIR / f"{safe_name}_state.json"
 
-
 # =========================
 # ユーザー別 保存・読込
 # =========================
@@ -206,7 +204,6 @@ def sanitize_filename(text: str) -> str:
     text = re.sub(r'[\\/:*?"<>|]', "_", text)
     text = text.replace(" ", "_")
     return text[:50]
-
 
 # =========================
 # PDF作成
@@ -342,7 +339,6 @@ def create_pdf_report(
     c.save()
     buffer.seek(0)
     return buffer.getvalue()
-
 
 # =========================
 # 初期化
@@ -608,7 +604,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
 # =========================
 # タイトル
 # =========================
@@ -863,7 +858,6 @@ with col_btn3:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-
 # =========================
 # 値取得
 # =========================
@@ -1089,7 +1083,6 @@ with col_b:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-
 # =========================
 # 危険月表示（改善版・強調）
 # =========================
@@ -1115,99 +1108,101 @@ else:
     """, unsafe_allow_html=True)
 
 # =========================
-# 一撃アクション（完全修正版）
+# 一撃アクション（完全修正版・分割方式）
 # =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.subheader("🎯 今すぐやること")
 
 if after_tax_balance >= 0:
-    # 黒字の場合
+    # ========== 黒字の場合 ==========
+    
+    # ヘッダー部分
     st.markdown(f"""
-    <div class="action-box" style="border-left: 8px solid #15803d;">
-        <h4 style="color: #0f172a; margin-top: 0;">
+    <div class="action-box" style="border-left: 8px solid #15803d; background: #f0fdf4;">
+        <h4 style="color: #0f172a; margin-top: 0; margin-bottom: 10px;">
             😊 良いですね！毎月 <span style="color: #15803d; font-size: 1.3rem; font-weight: bold;">+{after_tax_balance:,.0f} 万円</span> 増えています
         </h4>
-        
-        <p style="font-weight: bold; font-size: 1.1rem; margin-top: 20px;">
+        <p style="font-weight: bold; font-size: 1.1rem; margin-top: 15px; margin-bottom: 15px; color: #0f172a;">
             今の良い状態を活かしましょう：
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # ボックス1
+    # ボックス1：現金をもっと貯める
     st.markdown("""
-    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
-        <p style="font-size: 1.05rem; margin: 5px 0;">
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <p style="font-size: 1.05rem; margin: 0; line-height: 1.6; color: #0f172a;">
             💰 <b>現金をもっと貯める</b><br>
-            → 今の調子で貯金を増やせば、もっと安心できます
+            <span style="color: #64748b;">→ 今の調子で貯金を増やせば、もっと安心できます</span>
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # ボックス2
+    # ボックス2：利益の高い仕事を優先
     st.markdown("""
-    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
-        <p style="font-size: 1.05rem; margin: 5px 0;">
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <p style="font-size: 1.05rem; margin: 0; line-height: 1.6; color: #0f172a;">
             📈 <b>利益の高い仕事を優先</b><br>
-            → 儲かる仕事を選んで受注しましょう
+            <span style="color: #64748b;">→ 儲かる仕事を選んで受注しましょう</span>
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # ボックス3
+    # ボックス3：会社を大きくする判断に使う
     st.markdown("""
-    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
-        <p style="font-size: 1.05rem; margin: 5px 0;">
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <p style="font-size: 1.05rem; margin: 0; line-height: 1.6; color: #0f172a;">
             🚀 <b>会社を大きくする判断に使う</b><br>
-            → 人を雇う、機械を買う、などの判断材料にできます
+            <span style="color: #64748b;">→ 人を雇う、機械を買う、などの判断材料にできます</span>
         </p>
     </div>
     """, unsafe_allow_html=True)
 
 else:
-    # 赤字の場合
+    # ========== 赤字の場合 ==========
+    
+    # ヘッダー部分
     st.markdown(f"""
-    <div class="action-box">
-        <h4 style="color: #0f172a; margin-top: 0;">
+    <div class="action-box" style="border-left: 8px solid #b91c1c; background: #fef2f2;">
+        <h4 style="color: #0f172a; margin-top: 0; margin-bottom: 10px;">
             😰 今のままだと、毎月 <span style="color: #b91c1c; font-size: 1.3rem; font-weight: bold;">{abs(after_tax_balance):,.0f} 万円</span> ずつ減ります
         </h4>
-        
-        <p style="font-weight: bold; font-size: 1.1rem; margin-top: 20px;">
+        <p style="font-weight: bold; font-size: 1.1rem; margin-top: 15px; margin-bottom: 15px; color: #0f172a;">
             すぐに次のどれかをやりましょう：
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # ボックス1
+    # ボックス1：売上を増やす
     st.markdown(f"""
-    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
-        <p style="font-size: 1.05rem; margin: 5px 0;">
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <p style="font-size: 1.05rem; margin: 0; line-height: 1.6; color: #0f172a;">
             💡 <b>売上を増やす</b><br>
             → <span style="color: #2563eb; font-weight: bold;">あと {needed_sales_up:,.0f} 万円</span> 売上を上げれば安全圏<br>
-            → 例：月1件、{needed_sales_up:,.0f}万円の案件を追加
+            <span style="color: #64748b;">→ 例：月1件、{needed_sales_up:,.0f}万円の案件を追加</span>
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # ボックス2
+    # ボックス2：コストを減らす
     st.markdown(f"""
-    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
-        <p style="font-size: 1.05rem; margin: 5px 0;">
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <p style="font-size: 1.05rem; margin: 0; line-height: 1.6; color: #0f172a;">
             💡 <b>コストを減らす</b><br>
             → <span style="color: #2563eb; font-weight: bold;">あと {needed_cost_down:,.0f} 万円</span> 原価を下げれば安全圏<br>
-            → 例：外注費を見直す、材料の仕入れ先を検討
+            <span style="color: #64748b;">→ 例：外注費を見直す、材料の仕入れ先を検討</span>
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # ボックス3
+    # ボックス3：その他の対策
     st.markdown("""
-    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb;">
-        <p style="font-size: 1.05rem; margin: 5px 0;">
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <p style="font-size: 1.05rem; margin: 0; line-height: 1.6; color: #0f172a;">
             💡 <b>その他の対策</b><br>
-            → 人件費・家賃を見直せないか検討<br>
-            → 借金の返済額を相談できないか銀行に聞いてみる<br>
-            → 売掛金の回収を早められないか確認
+            <span style="color: #64748b;">→ 人件費・家賃を見直せないか検討</span><br>
+            <span style="color: #64748b;">→ 借金の返済額を相談できないか銀行に聞いてみる</span><br>
+            <span style="color: #64748b;">→ 売掛金の回収を早められないか確認</span>
         </p>
     </div>
     """, unsafe_allow_html=True)
