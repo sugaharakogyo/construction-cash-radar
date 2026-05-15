@@ -1025,6 +1025,108 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+
+st.markdown("""
+    <style>
+    /* 既存のスタイル... */
+    
+    /* ==================== */
+    /* グラフの見切れ防止 */
+    /* ==================== */
+    
+    /* グラフコンテナの設定 */
+    .js-plotly-plot {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: visible !important;
+    }
+    
+    /* グラフ内のSVG */
+    .js-plotly-plot .plotly svg {
+        width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* グラフを含むカードの余白調整 */
+    .card:has(.js-plotly-plot) {
+        padding: 10px !important;
+        overflow: visible !important;
+    }
+    
+    /* ==================== */
+    /* スマホでのグラフ調整 */
+    /* ==================== */
+    @media (max-width: 640px) {
+        /* グラフの高さを小さく */
+        .js-plotly-plot {
+            max-height: 320px !important;
+        }
+        
+        /* グラフを含むカードの余白をさらに小さく */
+        .card:has(.js-plotly-plot) {
+            padding: 8px !important;
+        }
+        
+        /* グラフのタイトルを小さく */
+        .js-plotly-plot .gtitle {
+            font-size: 1rem !important;
+        }
+        
+        /* 軸のラベルを小さく */
+        .js-plotly-plot .xtitle,
+        .js-plotly-plot .ytitle {
+            font-size: 0.9rem !important;
+        }
+        
+        /* 目盛りの数字を小さく */
+        .js-plotly-plot .xtick text,
+        .js-plotly-plot .ytick text {
+            font-size: 0.8rem !important;
+        }
+        
+        /* 凡例を小さく */
+        .js-plotly-plot .legend {
+            font-size: 0.85rem !important;
+        }
+        
+        /* 注釈を小さく */
+        .js-plotly-plot .annotation {
+            font-size: 0.75rem !important;
+        }
+    }
+    
+    /* ==================== */
+    /* さらに小さい画面 */
+    /* ==================== */
+    @media (max-width: 480px) {
+        .js-plotly-plot {
+            max-height: 280px !important;
+        }
+        
+        .card:has(.js-plotly-plot) {
+            padding: 5px !important;
+        }
+        
+        /* X軸の目盛りを間引く */
+        .js-plotly-plot .xtick {
+            display: none;
+        }
+        
+        .js-plotly-plot .xtick:nth-child(2n) {
+            display: block;
+        }
+    }
+    
+    /* ==================== */
+    /* 横向き表示対応 */
+    /* ==================== */
+    @media (max-width: 640px) and (orientation: landscape) {
+        .js-plotly-plot {
+            max-height: 250px !important;
+        }
+    }
+    </style>
+""", unsafe_allow_html=True)
 # =========================
 # タイトル
 # =========================
