@@ -1875,7 +1875,7 @@ with col_a:
         help="売上 - 外注材料費"
     )
     
-    # 最重要指標を強調
+# 最重要指標を強調
     if after_tax_balance >= 0:
         st.metric(
             "📈 毎月いくら増える？", 
