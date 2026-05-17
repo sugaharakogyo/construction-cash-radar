@@ -1641,56 +1641,146 @@ if abs(gap) > 10:
 
 st.markdown("</div>", unsafe_allow_html=True)
 # =========================
-# CSV / PDF
+# 値取得（追加・修正版）
 # =========================
+company_name = st.session_state.get("company_name", "株式会社○○")
+cash = st.session_state.get("cash", 500)
+plan = st.session_state.get("plan", "デモ（無料）")
+
+# 🆕 通帳ベースの値
+actual_income = st.session_state.get("actual_income", 0)
+actual_expense = st.session_state.get("actual_expense", 0)
+receivables = st.session_state.get("receivables", 0)
+payables = st.session_state.get("payables", 0)
+
+# 従来の利益ベースの値
+revenue = st.session_state.get("revenue", 500)
+cost = st.session_state.get("cost", 250)
+fixed_cost = st.session_state.get("fixed_cost", 130)
+loan_pay = st.session_state.get("loan_pay", 50)
+tax_rate = st.session_state.get("tax_rate", 0.30)
+
+# 日付
+today_str = datetime.now().strftime("%Y-%m-%d")
+
+# ファイル名用
+safe_company_name = sanitize_filename(company_name)
+# =========================
+# CSV / PDF（修正版）
+# =========================
+
+# 従来の利益ベース計算
+gross_profit = revenue - cost
+operating_balance = gross_profit - fixed_cost - loan_pay
+estimated_tax_profit = max(0, operating_balance * tax_rate)
+after_tax_balance_profit = operating_balance - estimated_tax_profit
+
+# 通帳ベース計算
+cash_flow_before_tax = actual_income - actual_expense
+estimated_tax = estimated_tax_profit  # 利益ベースで計算した税金を使用
+cash_flow = cash_flow_before_tax - estimated_tax
+next_month_cash = cash + cash_flow
+real_cash = cash + receivables - payables
+
+# 資金余命
+if cash_flow >= 0:
+    runway = 12
+else:
+    runway = cash / abs(cash_flow) if cash_flow != 0 else 12
+
+# 判定
+if runway >= 6:
+    status = "安全"
+    color = "#15803d"
+elif runway >= 3:
+    status = "注意"
+    color = "#d97706"
+else:
+    status = "危険"
+    color = "#b91c1c"
+
+# 改善必要額
+if cash_flow < 0:
+    shortage_for_safety = max(0, abs(cash_flow) * 6 - cash)
+else:
+    shortage_for_safety = 0
+
+needed_improvement = max(0, abs(cash_flow))
+needed_sales_up = needed_improvement
+needed_cost_down = needed_improvement
+
+# 危険月の計算
+months = list(range(13))
+cash_after_tax = []
+current_after_tax = cash
+
+for m in months:
+    cash_after_tax.append(current_after_tax)
+    current_after_tax += cash_flow
+
+danger_month = None
+for i, v in enumerate(cash_after_tax):
+    if v < 0:
+        danger_month = i
+        break
+
+# CSVサマリーデータ（修正版）
 summary_rows = [
     {"出力日": today_str, "会社名": company_name, "分類": "基本情報", "項目名": "利用プラン", "数値・内容": plan, "単位": ""},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "今ある現金", "数値・内容": cash, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "月の売上", "数値・内容": revenue, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "外注・材料費", "数値・内容": cost, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "人件費・家賃など", "数値・内容": fixed_cost, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "借金の返済", "数値・内容": loan_pay, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "入力値", "項目名": "税金の割合", "数値・内容": round(tax_rate * 100, 1), "単位": "%"},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "手元に残る利益", "数値・内容": gross_profit, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "営業キャッシュ", "数値・内容": operating_balance, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "税金の支払い", "数値・内容": estimated_tax, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "毎月の増減", "数値・内容": after_tax_balance, "単位": "万円"},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "あと何ヶ月もつ？", "数値・内容": round(min(runway, 12), 1), "単位": "ヶ月"},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "資金判定", "数値・内容": status, "単位": ""},
-    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "あといくら必要？", "数値・内容": shortage_for_safety, "単位": "万円"},
+    
+    # 通帳ベース
+    {"出力日": today_str, "会社名": company_name, "分類": "通帳ベース入力", "項目名": "今の通帳残高", "数値・内容": cash, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "通帳ベース入力", "項目名": "今月入ってくるお金", "数値・内容": actual_income, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "通帳ベース入力", "項目名": "今月出ていくお金", "数値・内容": actual_expense, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "通帳ベース入力", "項目名": "まだ入ってない売上", "数値・内容": receivables, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "通帳ベース入力", "項目名": "まだ払ってない支払い", "数値・内容": payables, "単位": "万円"},
+    
+    # 利益ベース（参考）
+    {"出力日": today_str, "会社名": company_name, "分類": "利益ベース入力", "項目名": "月の売上", "数値・内容": revenue, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "利益ベース入力", "項目名": "外注・材料費", "数値・内容": cost, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "利益ベース入力", "項目名": "人件費・家賃など", "数値・内容": fixed_cost, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "利益ベース入力", "項目名": "借金の返済", "数値・内容": loan_pay, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "利益ベース入力", "項目名": "税金の割合", "数値・内容": round(tax_rate * 100, 1), "単位": "%"},
+    
+    # 計算結果（通帳ベース）
+    {"出力日": today_str, "会社名": company_name, "分類": "通帳ベース結果", "項目名": "今月の通帳増減", "数値・内容": cash_flow, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "通帳ベース結果", "項目名": "来月末の通帳残高", "数値・内容": next_month_cash, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "通帳ベース結果", "項目名": "実質的な現金力", "数値・内容": real_cash, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "通帳ベース結果", "項目名": "あと何ヶ月もつ？", "数値・内容": round(min(runway, 12), 1), "単位": "ヶ月"},
+    {"出力日": today_str, "会社名": company_name, "分類": "通帳ベース結果", "項目名": "資金判定", "数値・内容": status, "単位": ""},
+    
+    # 計算結果（利益ベース・参考）
+    {"出力日": today_str, "会社名": company_name, "分類": "利益ベース結果", "項目名": "粗利益", "数値・内容": gross_profit, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "利益ベース結果", "項目名": "営業キャッシュ", "数値・内容": operating_balance, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "利益ベース結果", "項目名": "税引後月次増減", "数値・内容": after_tax_balance_profit, "単位": "万円"},
+    
+    # 税金・その他
+    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "概算納税額", "数値・内容": estimated_tax, "単位": "万円"},
+    {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "安全ライン不足額", "数値・内容": shortage_for_safety, "単位": "万円"},
     {"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "改善必要額", "数値・内容": needed_improvement, "単位": "万円"},
 ]
 
 if danger_month is not None:
-    summary_rows.append({"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "お金が足りなくなる時期", "数値・内容": danger_month, "単位": "ヶ月後"})
+    summary_rows.append({
+        "出力日": today_str, 
+        "会社名": company_name, 
+        "分類": "計算結果", 
+        "項目名": "お金が足りなくなる時期", 
+        "数値・内容": danger_month, 
+        "単位": "ヶ月後"
+    })
 else:
-    summary_rows.append({"出力日": today_str, "会社名": company_name, "分類": "計算結果", "項目名": "お金が足りなくなる時期", "数値・内容": "12ヶ月以内なし", "単位": ""})
+    summary_rows.append({
+        "出力日": today_str, 
+        "会社名": company_name, 
+        "分類": "計算結果", 
+        "項目名": "お金が足りなくなる時期", 
+        "数値・内容": "12ヶ月以内なし", 
+        "単位": ""
+    })
 
 df_summary = pd.DataFrame(summary_rows)
 summary_csv = df_summary.to_csv(index=False).encode("utf-8-sig")
-forecast_csv = df_forecast.to_csv(index=False).encode("utf-8-sig")
-
-pdf_bytes = create_pdf_report(
-    company_name=company_name,
-    today_str=today_str,
-    status=status,
-    color=color,
-    runway=runway,
-    cash=cash,
-    revenue=revenue,
-    cost=cost,
-    fixed_cost=fixed_cost,
-    loan_pay=loan_pay,
-    tax_rate=tax_rate,
-    gross_profit=gross_profit,
-    operating_balance=operating_balance,
-    estimated_tax=estimated_tax,
-    after_tax_balance=after_tax_balance,
-    shortage_for_safety=shortage_for_safety,
-    danger_month=danger_month,
-    needed_sales_up=needed_sales_up,
-    needed_cost_down=needed_cost_down
-)
 
 # =========================
 # 結果カード（改善版）
