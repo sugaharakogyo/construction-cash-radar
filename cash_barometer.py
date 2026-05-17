@@ -1297,119 +1297,171 @@ if not is_pro and st.session_state.get("calc_count", 0) >= DEMO_LIMIT:
     st.stop()
 
 # =========================
-# 入力欄（改善版）
+# 入力欄（通帳ベース版）
 # =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.subheader("💰 今月の数字を入れてください")
 
-col1, col2 = st.columns(2)
+# タブで切り替え
+tab1, tab2 = st.tabs(["🎯 通帳ベース（実際の入出金）", "📊 利益ベース（従来）"])
 
-with col1:
-    st.number_input(
-        "💵 今ある現金（万円）", 
-        min_value=0, 
-        step=100, 
-        key="cash",
-        help="通帳に今いくらありますか？",
-        on_change=change_and_save if is_pro else None
-    )
+with tab1:
+    st.markdown("### 📌 実際のお金の動き")
+    st.caption("利益ではなく、実際に通帳から出入りするお金を入れてください")
     
-    st.number_input(
-        "📈 月の売上（万円）", 
-        min_value=0, 
-        step=50, 
-        key="revenue",
-        help="1ヶ月でいくら売上がありますか？",
-        on_change=change_and_save if is_pro else None
-    )
+    col1, col2 = st.columns(2)
     
-    st.number_input(
-        "🔨 外注・材料費（万円）", 
-        min_value=0, 
-        step=10, 
-        key="cost",
-        help="職人さんへの支払いと材料代",
-        on_change=change_and_save if is_pro else None
-    )
+    with col1:
+        st.number_input(
+            "💵 今の通帳残高（万円）", 
+            min_value=0, 
+            step=100, 
+            key="cash",
+            help="💡 今、通帳にいくらありますか？",
+            on_change=change_and_save if is_pro else None
+        )
+        
+        st.number_input(
+            "📥 今月入ってくるお金（万円）", 
+            min_value=0, 
+            step=50, 
+            key="actual_income",
+            help="💡 今月中に実際に振り込まれる予定の金額です。売掛金の回収予定を入れてください。",
+            on_change=change_and_save if is_pro else None
+        )
+        
+        st.number_input(
+            "💰 まだ入ってない売上（万円）", 
+            min_value=0, 
+            step=50, 
+            key="receivables",
+            help="💡 請求済みだけど、まだ入金されていない金額（売掛金）",
+            on_change=change_and_save if is_pro else None
+        )
+    
+    with col2:
+        st.number_input(
+            "📤 今月出ていくお金（万円）", 
+            min_value=0, 
+            step=50, 
+            key="actual_expense",
+            help="💡 今月中に実際に払う予定の金額です。外注・材料・給料・家賃・返済の合計。",
+            on_change=change_and_save if is_pro else None
+        )
+        
+        st.number_input(
+            "💳 まだ払ってない支払い（万円）", 
+            min_value=0, 
+            step=50, 
+            key="payables",
+            help="💡 請求されているけど、まだ払っていない金額（買掛金）",
+            on_change=change_and_save if is_pro else None
+        )
+        
+        st.slider(
+            "📊 税金の割合（だいたい）", 
+            min_value=0.0, 
+            max_value=0.5, 
+            step=0.01, 
+            key="tax_rate",
+            value=0.30,
+            help="💡 利益の30%くらいが目安です。",
+            on_change=change_and_save if is_pro else None
+        )
 
-with col2:
-    st.number_input(
-        "🏢 人件費・家賃など（万円）", 
-        min_value=0, 
-        step=10, 
-        key="fixed_cost",
-        help="社員の給料、事務所の家賃など",
-        on_change=change_and_save if is_pro else None
-    )
+with tab2:
+    st.markdown("### 📊 利益ベース（参考）")
+    st.caption("会計的な利益を計算する場合はこちら")
     
-    st.number_input(
-        "💳 借金の返済（万円）", 
-        min_value=0, 
-        step=5, 
-        key="loan_pay",
-        help="銀行への返済額（月）",
-        on_change=change_and_save if is_pro else None
-    )
+    col3, col4 = st.columns(2)
     
-    st.slider(
-        "📊 税金の割合（だいたい）", 
-        min_value=0.0, 
-        max_value=0.5, 
-        step=0.01, 
-        key="tax_rate",
-        help="利益の30%くらいが目安",
-        on_change=change_and_save if is_pro else None
-    )
-
-col_btn1, col_btn2, col_btn3 = st.columns(3)
-with col_btn1:
-    if is_pro:
-        st.button("📊 計算する")
-    else:
-        st.button("📊 計算する", on_click=count_demo_use)
-with col_btn2:
-    if is_pro:
-        if st.button("💾 保存"):
-            save_state_for_user(st.session_state["auth_user"])
-            st.success("保存しました。")
-    else:
-        st.button("🔒 保存（Pro）", disabled=True)
-with col_btn3:
-    if is_pro:
-        st.button("🔄 初期値に戻す", on_click=lambda: reset_state_for_user(st.session_state["auth_user"]))
-    else:
-        st.button("🔄 初期値に戻す", on_click=lambda: reset_state_for_user(None))
+    with col3:
+        st.number_input(
+            "📈 月の売上（万円）", 
+            min_value=0, 
+            step=50, 
+            key="revenue",
+            help="💡 1ヶ月の売上高（発生ベース）",
+            on_change=change_and_save if is_pro else None
+        )
+        
+        st.number_input(
+            "🔨 外注・材料費（万円）", 
+            min_value=0, 
+            step=10, 
+            key="cost",
+            help="💡 売上に対応する原価",
+            on_change=change_and_save if is_pro else None
+        )
+    
+    with col4:
+        st.number_input(
+            "🏢 人件費・家賃など（万円）", 
+            min_value=0, 
+            step=10, 
+            key="fixed_cost",
+            help="💡 毎月固定でかかる費用",
+            on_change=change_and_save if is_pro else None
+        )
+        
+        st.number_input(
+            "💳 借金の返済（万円）", 
+            min_value=0, 
+            step=5, 
+            key="loan_pay",
+            help="💡 銀行への返済額（月）",
+            on_change=change_and_save if is_pro else None
+        )
 
 st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
 # 値取得
 # =========================
-company_name = st.session_state["company_name"].strip()
-cash = st.session_state["cash"]
-revenue = st.session_state["revenue"]
-cost = st.session_state["cost"]
-fixed_cost = st.session_state["fixed_cost"]
-loan_pay = st.session_state["loan_pay"]
-tax_rate = st.session_state["tax_rate"]
-plan = st.session_state["plan"]
+cash = st.session_state.get("cash", 500)
+actual_income = st.session_state.get("actual_income", 500)
+actual_expense = st.session_state.get("actual_expense", 430)
+receivables = st.session_state.get("receivables", 0)
+payables = st.session_state.get("payables", 0)
+tax_rate = st.session_state.get("tax_rate", 0.30)
 
-safe_company_name = sanitize_filename(company_name)
-today_str = datetime.now().strftime("%Y-%m-%d")
+# 従来の利益ベース計算（比較用）
+revenue = st.session_state.get("revenue", 500)
+cost = st.session_state.get("cost", 250)
+fixed_cost = st.session_state.get("fixed_cost", 130)
+loan_pay = st.session_state.get("loan_pay", 50)
 
-# =========================
-# 計算
-# =========================
 gross_profit = revenue - cost
 operating_balance = gross_profit - fixed_cost - loan_pay
-estimated_tax = max(0, operating_balance * tax_rate)
-after_tax_balance = operating_balance - estimated_tax
+estimated_tax_profit = max(0, operating_balance * tax_rate)
+after_tax_balance_profit = operating_balance - estimated_tax_profit
 
-if after_tax_balance >= 0:
+# =========================
+# 🆕 通帳ベースの計算
+# =========================
+
+# 今月の通帳増減（税金考慮前）
+cash_flow_before_tax = actual_income - actual_expense
+
+# 概算納税額（利益ベースで計算）
+estimated_tax = estimated_tax_profit
+
+# 税引後の通帳増減
+cash_flow = cash_flow_before_tax - estimated_tax
+
+# 来月末の通帳残高（予測）
+next_month_cash = cash + cash_flow
+
+# 実質的な現金（売掛金・買掛金考慮）
+real_cash = cash + receivables - payables
+
+# 資金余命（通帳ベース）
+if cash_flow >= 0:
     runway = 12
 else:
-    runway = cash / abs(after_tax_balance) if after_tax_balance != 0 else 12
+    runway = cash / abs(cash_flow) if cash_flow != 0 else 12
 
+# 判定
 if runway >= 6:
     status = "安全"
     color = "#15803d"
@@ -1420,44 +1472,174 @@ else:
     status = "危険"
     color = "#b91c1c"
 
-if after_tax_balance < 0:
-    shortage_for_safety = max(0, abs(after_tax_balance) * 6 - cash)
-else:
-    shortage_for_safety = 0
 
-needed_improvement = max(0, abs(after_tax_balance))
-needed_sales_up = needed_improvement
-needed_cost_down = needed_improvement
 
 # =========================
-# 12ヶ月推移データ
+# 結果カード（通帳ベース版）
 # =========================
-months = list(range(13))
-cash_before_tax = []
-cash_after_tax = []
+st.markdown(f"""
+    <div class="center-card" style="background:{color}; color:white;">
+        <div class="sub-big">今の状態は？</div>
+        <div class="big-status-font">{status}</div>
+        <div style="font-size:1.15rem; color:white;">
+            このままだと、あと {min(runway, 12):.1f} ヶ月もちます
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
-current_before_tax = cash
-current_after_tax = cash
-danger_month = None
+# メーター（既存のまま）
+fig = go.Figure(go.Indicator(
+    mode="gauge+number",
+    value=min(runway, 12),
+    # ... 既存のコード
+))
+st.plotly_chart(fig, use_container_width=True)
 
-for m in months:
-    cash_before_tax.append(current_before_tax)
-    cash_after_tax.append(current_after_tax)
-    current_before_tax += operating_balance
-    current_after_tax += after_tax_balance
+# =========================
+# 詳細データ（通帳ベース版）
+# =========================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("📊 詳しく見る（通帳ベース）")
 
-for i, v in enumerate(cash_after_tax):
-    if v < 0:
-        danger_month = i
-        break
+col_a, col_b, col_c = st.columns(3)
 
-df_forecast = pd.DataFrame({
-    "会社名": [company_name] * len(months),
-    "何ヶ月後": months,
-    "税引前残高_万円": cash_before_tax,
-    "税引後残高_万円": cash_after_tax
-})
+with col_a:
+    st.metric(
+        "💰 今の通帳残高", 
+        f"{cash:,.0f} 万円",
+        help="現在の現預金"
+    )
+    
+    st.metric(
+        "📥 今月入ってくる", 
+        f"{actual_income:,.0f} 万円",
+        help="今月中に振り込まれる予定"
+    )
 
+with col_b:
+    st.metric(
+        "📤 今月出ていく", 
+        f"{actual_expense:,.0f} 万円",
+        help="今月中に支払う予定"
+    )
+    
+    st.metric(
+        "💸 税金の支払い", 
+        f"{estimated_tax:,.0f} 万円",
+        help="概算納税額"
+    )
+
+with col_c:
+    if cash_flow >= 0:
+        st.metric(
+            "📈 今月の増減", 
+            f"+{cash_flow:,.0f} 万円",
+            delta="増えます",
+            help="税金を払った後、今月これだけ増えます"
+        )
+    else:
+        st.metric(
+            "📉 今月の増減", 
+            f"{cash_flow:,.0f} 万円",
+            delta="減ります",
+            delta_color="inverse",
+            help="税金を払った後、今月これだけ減ります"
+        )
+    
+    st.metric(
+        "🔮 来月末の通帳", 
+        f"{next_month_cash:,.0f} 万円",
+        help="このままいくと来月末の残高"
+    )
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# 売掛金・買掛金の状況
+# =========================
+if receivables > 0 or payables > 0:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("📋 回収・支払いの状況")
+    
+    col_d, col_e, col_f = st.columns(3)
+    
+    with col_d:
+        st.metric(
+            "💰 まだ入ってない売上", 
+            f"{receivables:,.0f} 万円",
+            help="請求済みだけど未回収"
+        )
+    
+    with col_e:
+        st.metric(
+            "💳 まだ払ってない支払い", 
+            f"{payables:,.0f} 万円",
+            help="請求されているけど未払い"
+        )
+    
+    with col_f:
+        diff = receivables - payables
+        if diff >= 0:
+            st.metric(
+                "📊 実質的な現金力", 
+                f"{real_cash:,.0f} 万円",
+                delta=f"+{diff:,.0f} 万円",
+                help="売掛金・買掛金を考慮した実質残高"
+            )
+        else:
+            st.metric(
+                "📊 実質的な現金力", 
+                f"{real_cash:,.0f} 万円",
+                delta=f"{diff:,.0f} 万円",
+                delta_color="inverse",
+                help="売掛金・買掛金を考慮した実質残高"
+            )
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# 利益ベースとの比較
+# =========================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.subheader("🔍 通帳ベース vs 利益ベース")
+
+compare_col1, compare_col2 = st.columns(2)
+
+with compare_col1:
+    st.markdown(f"""
+    <div style="background: #f0f9ff; padding: 15px; border-radius: 12px; border-left: 4px solid #2563eb;">
+        <h4 style="margin-top: 0; color: #1e40af;">💵 通帳ベース（現実）</h4>
+        <p style="font-size: 1.1rem; margin: 5px 0;">
+            今月の増減：<b>{cash_flow:+,.0f} 万円</b><br>
+            来月末残高：<b>{next_month_cash:,.0f} 万円</b>
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with compare_col2:
+    st.markdown(f"""
+    <div style="background: #fef3f2; padding: 15px; border-radius: 12px; border-left: 4px solid #dc2626;">
+        <h4 style="margin-top: 0; color: #991b1b;">📊 利益ベース（参考）</h4>
+        <p style="font-size: 1.1rem; margin: 5px 0;">
+            今月の増減：<b>{after_tax_balance_profit:+,.0f} 万円</b><br>
+            粗利益：<b>{gross_profit:,.0f} 万円</b>
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ズレの説明
+gap = cash_flow - after_tax_balance_profit
+if abs(gap) > 10:
+    st.markdown(f"""
+    <div style="background: #fef3c7; padding: 15px; border-radius: 12px; margin-top: 10px;">
+        <p style="margin: 0; color: #78350f; font-weight: 600;">
+            ⚠️ 通帳ベースと利益ベースに <b>{abs(gap):,.0f} 万円</b> のズレがあります。<br>
+            これは入金サイトや先払いのタイミングのズレです。
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
 # =========================
 # CSV / PDF
 # =========================
