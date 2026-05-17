@@ -943,6 +943,102 @@ st.markdown("""
     .stNumberInput [data-baseweb="input"] > div {
         gap: 0.3rem !important;
     }
+    st.markdown("""
+    <style>
+    /* 既存のCSS... */
+    
+    /* ==================== */
+    /* ヘルプアイコン（？）を大きく見やすく */
+    /* ==================== */
+    
+    /* ヘルプアイコン全体 */
+    .stTooltipIcon {
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+        margin-left: 0.5rem !important;
+    }
+    
+    /* アイコンのSVG */
+    .stTooltipIcon svg {
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+        color: #2563eb !important;
+        stroke-width: 2.5 !important;
+    }
+    
+    /* ホバー時の効果 */
+    .stTooltipIcon:hover svg {
+        color: #1d4ed8 !important;
+        transform: scale(1.15);
+        transition: all 0.2s ease;
+    }
+    
+    /* ツールチップの背景 */
+    [data-baseweb="tooltip"] {
+        background: #1e293b !important;
+        color: white !important;
+        font-size: 0.95rem !important;
+        padding: 12px 16px !important;
+        border-radius: 10px !important;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
+        max-width: 300px !important;
+    }
+    
+    /* ==================== */
+    /* スマホでさらに大きく */
+    /* ==================== */
+    @media (max-width: 640px) {
+        /* ヘルプアイコンをさらに大きく */
+        .stTooltipIcon {
+            width: 2rem !important;
+            height: 2rem !important;
+        }
+        
+        .stTooltipIcon svg {
+            width: 2rem !important;
+            height: 2rem !important;
+            stroke-width: 3 !important;
+        }
+        
+        /* ツールチップのフォントサイズ */
+        [data-baseweb="tooltip"] {
+            font-size: 1rem !important;
+            padding: 14px 18px !important;
+        }
+    }
+    
+    /* ==================== */
+    /* 入力欄のラベルとアイコンの配置調整 */
+    /* ==================== */
+    
+    /* ラベルとアイコンを横並びに */
+    .stNumberInput label,
+    .stTextInput label,
+    .stSlider label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+    }
+    
+    /* ラベルのフォントサイズを調整 */
+    .stNumberInput label span,
+    .stTextInput label span,
+    .stSlider label span {
+        font-size: 1.05rem !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+    }
+    
+    @media (max-width: 640px) {
+        .stNumberInput label span,
+        .stTextInput label span,
+        .stSlider label span {
+            font-size: 1rem !important;
+        }
+    }
+    </style>
+""", unsafe_allow_html=True)
+
     
     /* ==================== */
     /* スマホでさらに大きく */
