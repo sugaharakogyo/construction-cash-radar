@@ -1993,21 +1993,20 @@ else:
     </div>
     """, unsafe_allow_html=True)
 
-
 # =========================
-# 一撃アクション（完全修正版・分割方式）
+# 一撃アクション（修正版・cash_flowを使用）
 # =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.subheader("🎯 今すぐやること")
 
-if after_tax_balance >= 0:
+if cash_flow >= 0:  # ← 修正（after_tax_balance → cash_flow）
     # ========== 黒字の場合 ==========
     
     # ヘッダー部分
     st.markdown(f"""
     <div class="action-box" style="border-left: 8px solid #15803d; background: #f0fdf4;">
         <h4 style="color: #0f172a; margin-top: 0; margin-bottom: 10px;">
-            😊 良いですね！毎月 <span style="color: #15803d; font-size: 1.3rem; font-weight: bold;">+{after_tax_balance:,.0f} 万円</span> 増えています
+            😊 良いですね！毎月 <span style="color: #15803d; font-size: 1.3rem; font-weight: bold;">+{cash_flow:,.0f} 万円</span> 増えています
         </h4>
         <p style="font-weight: bold; font-size: 1.1rem; margin-top: 15px; margin-bottom: 15px; color: #0f172a;">
             今の良い状態を活かしましょう：
@@ -2052,7 +2051,7 @@ else:
     st.markdown(f"""
     <div class="action-box" style="border-left: 8px solid #b91c1c; background: #fef2f2;">
         <h4 style="color: #0f172a; margin-top: 0; margin-bottom: 10px;">
-            😰 今のままだと、毎月 <span style="color: #b91c1c; font-size: 1.3rem; font-weight: bold;">{abs(after_tax_balance):,.0f} 万円</span> ずつ減ります
+            😰 今のままだと、毎月 <span style="color: #b91c1c; font-size: 1.3rem; font-weight: bold;">{abs(cash_flow):,.0f} 万円</span> ずつ減ります
         </h4>
         <p style="font-weight: bold; font-size: 1.1rem; margin-top: 15px; margin-bottom: 15px; color: #0f172a;">
             すぐに次のどれかをやりましょう：
@@ -2095,6 +2094,8 @@ else:
     """, unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
+
+
 
 
 
