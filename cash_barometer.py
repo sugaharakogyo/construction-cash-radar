@@ -1859,60 +1859,107 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
-
 # =========================
-# 詳細データ（改善版）
+# 詳細データ（通帳ベース版）
 # =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.subheader("📊 詳しく見る")
+st.subheader("📊 詳しく見る（通帳ベース）")
 
-col_a, col_b = st.columns(2)
+col_a, col_b, col_c = st.columns(3)
 
 with col_a:
     st.metric(
-        "💰 手元に残る利益", 
-        f"{gross_profit:,.0f} 万円",
-        help="売上 - 外注材料費"
+        "💰 今の通帳残高", 
+        f"{cash:,.0f} 万円",
+        help="現在の現預金"
     )
     
-# 最重要指標を強調
-    if after_tax_balance >= 0:
-        st.metric(
-            "📈 毎月いくら増える？", 
-            f"+{after_tax_balance:,.0f} 万円",
-            delta="増えています",
-            help="税金を払った後、毎月これだけ増えます"
-        )
-    else:
-        st.metric(
-            "📉 毎月いくら減る？", 
-            f"{after_tax_balance:,.0f} 万円",
-            delta="減っています",
-            delta_color="inverse",
-            help="税金を払った後、毎月これだけ減ります"
-        )
+    st.metric(
+        "📥 今月入ってくる", 
+        f"{actual_income:,.0f} 万円",
+        help="今月中に振り込まれる予定"
+    )
 
 with col_b:
     st.metric(
-        "💸 税金の支払い", 
-        f"{estimated_tax:,.0f} 万円",
-        help="だいたいこれくらい税金がかかります"
+        "📤 今月出ていく", 
+        f"{actual_expense:,.0f} 万円",
+        help="今月中に支払う予定"
     )
     
-    if shortage_for_safety > 0:
+    st.metric(
+        "💸 税金の支払い", 
+        f"{estimated_tax:,.0f} 万円",
+        help="概算納税額"
+    )
+
+with col_c:
+    if cash_flow >= 0:
         st.metric(
-            "⚠️ あといくら必要？", 
-            f"{shortage_for_safety:,.0f} 万円",
-            help="6ヶ月安心して経営するために必要な金額"
+            "📈 今月の増減", 
+            f"+{cash_flow:,.0f} 万円",
+            delta="増えます",
+            help="税金を払った後、今月これだけ増えます"
         )
     else:
         st.metric(
-            "✅ 安全ライン達成", 
-            "OK！",
-            help="6ヶ月分の余裕があります"
+            "📉 今月の増減", 
+            f"{cash_flow:,.0f} 万円",
+            delta="減ります",
+            delta_color="inverse",
+            help="税金を払った後、今月これだけ減ります"
         )
+    
+    st.metric(
+        "🔮 来月末の通帳", 
+        f"{next_month_cash:,.0f} 万円",
+        help="このままいくと来月末の残高"
+    )
 
 st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# 売掛金・買掛金の状況
+# =========================
+if receivables > 0 or payables > 0:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("📋 回収・支払いの状況")
+    
+    col_d, col_e, col_f = st.columns(3)
+    
+    with col_d:
+        st.metric(
+            "💰 まだ入ってない売上", 
+            f"{receivables:,.0f} 万円",
+            help="請求済みだけど未回収"
+        )
+    
+    with col_e:
+        st.metric(
+            "💳 まだ払ってない支払い", 
+            f"{payables:,.0f} 万円",
+            help="請求されているけど未払い"
+        )
+    
+    with col_f:
+        diff = receivables - payables
+        if diff >= 0:
+            st.metric(
+                "📊 実質的な現金力", 
+                f"{real_cash:,.0f} 万円",
+                delta=f"+{diff:,.0f} 万円",
+                help="売掛金・買掛金を考慮した実質残高"
+            )
+        else:
+            st.metric(
+                "📊 実質的な現金力", 
+                f"{real_cash:,.0f} 万円",
+                delta=f"{diff:,.0f} 万円",
+                delta_color="inverse",
+                help="売掛金・買掛金を考慮した実質残高"
+            )
+    
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================
 # 危険月表示（修正版）
