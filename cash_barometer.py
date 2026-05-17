@@ -944,8 +944,7 @@ st.markdown("""
         gap: 0.3rem !important;
     }
     st.markdown("""
-    <style>
-    /* 既存のCSS... */
+   
     
     /* ==================== */
     /* ヘルプアイコン（？）を大きく見やすく */
